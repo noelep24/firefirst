@@ -66,14 +66,44 @@ python manage.py import_data <department-slug> people people.xlsx --commit
 
 ## Mobile apps
 
-Build them with EAS and point them at your server:
+The apps are built in the cloud with EAS, from `mobile/` (project
+`@noelep24/firefirst` on expo.dev). `mobile/eas.json` has two profiles:
+
+| Profile | What you get | Needs |
+| --- | --- | --- |
+| `preview` | An app your crews install directly: an APK on Android, an ad hoc build on iPhone | Apple Developer account for iPhone; each iPhone registered first (`npx eas-cli@latest device:create`) |
+| `production` | Store builds for TestFlight and Google Play, build number raised automatically | Apple Developer account ($99/yr), Google Play Console account ($25 once) |
+
+**1. Tell the apps where the server is.** On expo.dev → FireFirst → Environment
+variables, add `EXPO_PUBLIC_API_URL` (for example
+`https://app.firefirst.example`) to the *preview* and *production*
+environments, with visibility "Plain text". It is baked into the app at build
+time. Without it the app starts pointed at `localhost` and members have to
+type the server address on the sign-in screen (they can always change it
+there).
+
+**2. Build.**
 
 ```bash
 cd mobile
-EXPO_PUBLIC_API_URL=https://app.firefirst.example npx eas-cli@latest build --platform all
+npx eas-cli@latest login
+npx eas-cli@latest build --profile preview --platform android   # install link + QR code when done
+npx eas-cli@latest build --profile production --platform all
 ```
 
-Members can also change the server address on the sign-in screen.
+The first iOS build asks for your Apple ID and creates the certificates and
+provisioning profiles for you. The first Android build creates an upload key,
+which EAS stores.
+
+**3. Ship to testers.**
+
+```bash
+npx eas-cli@latest submit --platform ios       # to TestFlight
+npx eas-cli@latest submit --platform android   # to a Google Play track
+```
+
+Google Play needs the very first upload done by hand in the Play Console, and
+a service account key for `submit` after that (EAS walks you through it).
 
 ## Before you sell it
 

@@ -120,4 +120,4 @@ loads.
 - Photos on rig checks and work orders
 - Date picker (leave dates are typed as YYYY-MM-DD for now)
 - App icons and splash artwork (Expo placeholders for now)
-- EAS build profiles and store submission
+- First store release (build profiles are ready; see [DEPLOY.md](../DEPLOY.md#mobile-apps))

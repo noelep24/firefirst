@@ -2,6 +2,7 @@
   "expo": {
     "name": "FireFirst",
     "slug": "firefirst",
+    "owner": "noelep24",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +10,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "app.firefirst.mobile"
+      "bundleIdentifier": "app.firefirst.mobile",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -53,6 +57,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6b61d4eb-5c49-4dfb-8e43-422f0c04625f"
+      }
     }
   }
 }
