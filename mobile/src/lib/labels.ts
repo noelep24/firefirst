@@ -46,3 +46,23 @@ export const leaveTypes: { value: Schemas['LeaveRequestRequest']['leave_type']; 
 ];
 
 export const leaveTypeLabel = (value: string) => leaveTypes.find((t) => t.value === value)?.label ?? value;
+
+export const positionLabels: Record<string, string> = {
+  chief: 'Shift chief',
+  captain: 'Captain',
+  lieutenant: 'Lieutenant',
+  engineer: 'Engineer',
+  firefighter: 'Firefighter',
+  paramedic: 'Paramedic',
+  emt: 'EMT',
+};
+
+export const positionLabel = (value: string | null | undefined) => (value ? (positionLabels[value] ?? value) : '');
+
+export const dutyStatus: Record<string, { label: string; tone: Tone }> = {
+  on_duty: { label: 'On duty', tone: 'success' },
+  covering: { label: 'On duty · trade', tone: 'success' },
+  on_leave: { label: 'On leave', tone: 'neutral' },
+  traded_off: { label: 'Traded off', tone: 'neutral' },
+  off_duty: { label: 'Off duty', tone: 'neutral' },
+};

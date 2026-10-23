@@ -4,7 +4,9 @@ import datetime
 
 from django.db import models
 
+from apps.apparatus.models import Apparatus
 from apps.certifications.models import Certification
+from apps.core.models import Station
 
 from .models import Assignment, LeaveRequest, RotationPattern, ShiftTrade, StaffingRule
 
@@ -27,7 +29,7 @@ def build_roster(department, date, assume_on_leave=frozenset()):
     assignments = {
         a.user_id: a
         for a in Assignment.objects.filter(department=department, user__is_active=True).select_related(
-            "user", "platoon", "station"
+            "user", "platoon", "station", "apparatus"
         )
     }
     scheduled = {uid for uid, a in assignments.items() if a.platoon.code == code}
@@ -69,6 +71,82 @@ def build_roster(department, date, assume_on_leave=frozenset()):
         "on_leave": [_person(assignments[uid].user, assignments[uid]) for uid in sorted(scheduled & on_leave)],
         "traded_off": traded_off,
         "shortfalls": shortfalls(department, date, working),
+    }
+
+
+def station_board(user, date, station=None):
+    """The Today screen for ``user``: their own assignment for the day, plus the crew and rigs at
+    ``station`` (default: where they work today, else their assigned or home station)."""
+    department = user.department
+    roster = build_roster(department, date)
+    assignment = Assignment.objects.filter(user=user).select_related("platoon", "station", "apparatus").first()
+    working = next((p for p in roster["working"] if p["user"] == user.id), None)
+    stations = list(Station.objects.filter(department=department))
+
+    if station is None:
+        preferred = (working and working["station"]) or (assignment and assignment.station_id) or user.home_station_id
+        station = next((s for s in stations if s.id == preferred), stations[0] if stations else None)
+
+    rigs = list(Apparatus.objects.filter(department=department, station=station)) if station else []
+    rig_ids = {rig.id for rig in rigs}
+    here = station.id if station else None
+
+    return {
+        "date": date,
+        "platoon": roster["platoon"],
+        "me": _board_member(user, assignment, working, roster),
+        "stations": [_board_station(s) for s in stations],
+        "station": _board_station(station) if station else None,
+        "apparatus": [
+            {
+                "id": rig.id,
+                "unit_number": rig.unit_number,
+                "apparatus_type": rig.apparatus_type,
+                "status": rig.status,
+                "crew": [p for p in roster["working"] if p["apparatus"] == rig.id],
+            }
+            for rig in rigs
+        ],
+        "unassigned": [p for p in roster["working"] if p["station"] == here and p["apparatus"] not in rig_ids],
+        "on_leave": [p for p in roster["on_leave"] if p["station"] == here],
+        "traded_off": [p for p in roster["traded_off"] if p["station"] == here],
+        "shortfalls": [s for s in roster["shortfalls"] if s["station"] == here],
+    }
+
+
+def _board_station(station):
+    return {"id": station.id, "number": station.number, "name": station.name}
+
+
+def _board_member(user, assignment, working, roster):
+    # Covering a trade puts the member in the requester's seat for the day.
+    seat = working or (_person(user, assignment) if assignment else None)
+    if working and working.get("covering_for"):
+        status = "covering"
+        covered = Assignment.objects.select_related("user").get(user_id=working["covering_for"]).user
+        note = f"Covering for {covered}"
+    elif working:
+        status, note = "on_duty", ""
+    elif any(p["user"] == user.id for p in roster["on_leave"]):
+        status, note = "on_leave", ""
+    elif any(p["user"] == user.id for p in roster["traded_off"]):
+        status, note = "traded_off", ""
+    else:
+        status, note = "off_duty", ""
+    station = None
+    if seat and seat["station"]:
+        station = _board_station(Station.objects.get(pk=seat["station"]))
+    return {
+        "name": str(user),
+        "rank": user.rank,
+        "platoon": assignment.platoon.code if assignment else None,
+        "station": station,
+        "position": seat["position"] if seat else None,
+        "apparatus": seat["apparatus"] if seat else None,
+        "apparatus_unit": seat["apparatus_unit"] if seat else None,
+        "on_duty": working is not None,
+        "status": status,
+        "note": note,
     }
 
 
@@ -131,6 +209,9 @@ def _person(user, assignment):
         "station": assignment.station_id,
         "station_number": assignment.station.number if assignment.station else None,
         "position": assignment.position,
+        "rank": user.rank,
+        "apparatus": assignment.apparatus_id,
+        "apparatus_unit": assignment.apparatus.unit_number if assignment.apparatus else None,
     }
 
 

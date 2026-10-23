@@ -1332,6 +1332,26 @@ export interface paths {
         patch: operations["api_v1_staffing_rules_partial_update"];
         trace?: never;
     };
+    "/api/v1/station-board/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description ``GET /station-board/?station=&date=`` – the Today screen: the member's own assignment, and who is
+         *     riding which rig at a station (defaults to where the member works).
+         */
+        get: operations["api_v1_station_board_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stations/": {
         parameters: {
             query?: never;
@@ -1537,6 +1557,9 @@ export interface components {
             station?: number | null;
             readonly station_name: string;
             position?: components["schemas"]["PositionEnum"];
+            /** @description The rig this member rides */
+            apparatus?: number | null;
+            readonly apparatus_unit: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         AssignmentRequest: {
@@ -1544,6 +1567,8 @@ export interface components {
             platoon: number;
             station?: number | null;
             position?: components["schemas"]["PositionEnum"];
+            /** @description The rig this member rides */
+            apparatus?: number | null;
         };
         Attendance: {
             user: number;
@@ -1590,6 +1615,32 @@ export interface components {
         AuditEntryActionEnum: "create" | "update" | "delete";
         /** @enum {unknown} */
         BlankEnum: "";
+        BoardApparatus: {
+            id: number;
+            unit_number: string;
+            apparatus_type: string;
+            status: string;
+            crew: components["schemas"]["RosterPerson"][];
+        };
+        /** @description The signed-in member's standing assignment and whether they work today. */
+        BoardMember: {
+            name: string;
+            rank: string;
+            platoon: string | null;
+            station: components["schemas"]["BoardStation"] | null;
+            position: string | null;
+            apparatus: number | null;
+            apparatus_unit: string | null;
+            on_duty: boolean;
+            /** @description on_duty, covering, on_leave, traded_off or off_duty */
+            status: string;
+            note: string;
+        };
+        BoardStation: {
+            id: number;
+            number: string;
+            name: string;
+        };
         CalendarLink: {
             /**
              * Format: uri
@@ -2468,6 +2519,8 @@ export interface components {
             platoon?: number;
             station?: number | null;
             position?: components["schemas"]["PositionEnum"];
+            /** @description The rig this member rides */
+            apparatus?: number | null;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedCertificationRequest: {
@@ -2837,6 +2890,10 @@ export interface components {
             station: number | null;
             station_number: string | null;
             position: string;
+            rank: string;
+            /** @description The rig this person rides */
+            apparatus: number | null;
+            apparatus_unit: string | null;
             /** @description Member this person is covering on a trade */
             covering_for?: number;
         };
@@ -3039,6 +3096,20 @@ export interface components {
             name?: string;
             address?: string;
             phone?: string;
+        };
+        StationBoard: {
+            /** Format: date */
+            date: string;
+            platoon: string | null;
+            me: components["schemas"]["BoardMember"];
+            stations: components["schemas"]["BoardStation"][];
+            station: components["schemas"]["BoardStation"] | null;
+            apparatus: components["schemas"]["BoardApparatus"][];
+            /** @description Working at this station without a rig here */
+            unassigned: components["schemas"]["RosterPerson"][];
+            on_leave: components["schemas"]["RosterPerson"][];
+            traded_off: components["schemas"]["RosterPerson"][];
+            shortfalls: components["schemas"]["Shortfall"][];
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         StationRequest: {
@@ -6950,6 +7021,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StaffingRule"];
+                };
+            };
+        };
+    };
+    api_v1_station_board_retrieve: {
+        parameters: {
+            query?: {
+                date?: string;
+                station?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationBoard"];
                 };
             };
         };

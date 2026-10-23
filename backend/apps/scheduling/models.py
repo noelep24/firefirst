@@ -76,6 +76,14 @@ class Assignment(TenantModel):
     platoon = models.ForeignKey(Platoon, on_delete=models.RESTRICT, related_name="assignments")
     station = models.ForeignKey(Station, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
     position = models.CharField(max_length=20, choices=Position.choices, default=Position.FIREFIGHTER)
+    apparatus = models.ForeignKey(
+        "apparatus.Apparatus",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="riders",
+        help_text="The rig this member rides",
+    )
 
     class Meta:
         ordering = ["platoon__code", "station__number"]

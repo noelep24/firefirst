@@ -59,6 +59,7 @@ api_v1 = [
     path("department/", core.DepartmentView.as_view(), name="department"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
+    path("station-board/", scheduling.StationBoardView.as_view(), name="station-board"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),
     path("reports/", reports.ReportListView.as_view(), name="reports"),

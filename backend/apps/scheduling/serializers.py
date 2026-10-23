@@ -44,10 +44,21 @@ class RotationPatternSerializer(TenantSerializer):
 class AssignmentSerializer(TenantSerializer):
     user_name = serializers.CharField(source="user.__str__", read_only=True)
     station_name = serializers.StringRelatedField(source="station", read_only=True)
+    apparatus_unit = serializers.CharField(source="apparatus.unit_number", read_only=True, default=None)
 
     class Meta:
         model = Assignment
-        fields = ["id", "user", "user_name", "platoon", "station", "station_name", "position"]
+        fields = [
+            "id",
+            "user",
+            "user_name",
+            "platoon",
+            "station",
+            "station_name",
+            "position",
+            "apparatus",
+            "apparatus_unit",
+        ]
 
 
 class LeaveRequestSerializer(TenantSerializer):
@@ -134,6 +145,9 @@ class RosterPersonSerializer(serializers.Serializer):
     station = serializers.IntegerField(allow_null=True)
     station_number = serializers.CharField(allow_null=True)
     position = serializers.CharField()
+    rank = serializers.CharField()
+    apparatus = serializers.IntegerField(allow_null=True, help_text="The rig this person rides")
+    apparatus_unit = serializers.CharField(allow_null=True)
     covering_for = serializers.IntegerField(required=False, help_text="Member this person is covering on a trade")
 
 
@@ -178,3 +192,45 @@ class RosterSerializer(serializers.Serializer):
 class ShiftDaySerializer(serializers.Serializer):
     date = serializers.DateField()
     platoon = serializers.CharField(allow_null=True)
+
+
+class BoardStationSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    number = serializers.CharField()
+    name = serializers.CharField()
+
+
+class BoardMemberSerializer(serializers.Serializer):
+    """The signed-in member's standing assignment and whether they work today."""
+
+    name = serializers.CharField()
+    rank = serializers.CharField()
+    platoon = serializers.CharField(allow_null=True)
+    station = BoardStationSerializer(allow_null=True)
+    position = serializers.CharField(allow_null=True)
+    apparatus = serializers.IntegerField(allow_null=True)
+    apparatus_unit = serializers.CharField(allow_null=True)
+    on_duty = serializers.BooleanField()
+    status = serializers.CharField(help_text="on_duty, covering, on_leave, traded_off or off_duty")
+    note = serializers.CharField(allow_blank=True)
+
+
+class BoardApparatusSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    unit_number = serializers.CharField()
+    apparatus_type = serializers.CharField()
+    status = serializers.CharField()
+    crew = RosterPersonSerializer(many=True)
+
+
+class StationBoardSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    platoon = serializers.CharField(allow_null=True)
+    me = BoardMemberSerializer()
+    stations = BoardStationSerializer(many=True)
+    station = BoardStationSerializer(allow_null=True)
+    apparatus = BoardApparatusSerializer(many=True)
+    unassigned = RosterPersonSerializer(many=True, help_text="Working at this station without a rig here")
+    on_leave = RosterPersonSerializer(many=True)
+    traded_off = RosterPersonSerializer(many=True)
+    shortfalls = ShortfallSerializer(many=True)
