@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
 import { OnboardingCard } from '@/components/onboarding';
+import { StationBoard } from '@/components/station-board';
 import { Badge, Card, DataTable, Empty, PageHeader, QueryState } from '@/components/ui';
 import { formatDateTime, formatDay } from '@/lib/format';
 import { labelFor, eventCategories } from '@/lib/labels';
@@ -27,10 +28,12 @@ export default function Dashboard() {
         {(d) => (
           <>
             <PageHeader
-              title="Dashboard"
-              subtitle={`${formatDay(d.date, { weekday: 'long' })} · ${d.platoon_on_duty ? `${d.platoon_on_duty} Shift on duty` : 'No rotation set up'}`}
+              title="Today"
+              subtitle={d.platoon_on_duty ? `${d.platoon_on_duty} Shift on duty` : 'No rotation set up'}
             />
             <OnboardingCard />
+            <StationBoard />
+            <h2>Department</h2>
             <div className="grid">
               <StatLink to="/apparatus" label="Rigs out of service" value={d.apparatus_out_of_service.length} danger />
               <StatLink to="/work-orders" label="Open work orders" value={d.open_work_orders} />

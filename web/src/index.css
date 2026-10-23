@@ -1,22 +1,27 @@
+/*
+ * FireFirst web: the same look as the phone app. A white page, soft grey cards without borders,
+ * big bold headings, chunky rounded controls, and the brand red for whatever is selected.
+ * Colors mirror mobile/src/constants/theme.ts.
+ */
 :root {
-  --bg: #f6f6f8;
+  --bg: #ffffff;
   --surface: #ffffff;
   --surface-2: #f0f0f3;
-  --surface-3: #e4e4e9;
-  --border: #dcdce2;
-  --text: #16171a;
-  --text-2: #5d6068;
+  --surface-3: #e0e1e6;
+  --border: #d9d9e0;
+  --text: #111113;
+  --text-2: #60646c;
   --accent: #c62828;
   --accent-hover: #a91f1f;
-  --accent-soft: #fdecec;
+  --accent-soft: #fbe9e9;
   --accent-text: #ffffff;
   --success: #1b7f3b;
-  --warning: #9a5800;
+  --warning: #a15c00;
   --danger: #c62828;
   --focus: #2563eb;
-  --radius: 10px;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 8px rgb(0 0 0 / 0.04);
-  --sidebar: 232px;
+  --radius: 14px;
+  --radius-sm: 12px;
+  --sidebar: 248px;
 
   color-scheme: light;
   font-family:
@@ -26,7 +31,7 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
   color: var(--text);
   background: var(--bg);
@@ -35,13 +40,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111214;
-    --surface: #1a1b1e;
-    --surface-2: #232428;
-    --surface-3: #2e3035;
-    --border: #34363c;
-    --text: #ececef;
-    --text-2: #a3a6ad;
+    --bg: #000000;
+    --surface: #111113;
+    --surface-2: #212225;
+    --surface-3: #2e3135;
+    --border: #3a3d42;
+    --text: #ffffff;
+    --text-2: #b0b4ba;
     --accent: #ef5350;
     --accent-hover: #f26b69;
     --accent-soft: #3a1d1d;
@@ -49,7 +54,6 @@
     --warning: #f5a524;
     --danger: #ff6b6b;
     --focus: #60a5fa;
-    --shadow: none;
     color-scheme: dark;
   }
 }
@@ -61,6 +65,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--bg);
 }
 
 h1,
@@ -71,13 +76,17 @@ h3 {
 }
 
 h1 {
-  font-size: 1.6rem;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 h2 {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 h3 {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 p {
@@ -97,7 +106,7 @@ a {
   color: var(--text-2);
 }
 .small {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
 }
 .num {
   font-variant-numeric: tabular-nums;
@@ -105,7 +114,7 @@ a {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 .stack-sm {
   display: flex;
@@ -128,8 +137,8 @@ a {
 }
 .grid-2 {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
 }
 
 /* ---------- Layout ---------- */
@@ -141,9 +150,9 @@ a {
 }
 
 .sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 12px;
+  background: var(--bg);
+  border-right: 1px solid var(--surface-3);
+  padding: 24px 14px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -155,56 +164,57 @@ a {
 
 .brand {
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
   color: var(--accent);
-  padding: 0 10px 4px;
+  padding: 0 12px 2px;
 }
 
 .brand-sub {
-  padding: 0 10px 16px;
-  font-size: 0.85rem;
+  padding: 0 12px 16px;
+  font-size: 0.9rem;
   color: var(--text-2);
 }
 
 .nav-group {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-2);
-  padding: 14px 10px 4px;
+  padding: 16px 12px 6px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   color: var(--text);
-  font-weight: 500;
+  font-weight: 600;
 }
 .nav-link:hover {
   background: var(--surface-2);
 }
 .nav-link.active {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
 .sidebar-footer {
   margin-top: auto;
-  padding: 12px 10px 0;
-  border-top: 1px solid var(--border);
+  padding: 14px 12px 0;
+  border-top: 1px solid var(--surface-3);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .main {
-  padding: 28px 32px 64px;
+  padding: 36px 40px 72px;
   min-width: 0;
   max-width: 1280px;
 }
@@ -215,7 +225,10 @@ a {
   align-items: flex-start;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+}
+.page-header .muted {
+  font-size: 1.05rem;
 }
 
 .mobile-bar {
@@ -242,8 +255,8 @@ a {
     align-items: center;
     gap: 12px;
     padding: 10px 16px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    border-bottom: 1px solid var(--surface-3);
     position: sticky;
     top: 0;
     z-index: 20;
@@ -256,23 +269,23 @@ a {
 /* ---------- Components ---------- */
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-2);
   border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
+  padding: 18px 20px;
 }
 
 .card-link {
   text-decoration: none;
   display: block;
+  transition: background 0.12s;
 }
-.card-link:hover {
-  border-color: var(--text-2);
+.card-link:hover .card,
+.card-link.card:hover {
+  background: var(--surface-3);
 }
 
 .stat-value {
-  font-size: 1.9rem;
+  font-size: 2.25rem;
   font-weight: 800;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -280,11 +293,11 @@ a {
 
 .btn {
   appearance: none;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -292,10 +305,16 @@ a {
   gap: 6px;
   white-space: nowrap;
   text-decoration: none;
-  min-height: 36px;
+  min-height: 46px;
+  transition:
+    background 0.12s,
+    opacity 0.12s;
+}
+.btn:active:not(:disabled) {
+  opacity: 0.75;
 }
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 .btn-primary {
@@ -306,12 +325,11 @@ a {
   background: var(--accent-hover);
 }
 .btn-secondary {
-  background: var(--surface-2);
+  background: var(--surface-3);
   color: var(--text);
-  border-color: var(--border);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-3);
+  background: var(--border);
 }
 .btn-ghost {
   background: transparent;
@@ -326,20 +344,20 @@ a {
   border-color: var(--danger);
 }
 .btn-sm {
-  padding: 4px 10px;
-  min-height: 30px;
-  font-size: 0.85rem;
+  padding: 6px 14px;
+  min-height: 38px;
+  font-size: 0.94rem;
 }
 
 .badge {
   display: inline-block;
   border: 1.5px solid currentColor;
   border-radius: 999px;
-  padding: 0 8px;
-  font-size: 0.72rem;
+  padding: 1px 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   line-height: 1.6;
 }
@@ -356,11 +374,12 @@ a {
   color: var(--danger);
 }
 
+/* Tables sit in a grey card like the phone's lists. */
 .table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-2);
   border-radius: var(--radius);
   overflow-x: auto;
+  padding: 4px 8px;
 }
 table {
   width: 100%;
@@ -369,8 +388,8 @@ table {
 th,
 td {
   text-align: left;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--surface-3);
   vertical-align: middle;
 }
 th {
@@ -378,7 +397,6 @@ th {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-2);
-  background: var(--surface-2);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -388,43 +406,58 @@ tbody tr:last-child td {
 tr.clickable {
   cursor: pointer;
 }
+tr.clickable td:first-child {
+  border-radius: 10px 0 0 10px;
+}
+tr.clickable td:last-child {
+  border-radius: 0 10px 10px 0;
+}
 tr.clickable:hover td {
-  background: var(--surface-2);
+  background: var(--surface-3);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 .field label,
 .field-label {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 700;
   color: var(--text-2);
 }
 .field-error {
   color: var(--danger);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
 }
 .field-help {
   color: var(--text-2);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 input:not([type='checkbox']):not([type='color']),
 select,
 textarea {
   font: inherit;
   color: var(--text);
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 10px;
-  min-height: 36px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-height: 46px;
   width: 100%;
 }
+/* Inside a grey card, fields are white so they stand out. */
+.card input:not([type='checkbox']):not([type='color']),
+.card select,
+.card textarea,
+dialog input:not([type='checkbox']):not([type='color']),
+dialog select,
+dialog textarea {
+  background: var(--surface);
+}
 textarea {
-  min-height: 80px;
+  min-height: 90px;
   resize: vertical;
 }
 input[aria-invalid='true'],
@@ -435,18 +468,18 @@ textarea[aria-invalid='true'] {
 .checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 500;
+  gap: 10px;
+  font-weight: 600;
 }
 .checkbox input {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   accent-color: var(--accent);
 }
 .form-grid {
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 .form-grid .span-all {
   grid-column: 1 / -1;
@@ -463,43 +496,49 @@ textarea[aria-invalid='true'] {
 .toolbar input:not([type='checkbox']):not([type='color']),
 .toolbar select {
   width: auto;
-  min-width: 180px;
+  min-width: 190px;
 }
 
+/* Tabs are pill buttons, like the phone's station picker. */
 .tabs {
   display: flex;
-  gap: 4px;
-  border-bottom: 1px solid var(--border);
+  gap: 8px;
   margin-bottom: 16px;
   overflow-x: auto;
+  flex-wrap: wrap;
 }
 .tab {
-  padding: 8px 14px;
+  padding: 8px 16px;
+  min-height: 40px;
   border: none;
-  background: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
   font: inherit;
-  font-weight: 600;
-  color: var(--text-2);
+  font-weight: 700;
+  color: var(--text);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   text-decoration: none;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+.tab:hover {
+  background: var(--border);
 }
 .tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 dialog.modal {
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: none;
+  border-radius: 20px;
   padding: 0;
-  width: min(640px, calc(100vw - 32px));
+  width: min(660px, calc(100vw - 32px));
   max-height: calc(100vh - 48px);
-  background: var(--surface);
+  background: var(--bg);
   color: var(--text);
-  box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.3);
 }
 dialog.modal::backdrop {
   background: rgb(0 0 0 / 0.45);
@@ -508,42 +547,44 @@ dialog.modal::backdrop {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 8px;
+}
+.modal-head h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 .modal-body {
-  padding: 20px;
+  padding: 12px 24px 20px;
   overflow-y: auto;
 }
 .modal-foot {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  padding: 14px 20px;
-  border-top: 1px solid var(--border);
+  padding: 14px 24px 20px;
 }
 
 .alert {
   border: 1.5px solid var(--danger);
   color: var(--danger);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
   white-space: pre-line;
 }
 .notice {
   border: 1.5px solid var(--success);
   color: var(--success);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
 }
 .empty {
   text-align: center;
   color: var(--text-2);
-  padding: 32px 16px;
+  padding: 28px 16px;
 }
 .spinner {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border: 3px solid var(--surface-3);
   border-top-color: var(--accent);
   border-radius: 50%;
@@ -571,45 +612,48 @@ dialog.modal::backdrop {
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--border);
-  gap: 1px;
+  background: var(--bg);
+  gap: 3px;
 }
 .calendar-head {
-  background: var(--surface-2);
-  padding: 6px 8px;
+  background: var(--bg);
+  padding: 4px 10px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-2);
 }
 .calendar-day {
-  background: var(--surface);
-  min-height: 96px;
-  padding: 6px 8px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  min-height: 100px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   min-width: 0;
 }
 .calendar-day.outside {
-  background: var(--surface-2);
+  background: transparent;
   color: var(--text-2);
+  outline: 1px solid var(--surface-2);
+  outline-offset: -1px;
 }
 .calendar-day.today .day-number {
   background: var(--accent);
   color: var(--accent-text);
   border-radius: 999px;
-  padding: 0 7px;
+  padding: 0 8px;
+  font-weight: 700;
 }
 .calendar-event {
-  background: var(--accent-soft);
+  background: var(--bg);
   color: var(--text);
-  border-radius: 6px;
-  padding: 2px 6px;
+  border-radius: 8px;
+  padding: 2px 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -626,7 +670,7 @@ dialog.modal::backdrop {
   padding: 16px;
 }
 .login-card {
-  width: min(400px, 100%);
+  width: min(420px, 100%);
 }
 
 .checklist-item {
@@ -653,4 +697,37 @@ dialog.modal::backdrop {
 .diff ins {
   color: var(--success);
   text-decoration: none;
+}
+
+/* ---------- Station board (the phone's Today screen) ---------- */
+
+.me-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.me-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.rig-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.rig-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rig-unit {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.crew-line {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 8px;
+  align-items: center;
 }
