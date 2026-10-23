@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 
-import { currentServer } from '@/api/client';
+import { ApiError, currentServer } from '@/api/client';
 import { useAuth } from '@/auth/auth-context';
 import { Button, ErrorBox, Field, Label, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -22,6 +22,8 @@ export default function LoginScreen() {
       await signIn(server, username.trim(), password);
     } catch (e) {
       setError(e);
+      // Couldn't reach the server: show the address so it can be checked and changed.
+      if (e instanceof ApiError && e.status === 0) setShowServer(true);
       setBusy(false);
     }
   }
