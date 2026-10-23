@@ -7,7 +7,7 @@ info:
 paths:
   /api/schema/:
     get:
-      operationId: schema_retrieve
+      operationId: api_schema_retrieve
       description: |-
         OpenApi3 schema for this API. Format can be selected via content negotiation.
 
@@ -126,7 +126,7 @@ paths:
           - zh-hans
           - zh-hant
       tags:
-      - schema
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -153,7 +153,7 @@ paths:
           description: ''
   /api/v1/apparatus/:
     get:
-      operationId: v1_apparatus_list
+      operationId: api_v1_apparatus_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -227,7 +227,7 @@ paths:
           * `out_of_service` - Out of service
           * `reserve` - Reserve
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -239,10 +239,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedApparatusList'
           description: ''
     post:
-      operationId: v1_apparatus_create
+      operationId: api_v1_apparatus_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -267,7 +267,7 @@ paths:
           description: ''
   /api/v1/apparatus/{id}/:
     get:
-      operationId: v1_apparatus_retrieve
+      operationId: api_v1_apparatus_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -277,7 +277,7 @@ paths:
         description: A unique integer value identifying this apparatus.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -289,7 +289,7 @@ paths:
                 $ref: '#/components/schemas/Apparatus'
           description: ''
     put:
-      operationId: v1_apparatus_update
+      operationId: api_v1_apparatus_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -299,7 +299,7 @@ paths:
         description: A unique integer value identifying this apparatus.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -323,7 +323,7 @@ paths:
                 $ref: '#/components/schemas/Apparatus'
           description: ''
     patch:
-      operationId: v1_apparatus_partial_update
+      operationId: api_v1_apparatus_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -333,7 +333,7 @@ paths:
         description: A unique integer value identifying this apparatus.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -356,7 +356,7 @@ paths:
                 $ref: '#/components/schemas/Apparatus'
           description: ''
     delete:
-      operationId: v1_apparatus_destroy
+      operationId: api_v1_apparatus_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -366,7 +366,7 @@ paths:
         description: A unique integer value identifying this apparatus.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -375,7 +375,7 @@ paths:
           description: No response body
   /api/v1/apparatus/{id}/checklists/:
     get:
-      operationId: v1_apparatus_checklists_list
+      operationId: api_v1_apparatus_checklists_list
       description: Active checklists that can be used for this apparatus.
       parameters:
       - in: query
@@ -443,7 +443,7 @@ paths:
           * `out_of_service` - Out of service
           * `reserve` - Reserve
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -458,7 +458,7 @@ paths:
           description: ''
   /api/v1/assignments/:
     get:
-      operationId: v1_assignments_list
+      operationId: api_v1_assignments_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -518,7 +518,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -530,10 +530,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedAssignmentList'
           description: ''
     post:
-      operationId: v1_assignments_create
+      operationId: api_v1_assignments_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -558,7 +558,7 @@ paths:
           description: ''
   /api/v1/assignments/{id}/:
     get:
-      operationId: v1_assignments_retrieve
+      operationId: api_v1_assignments_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -568,7 +568,7 @@ paths:
         description: A unique integer value identifying this assignment.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -580,7 +580,7 @@ paths:
                 $ref: '#/components/schemas/Assignment'
           description: ''
     put:
-      operationId: v1_assignments_update
+      operationId: api_v1_assignments_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -590,7 +590,7 @@ paths:
         description: A unique integer value identifying this assignment.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -614,7 +614,7 @@ paths:
                 $ref: '#/components/schemas/Assignment'
           description: ''
     patch:
-      operationId: v1_assignments_partial_update
+      operationId: api_v1_assignments_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -624,7 +624,7 @@ paths:
         description: A unique integer value identifying this assignment.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -647,7 +647,7 @@ paths:
                 $ref: '#/components/schemas/Assignment'
           description: ''
     delete:
-      operationId: v1_assignments_destroy
+      operationId: api_v1_assignments_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -657,7 +657,7 @@ paths:
         description: A unique integer value identifying this assignment.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -666,7 +666,7 @@ paths:
           description: No response body
   /api/v1/audit-log/:
     get:
-      operationId: v1_audit_log_list
+      operationId: api_v1_audit_log_list
       description: Who changed what. Department admins only.
       parameters:
       - in: query
@@ -730,7 +730,7 @@ paths:
           format: date
         description: On or after this date
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -743,7 +743,7 @@ paths:
           description: ''
   /api/v1/audit-log/{id}/:
     get:
-      operationId: v1_audit_log_retrieve
+      operationId: api_v1_audit_log_retrieve
       description: Who changed what. Department admins only.
       parameters:
       - in: path
@@ -753,7 +753,7 @@ paths:
         description: A unique integer value identifying this audit entry.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -766,10 +766,10 @@ paths:
           description: ''
   /api/v1/auth/csrf/:
     get:
-      operationId: v1_auth_csrf_retrieve
+      operationId: api_v1_auth_csrf_retrieve
       description: Sets the ``csrftoken`` cookie. Call once before logging in.
       tags:
-      - v1
+      - api
       security:
       - {}
       responses:
@@ -777,9 +777,9 @@ paths:
           description: No response body
   /api/v1/auth/session/:
     post:
-      operationId: v1_auth_session_create
+      operationId: api_v1_auth_session_create
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -804,9 +804,9 @@ paths:
         '400':
           description: No response body
     delete:
-      operationId: v1_auth_session_destroy
+      operationId: api_v1_auth_session_destroy
       tags:
-      - v1
+      - api
       security:
       - {}
       responses:
@@ -814,12 +814,12 @@ paths:
           description: No response body
   /api/v1/auth/token/:
     post:
-      operationId: v1_auth_token_create
+      operationId: api_v1_auth_token_create
       description: |-
         Takes a set of user credentials and returns an access and refresh JSON web
         token pair to prove the authentication of those credentials.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -841,12 +841,12 @@ paths:
           description: ''
   /api/v1/auth/token/refresh/:
     post:
-      operationId: v1_auth_token_refresh_create
+      operationId: api_v1_auth_token_refresh_create
       description: |-
         Takes a refresh type JSON web token and returns an access type JSON web
         token if the refresh token is valid.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -868,7 +868,7 @@ paths:
           description: ''
   /api/v1/certification-types/:
     get:
-      operationId: v1_certification_types_list
+      operationId: api_v1_certification_types_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -896,7 +896,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -908,10 +908,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedCertificationTypeList'
           description: ''
     post:
-      operationId: v1_certification_types_create
+      operationId: api_v1_certification_types_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -936,7 +936,7 @@ paths:
           description: ''
   /api/v1/certification-types/{id}/:
     get:
-      operationId: v1_certification_types_retrieve
+      operationId: api_v1_certification_types_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -946,7 +946,7 @@ paths:
         description: A unique integer value identifying this certification type.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -958,7 +958,7 @@ paths:
                 $ref: '#/components/schemas/CertificationType'
           description: ''
     put:
-      operationId: v1_certification_types_update
+      operationId: api_v1_certification_types_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -968,7 +968,7 @@ paths:
         description: A unique integer value identifying this certification type.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -992,7 +992,7 @@ paths:
                 $ref: '#/components/schemas/CertificationType'
           description: ''
     patch:
-      operationId: v1_certification_types_partial_update
+      operationId: api_v1_certification_types_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1002,7 +1002,7 @@ paths:
         description: A unique integer value identifying this certification type.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1025,7 +1025,7 @@ paths:
                 $ref: '#/components/schemas/CertificationType'
           description: ''
     delete:
-      operationId: v1_certification_types_destroy
+      operationId: api_v1_certification_types_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1035,7 +1035,7 @@ paths:
         description: A unique integer value identifying this certification type.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1044,7 +1044,7 @@ paths:
           description: No response body
   /api/v1/certifications/:
     get:
-      operationId: v1_certifications_list
+      operationId: api_v1_certifications_list
       description: Officers manage everyone's certifications; members see their own.
       parameters:
       - in: query
@@ -1080,7 +1080,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1092,10 +1092,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedCertificationList'
           description: ''
     post:
-      operationId: v1_certifications_create
+      operationId: api_v1_certifications_create
       description: Officers manage everyone's certifications; members see their own.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1120,7 +1120,7 @@ paths:
           description: ''
   /api/v1/certifications/{id}/:
     get:
-      operationId: v1_certifications_retrieve
+      operationId: api_v1_certifications_retrieve
       description: Officers manage everyone's certifications; members see their own.
       parameters:
       - in: path
@@ -1130,7 +1130,7 @@ paths:
         description: A unique integer value identifying this certification.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1142,7 +1142,7 @@ paths:
                 $ref: '#/components/schemas/Certification'
           description: ''
     put:
-      operationId: v1_certifications_update
+      operationId: api_v1_certifications_update
       description: Officers manage everyone's certifications; members see their own.
       parameters:
       - in: path
@@ -1152,7 +1152,7 @@ paths:
         description: A unique integer value identifying this certification.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1176,7 +1176,7 @@ paths:
                 $ref: '#/components/schemas/Certification'
           description: ''
     patch:
-      operationId: v1_certifications_partial_update
+      operationId: api_v1_certifications_partial_update
       description: Officers manage everyone's certifications; members see their own.
       parameters:
       - in: path
@@ -1186,7 +1186,7 @@ paths:
         description: A unique integer value identifying this certification.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1209,7 +1209,7 @@ paths:
                 $ref: '#/components/schemas/Certification'
           description: ''
     delete:
-      operationId: v1_certifications_destroy
+      operationId: api_v1_certifications_destroy
       description: Officers manage everyone's certifications; members see their own.
       parameters:
       - in: path
@@ -1219,7 +1219,7 @@ paths:
         description: A unique integer value identifying this certification.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1228,7 +1228,7 @@ paths:
           description: No response body
   /api/v1/certifications/compliance/:
     get:
-      operationId: v1_certifications_compliance_list
+      operationId: api_v1_certifications_compliance_list
       description: Members with certifications that are expiring, expired, or required
         but missing.
       parameters:
@@ -1253,7 +1253,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1268,7 +1268,7 @@ paths:
           description: ''
   /api/v1/checklists/:
     get:
-      operationId: v1_checklists_list
+      operationId: api_v1_checklists_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -1330,7 +1330,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1342,10 +1342,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedChecklistTemplateList'
           description: ''
     post:
-      operationId: v1_checklists_create
+      operationId: api_v1_checklists_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1370,7 +1370,7 @@ paths:
           description: ''
   /api/v1/checklists/{id}/:
     get:
-      operationId: v1_checklists_retrieve
+      operationId: api_v1_checklists_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1380,7 +1380,7 @@ paths:
         description: A unique integer value identifying this checklist template.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1392,7 +1392,7 @@ paths:
                 $ref: '#/components/schemas/ChecklistTemplate'
           description: ''
     put:
-      operationId: v1_checklists_update
+      operationId: api_v1_checklists_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1402,7 +1402,7 @@ paths:
         description: A unique integer value identifying this checklist template.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1426,7 +1426,7 @@ paths:
                 $ref: '#/components/schemas/ChecklistTemplate'
           description: ''
     patch:
-      operationId: v1_checklists_partial_update
+      operationId: api_v1_checklists_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1436,7 +1436,7 @@ paths:
         description: A unique integer value identifying this checklist template.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1459,7 +1459,7 @@ paths:
                 $ref: '#/components/schemas/ChecklistTemplate'
           description: ''
     delete:
-      operationId: v1_checklists_destroy
+      operationId: api_v1_checklists_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -1469,7 +1469,7 @@ paths:
         description: A unique integer value identifying this checklist template.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1478,10 +1478,10 @@ paths:
           description: No response body
   /api/v1/dashboard/:
     get:
-      operationId: v1_dashboard_retrieve
+      operationId: api_v1_dashboard_retrieve
       description: 'The station-officer morning view: what needs attention today.'
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1494,9 +1494,9 @@ paths:
           description: ''
   /api/v1/department/:
     get:
-      operationId: v1_department_retrieve
+      operationId: api_v1_department_retrieve
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1508,9 +1508,9 @@ paths:
                 $ref: '#/components/schemas/Department'
           description: ''
     patch:
-      operationId: v1_department_partial_update
+      operationId: api_v1_department_partial_update
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1534,7 +1534,7 @@ paths:
           description: ''
   /api/v1/events/:
     get:
-      operationId: v1_events_list
+      operationId: api_v1_events_list
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1605,7 +1605,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1617,11 +1617,11 @@ paths:
                 $ref: '#/components/schemas/PaginatedEventList'
           description: ''
     post:
-      operationId: v1_events_create
+      operationId: api_v1_events_create
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1646,7 +1646,7 @@ paths:
           description: ''
   /api/v1/events/{id}/:
     get:
-      operationId: v1_events_retrieve
+      operationId: api_v1_events_retrieve
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1657,7 +1657,7 @@ paths:
         description: A unique integer value identifying this event.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1669,7 +1669,7 @@ paths:
                 $ref: '#/components/schemas/Event'
           description: ''
     put:
-      operationId: v1_events_update
+      operationId: api_v1_events_update
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1680,7 +1680,7 @@ paths:
         description: A unique integer value identifying this event.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1704,7 +1704,7 @@ paths:
                 $ref: '#/components/schemas/Event'
           description: ''
     patch:
-      operationId: v1_events_partial_update
+      operationId: api_v1_events_partial_update
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1715,7 +1715,7 @@ paths:
         description: A unique integer value identifying this event.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1738,7 +1738,7 @@ paths:
                 $ref: '#/components/schemas/Event'
           description: ''
     delete:
-      operationId: v1_events_destroy
+      operationId: api_v1_events_destroy
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1748,8 +1748,16 @@ paths:
           type: integer
         description: A unique integer value identifying this event.
         required: true
+      - in: query
+        name: scope
+        schema:
+          type: string
+          enum:
+          - following
+          - this
+        description: For repeating events
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1758,7 +1766,7 @@ paths:
           description: No response body
   /api/v1/events/{id}/attendance/:
     post:
-      operationId: v1_events_attendance_create
+      operationId: api_v1_events_attendance_create
       description: Officers record who actually showed up. Attended members earn the
         event's training hours.
       parameters:
@@ -1769,7 +1777,7 @@ paths:
         description: A unique integer value identifying this event.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1793,7 +1801,7 @@ paths:
           description: ''
   /api/v1/events/{id}/rsvp/:
     post:
-      operationId: v1_events_rsvp_create
+      operationId: api_v1_events_rsvp_create
       description: '``?start=&end=`` (YYYY-MM-DD) returns events overlapping that
         range.'
       parameters:
@@ -1804,7 +1812,7 @@ paths:
         description: A unique integer value identifying this event.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1829,7 +1837,7 @@ paths:
           description: ''
   /api/v1/events/training-hours/:
     get:
-      operationId: v1_events_training_hours_list
+      operationId: api_v1_events_training_hours_list
       description: Training hours per member from attended events, optionally within
         ``?start=&end=``.
       parameters:
@@ -1876,7 +1884,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1891,10 +1899,10 @@ paths:
           description: ''
   /api/v1/imports/:
     get:
-      operationId: v1_imports_list
+      operationId: api_v1_imports_list
       description: The available importers and the columns each understands.
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1909,7 +1917,7 @@ paths:
           description: ''
   /api/v1/imports/{kind}/:
     post:
-      operationId: v1_imports_create
+      operationId: api_v1_imports_create
       description: Upload a CSV or XLSX. Without ``commit`` this only previews; with
         it, valid rows are saved.
       parameters:
@@ -1919,7 +1927,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           multipart/form-data:
@@ -1938,7 +1946,7 @@ paths:
           description: ''
   /api/v1/imports/{kind}/template/:
     get:
-      operationId: v1_imports_template_retrieve
+      operationId: api_v1_imports_template_retrieve
       description: A CSV with the expected headers and an example row.
       parameters:
       - in: path
@@ -1947,7 +1955,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -1960,7 +1968,7 @@ paths:
           description: ''
   /api/v1/inspections/:
     get:
-      operationId: v1_inspections_list
+      operationId: api_v1_inspections_list
       description: Any member can log a rig check. Inspections are a record, so they
         can't be edited afterwards.
       parameters:
@@ -2001,7 +2009,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2013,11 +2021,11 @@ paths:
                 $ref: '#/components/schemas/PaginatedInspectionList'
           description: ''
     post:
-      operationId: v1_inspections_create
+      operationId: api_v1_inspections_create
       description: Any member can log a rig check. Inspections are a record, so they
         can't be edited afterwards.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2042,7 +2050,7 @@ paths:
           description: ''
   /api/v1/inspections/{id}/:
     get:
-      operationId: v1_inspections_retrieve
+      operationId: api_v1_inspections_retrieve
       description: Any member can log a rig check. Inspections are a record, so they
         can't be edited afterwards.
       parameters:
@@ -2053,7 +2061,7 @@ paths:
         description: A unique integer value identifying this inspection.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2066,7 +2074,7 @@ paths:
           description: ''
   /api/v1/inventory/items/:
     get:
-      operationId: v1_inventory_items_list
+      operationId: api_v1_inventory_items_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -2122,7 +2130,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2134,10 +2142,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedItemList'
           description: ''
     post:
-      operationId: v1_inventory_items_create
+      operationId: api_v1_inventory_items_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2162,7 +2170,7 @@ paths:
           description: ''
   /api/v1/inventory/items/{id}/:
     get:
-      operationId: v1_inventory_items_retrieve
+      operationId: api_v1_inventory_items_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2172,7 +2180,7 @@ paths:
         description: A unique integer value identifying this item.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2184,7 +2192,7 @@ paths:
                 $ref: '#/components/schemas/Item'
           description: ''
     put:
-      operationId: v1_inventory_items_update
+      operationId: api_v1_inventory_items_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2194,7 +2202,7 @@ paths:
         description: A unique integer value identifying this item.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2218,7 +2226,7 @@ paths:
                 $ref: '#/components/schemas/Item'
           description: ''
     patch:
-      operationId: v1_inventory_items_partial_update
+      operationId: api_v1_inventory_items_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2228,7 +2236,7 @@ paths:
         description: A unique integer value identifying this item.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2251,7 +2259,7 @@ paths:
                 $ref: '#/components/schemas/Item'
           description: ''
     delete:
-      operationId: v1_inventory_items_destroy
+      operationId: api_v1_inventory_items_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2261,7 +2269,7 @@ paths:
         description: A unique integer value identifying this item.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2270,7 +2278,7 @@ paths:
           description: No response body
   /api/v1/inventory/locations/:
     get:
-      operationId: v1_inventory_locations_list
+      operationId: api_v1_inventory_locations_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -2306,7 +2314,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2318,10 +2326,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedStorageLocationList'
           description: ''
     post:
-      operationId: v1_inventory_locations_create
+      operationId: api_v1_inventory_locations_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2346,7 +2354,7 @@ paths:
           description: ''
   /api/v1/inventory/locations/{id}/:
     get:
-      operationId: v1_inventory_locations_retrieve
+      operationId: api_v1_inventory_locations_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2356,7 +2364,7 @@ paths:
         description: A unique integer value identifying this storage location.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2368,7 +2376,7 @@ paths:
                 $ref: '#/components/schemas/StorageLocation'
           description: ''
     put:
-      operationId: v1_inventory_locations_update
+      operationId: api_v1_inventory_locations_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2378,7 +2386,7 @@ paths:
         description: A unique integer value identifying this storage location.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2402,7 +2410,7 @@ paths:
                 $ref: '#/components/schemas/StorageLocation'
           description: ''
     patch:
-      operationId: v1_inventory_locations_partial_update
+      operationId: api_v1_inventory_locations_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2412,7 +2420,7 @@ paths:
         description: A unique integer value identifying this storage location.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2435,7 +2443,7 @@ paths:
                 $ref: '#/components/schemas/StorageLocation'
           description: ''
     delete:
-      operationId: v1_inventory_locations_destroy
+      operationId: api_v1_inventory_locations_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2445,7 +2453,7 @@ paths:
         description: A unique integer value identifying this storage location.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2454,7 +2462,7 @@ paths:
           description: No response body
   /api/v1/inventory/stock/:
     get:
-      operationId: v1_inventory_stock_list
+      operationId: api_v1_inventory_stock_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -2523,7 +2531,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2535,10 +2543,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedStockLevelList'
           description: ''
     post:
-      operationId: v1_inventory_stock_create
+      operationId: api_v1_inventory_stock_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2563,7 +2571,7 @@ paths:
           description: ''
   /api/v1/inventory/stock/{id}/:
     get:
-      operationId: v1_inventory_stock_retrieve
+      operationId: api_v1_inventory_stock_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2573,7 +2581,7 @@ paths:
         description: A unique integer value identifying this stock level.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2585,7 +2593,7 @@ paths:
                 $ref: '#/components/schemas/StockLevel'
           description: ''
     put:
-      operationId: v1_inventory_stock_update
+      operationId: api_v1_inventory_stock_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2595,7 +2603,7 @@ paths:
         description: A unique integer value identifying this stock level.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2619,7 +2627,7 @@ paths:
                 $ref: '#/components/schemas/StockLevel'
           description: ''
     patch:
-      operationId: v1_inventory_stock_partial_update
+      operationId: api_v1_inventory_stock_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2629,7 +2637,7 @@ paths:
         description: A unique integer value identifying this stock level.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2652,7 +2660,7 @@ paths:
                 $ref: '#/components/schemas/StockLevel'
           description: ''
     delete:
-      operationId: v1_inventory_stock_destroy
+      operationId: api_v1_inventory_stock_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -2662,7 +2670,7 @@ paths:
         description: A unique integer value identifying this stock level.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2671,7 +2679,7 @@ paths:
           description: No response body
   /api/v1/inventory/stock/{id}/adjust/:
     post:
-      operationId: v1_inventory_stock_adjust_create
+      operationId: api_v1_inventory_stock_adjust_create
       description: Record usage, restocking, disposal or a count correction. Any member
         can do this.
       parameters:
@@ -2682,7 +2690,7 @@ paths:
         description: A unique integer value identifying this stock level.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2707,7 +2715,7 @@ paths:
           description: ''
   /api/v1/inventory/stock/expiring/:
     get:
-      operationId: v1_inventory_stock_expiring_list
+      operationId: api_v1_inventory_stock_expiring_list
       description: Stock expiring within ``?days=`` (default 30), including already
         expired.
       parameters:
@@ -2765,7 +2773,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2780,7 +2788,7 @@ paths:
           description: ''
   /api/v1/inventory/transactions/:
     get:
-      operationId: v1_inventory_transactions_list
+      operationId: api_v1_inventory_transactions_list
       description: Read-only audit trail of stock movements.
       parameters:
       - name: ordering
@@ -2844,7 +2852,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2857,7 +2865,7 @@ paths:
           description: ''
   /api/v1/inventory/transactions/{id}/:
     get:
-      operationId: v1_inventory_transactions_retrieve
+      operationId: api_v1_inventory_transactions_retrieve
       description: Read-only audit trail of stock movements.
       parameters:
       - in: path
@@ -2867,7 +2875,7 @@ paths:
         description: A unique integer value identifying this stock transaction.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2880,7 +2888,7 @@ paths:
           description: ''
   /api/v1/leave-requests/:
     get:
-      operationId: v1_leave_requests_list
+      operationId: api_v1_leave_requests_list
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -2961,7 +2969,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -2973,11 +2981,11 @@ paths:
                 $ref: '#/components/schemas/PaginatedLeaveRequestList'
           description: ''
     post:
-      operationId: v1_leave_requests_create
+      operationId: api_v1_leave_requests_create
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3002,7 +3010,7 @@ paths:
           description: ''
   /api/v1/leave-requests/{id}/:
     get:
-      operationId: v1_leave_requests_retrieve
+      operationId: api_v1_leave_requests_retrieve
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3013,7 +3021,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3025,7 +3033,7 @@ paths:
                 $ref: '#/components/schemas/LeaveRequest'
           description: ''
     put:
-      operationId: v1_leave_requests_update
+      operationId: api_v1_leave_requests_update
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3036,7 +3044,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3060,7 +3068,7 @@ paths:
                 $ref: '#/components/schemas/LeaveRequest'
           description: ''
     patch:
-      operationId: v1_leave_requests_partial_update
+      operationId: api_v1_leave_requests_partial_update
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3071,7 +3079,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3094,7 +3102,7 @@ paths:
                 $ref: '#/components/schemas/LeaveRequest'
           description: ''
     delete:
-      operationId: v1_leave_requests_destroy
+      operationId: api_v1_leave_requests_destroy
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3105,7 +3113,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3114,7 +3122,7 @@ paths:
           description: No response body
   /api/v1/leave-requests/{id}/approve/:
     post:
-      operationId: v1_leave_requests_approve_create
+      operationId: api_v1_leave_requests_approve_create
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3125,7 +3133,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3149,7 +3157,7 @@ paths:
           description: ''
   /api/v1/leave-requests/{id}/cancel/:
     post:
-      operationId: v1_leave_requests_cancel_create
+      operationId: api_v1_leave_requests_cancel_create
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3160,7 +3168,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3173,7 +3181,7 @@ paths:
           description: ''
   /api/v1/leave-requests/{id}/deny/:
     post:
-      operationId: v1_leave_requests_deny_create
+      operationId: api_v1_leave_requests_deny_create
       description: Members see and file their own leave; officers see everyone's and
         approve or deny.
       parameters:
@@ -3184,7 +3192,7 @@ paths:
         description: A unique integer value identifying this leave request.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3208,7 +3216,7 @@ paths:
           description: ''
   /api/v1/leave-requests/{id}/impact/:
     get:
-      operationId: v1_leave_requests_impact_list
+      operationId: api_v1_leave_requests_impact_list
       description: Staffing shortfalls approving this leave would cause, by day.
       parameters:
       - in: path
@@ -3270,7 +3278,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3285,7 +3293,7 @@ paths:
           description: ''
   /api/v1/maintenance-schedules/:
     get:
-      operationId: v1_maintenance_schedules_list
+      operationId: api_v1_maintenance_schedules_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -3317,7 +3325,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3329,10 +3337,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedMaintenanceScheduleList'
           description: ''
     post:
-      operationId: v1_maintenance_schedules_create
+      operationId: api_v1_maintenance_schedules_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3357,7 +3365,7 @@ paths:
           description: ''
   /api/v1/maintenance-schedules/{id}/:
     get:
-      operationId: v1_maintenance_schedules_retrieve
+      operationId: api_v1_maintenance_schedules_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3367,7 +3375,7 @@ paths:
         description: A unique integer value identifying this maintenance schedule.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3379,7 +3387,7 @@ paths:
                 $ref: '#/components/schemas/MaintenanceSchedule'
           description: ''
     put:
-      operationId: v1_maintenance_schedules_update
+      operationId: api_v1_maintenance_schedules_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3389,7 +3397,7 @@ paths:
         description: A unique integer value identifying this maintenance schedule.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3413,7 +3421,7 @@ paths:
                 $ref: '#/components/schemas/MaintenanceSchedule'
           description: ''
     patch:
-      operationId: v1_maintenance_schedules_partial_update
+      operationId: api_v1_maintenance_schedules_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3423,7 +3431,7 @@ paths:
         description: A unique integer value identifying this maintenance schedule.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3446,7 +3454,7 @@ paths:
                 $ref: '#/components/schemas/MaintenanceSchedule'
           description: ''
     delete:
-      operationId: v1_maintenance_schedules_destroy
+      operationId: api_v1_maintenance_schedules_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3456,7 +3464,7 @@ paths:
         description: A unique integer value identifying this maintenance schedule.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3465,7 +3473,7 @@ paths:
           description: No response body
   /api/v1/maintenance-schedules/due/:
     get:
-      operationId: v1_maintenance_schedules_due_list
+      operationId: api_v1_maintenance_schedules_due_list
       description: Schedules that are due now, or within ``?days=`` (default 14).
       parameters:
       - in: query
@@ -3490,7 +3498,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3505,9 +3513,9 @@ paths:
           description: ''
   /api/v1/me/:
     get:
-      operationId: v1_me_retrieve
+      operationId: api_v1_me_retrieve
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3519,9 +3527,9 @@ paths:
                 $ref: '#/components/schemas/Me'
           description: ''
     patch:
-      operationId: v1_me_partial_update
+      operationId: api_v1_me_partial_update
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3543,9 +3551,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/Me'
           description: ''
+  /api/v1/me/calendar-feed/:
+    get:
+      operationId: api_v1_me_calendar_feed_retrieve
+      description: '``GET`` the personal calendar link (created on first use); ``POST``
+        to replace it with a new one.'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarLink'
+          description: ''
+    post:
+      operationId: api_v1_me_calendar_feed_create
+      description: '``GET`` the personal calendar link (created on first use); ``POST``
+        to replace it with a new one.'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarLink'
+          description: ''
   /api/v1/platoons/:
     get:
-      operationId: v1_platoons_list
+      operationId: api_v1_platoons_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -3573,7 +3614,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3585,10 +3626,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedPlatoonList'
           description: ''
     post:
-      operationId: v1_platoons_create
+      operationId: api_v1_platoons_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3613,7 +3654,7 @@ paths:
           description: ''
   /api/v1/platoons/{id}/:
     get:
-      operationId: v1_platoons_retrieve
+      operationId: api_v1_platoons_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3623,7 +3664,7 @@ paths:
         description: A unique integer value identifying this platoon.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3635,7 +3676,7 @@ paths:
                 $ref: '#/components/schemas/Platoon'
           description: ''
     put:
-      operationId: v1_platoons_update
+      operationId: api_v1_platoons_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3645,7 +3686,7 @@ paths:
         description: A unique integer value identifying this platoon.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3669,7 +3710,7 @@ paths:
                 $ref: '#/components/schemas/Platoon'
           description: ''
     patch:
-      operationId: v1_platoons_partial_update
+      operationId: api_v1_platoons_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3679,7 +3720,7 @@ paths:
         description: A unique integer value identifying this platoon.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3702,7 +3743,7 @@ paths:
                 $ref: '#/components/schemas/Platoon'
           description: ''
     delete:
-      operationId: v1_platoons_destroy
+      operationId: api_v1_platoons_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3712,7 +3753,7 @@ paths:
         description: A unique integer value identifying this platoon.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3721,9 +3762,9 @@ paths:
           description: No response body
   /api/v1/reports/:
     get:
-      operationId: v1_reports_list
+      operationId: api_v1_reports_list
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3738,7 +3779,7 @@ paths:
           description: ''
   /api/v1/reports/{slug}/:
     get:
-      operationId: v1_reports_retrieve
+      operationId: api_v1_reports_retrieve
       description: A report as JSON, or as CSV with ``?export=csv``. Dates default
         to the year to date.
       parameters:
@@ -3764,7 +3805,7 @@ paths:
           type: string
           format: date
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3777,7 +3818,7 @@ paths:
           description: ''
   /api/v1/roster/:
     get:
-      operationId: v1_roster_retrieve
+      operationId: api_v1_roster_retrieve
       description: '``GET /roster/?date=YYYY-MM-DD`` – who is on duty (defaults to
         today).'
       parameters:
@@ -3787,7 +3828,7 @@ paths:
           type: string
           format: date
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3800,7 +3841,7 @@ paths:
           description: ''
   /api/v1/rotation-patterns/:
     get:
-      operationId: v1_rotation_patterns_list
+      operationId: api_v1_rotation_patterns_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -3828,7 +3869,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3840,10 +3881,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedRotationPatternList'
           description: ''
     post:
-      operationId: v1_rotation_patterns_create
+      operationId: api_v1_rotation_patterns_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3868,7 +3909,7 @@ paths:
           description: ''
   /api/v1/rotation-patterns/{id}/:
     get:
-      operationId: v1_rotation_patterns_retrieve
+      operationId: api_v1_rotation_patterns_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3878,7 +3919,7 @@ paths:
         description: A unique integer value identifying this rotation pattern.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3890,7 +3931,7 @@ paths:
                 $ref: '#/components/schemas/RotationPattern'
           description: ''
     put:
-      operationId: v1_rotation_patterns_update
+      operationId: api_v1_rotation_patterns_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3900,7 +3941,7 @@ paths:
         description: A unique integer value identifying this rotation pattern.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3924,7 +3965,7 @@ paths:
                 $ref: '#/components/schemas/RotationPattern'
           description: ''
     patch:
-      operationId: v1_rotation_patterns_partial_update
+      operationId: api_v1_rotation_patterns_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3934,7 +3975,7 @@ paths:
         description: A unique integer value identifying this rotation pattern.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -3957,7 +3998,7 @@ paths:
                 $ref: '#/components/schemas/RotationPattern'
           description: ''
     delete:
-      operationId: v1_rotation_patterns_destroy
+      operationId: api_v1_rotation_patterns_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -3967,7 +4008,7 @@ paths:
         description: A unique integer value identifying this rotation pattern.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -3976,7 +4017,7 @@ paths:
           description: No response body
   /api/v1/service-records/:
     get:
-      operationId: v1_service_records_list
+      operationId: api_v1_service_records_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -4012,7 +4053,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4024,10 +4065,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedServiceRecordList'
           description: ''
     post:
-      operationId: v1_service_records_create
+      operationId: api_v1_service_records_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4052,7 +4093,7 @@ paths:
           description: ''
   /api/v1/service-records/{id}/:
     get:
-      operationId: v1_service_records_retrieve
+      operationId: api_v1_service_records_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4062,7 +4103,7 @@ paths:
         description: A unique integer value identifying this service record.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4074,7 +4115,7 @@ paths:
                 $ref: '#/components/schemas/ServiceRecord'
           description: ''
     put:
-      operationId: v1_service_records_update
+      operationId: api_v1_service_records_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4084,7 +4125,7 @@ paths:
         description: A unique integer value identifying this service record.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4108,7 +4149,7 @@ paths:
                 $ref: '#/components/schemas/ServiceRecord'
           description: ''
     patch:
-      operationId: v1_service_records_partial_update
+      operationId: api_v1_service_records_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4118,7 +4159,7 @@ paths:
         description: A unique integer value identifying this service record.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4141,7 +4182,7 @@ paths:
                 $ref: '#/components/schemas/ServiceRecord'
           description: ''
     delete:
-      operationId: v1_service_records_destroy
+      operationId: api_v1_service_records_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4151,7 +4192,7 @@ paths:
         description: A unique integer value identifying this service record.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4160,7 +4201,7 @@ paths:
           description: No response body
   /api/v1/shift-calendar/:
     get:
-      operationId: v1_shift_calendar_list
+      operationId: api_v1_shift_calendar_list
       description: '``GET /shift-calendar/?start=&end=`` – the on-duty platoon for
         each day in a range.'
       parameters:
@@ -4177,7 +4218,7 @@ paths:
           format: date
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4192,7 +4233,7 @@ paths:
           description: ''
   /api/v1/shift-trades/:
     get:
-      operationId: v1_shift_trades_list
+      operationId: api_v1_shift_trades_list
       description: Members see trades they're part of; officers see all.
       parameters:
       - name: ordering
@@ -4243,7 +4284,7 @@ paths:
           * `declined` - Declined by covering member
           * `cancelled` - Cancelled
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4255,10 +4296,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedShiftTradeList'
           description: ''
     post:
-      operationId: v1_shift_trades_create
+      operationId: api_v1_shift_trades_create
       description: Members see trades they're part of; officers see all.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4283,7 +4324,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/:
     get:
-      operationId: v1_shift_trades_retrieve
+      operationId: api_v1_shift_trades_retrieve
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4293,7 +4334,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4306,7 +4347,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/accept/:
     post:
-      operationId: v1_shift_trades_accept_create
+      operationId: api_v1_shift_trades_accept_create
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4316,7 +4357,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4329,7 +4370,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/approve/:
     post:
-      operationId: v1_shift_trades_approve_create
+      operationId: api_v1_shift_trades_approve_create
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4339,7 +4380,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4352,7 +4393,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/cancel/:
     post:
-      operationId: v1_shift_trades_cancel_create
+      operationId: api_v1_shift_trades_cancel_create
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4362,7 +4403,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4375,7 +4416,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/decline/:
     post:
-      operationId: v1_shift_trades_decline_create
+      operationId: api_v1_shift_trades_decline_create
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4385,7 +4426,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4398,7 +4439,7 @@ paths:
           description: ''
   /api/v1/shift-trades/{id}/deny/:
     post:
-      operationId: v1_shift_trades_deny_create
+      operationId: api_v1_shift_trades_deny_create
       description: Members see trades they're part of; officers see all.
       parameters:
       - in: path
@@ -4408,7 +4449,7 @@ paths:
         description: A unique integer value identifying this shift trade.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4421,7 +4462,7 @@ paths:
           description: ''
   /api/v1/staffing/:
     get:
-      operationId: v1_staffing_list
+      operationId: api_v1_staffing_list
       description: '``GET /staffing/?start=&end=`` – days in the range whose crew
         misses a staffing rule.'
       parameters:
@@ -4438,7 +4479,7 @@ paths:
           format: date
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4453,7 +4494,7 @@ paths:
           description: ''
   /api/v1/staffing-rules/:
     get:
-      operationId: v1_staffing_rules_list
+      operationId: api_v1_staffing_rules_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -4481,7 +4522,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4493,10 +4534,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedStaffingRuleList'
           description: ''
     post:
-      operationId: v1_staffing_rules_create
+      operationId: api_v1_staffing_rules_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4521,7 +4562,7 @@ paths:
           description: ''
   /api/v1/staffing-rules/{id}/:
     get:
-      operationId: v1_staffing_rules_retrieve
+      operationId: api_v1_staffing_rules_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4531,7 +4572,7 @@ paths:
         description: A unique integer value identifying this staffing rule.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4543,7 +4584,7 @@ paths:
                 $ref: '#/components/schemas/StaffingRule'
           description: ''
     put:
-      operationId: v1_staffing_rules_update
+      operationId: api_v1_staffing_rules_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4553,7 +4594,7 @@ paths:
         description: A unique integer value identifying this staffing rule.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4577,7 +4618,7 @@ paths:
                 $ref: '#/components/schemas/StaffingRule'
           description: ''
     patch:
-      operationId: v1_staffing_rules_partial_update
+      operationId: api_v1_staffing_rules_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4587,7 +4628,7 @@ paths:
         description: A unique integer value identifying this staffing rule.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4610,7 +4651,7 @@ paths:
                 $ref: '#/components/schemas/StaffingRule'
           description: ''
     delete:
-      operationId: v1_staffing_rules_destroy
+      operationId: api_v1_staffing_rules_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4620,7 +4661,7 @@ paths:
         description: A unique integer value identifying this staffing rule.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4629,7 +4670,7 @@ paths:
           description: No response body
   /api/v1/stations/:
     get:
-      operationId: v1_stations_list
+      operationId: api_v1_stations_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - name: ordering
@@ -4657,7 +4698,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4669,10 +4710,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedStationList'
           description: ''
     post:
-      operationId: v1_stations_create
+      operationId: api_v1_stations_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4697,7 +4738,7 @@ paths:
           description: ''
   /api/v1/stations/{id}/:
     get:
-      operationId: v1_stations_retrieve
+      operationId: api_v1_stations_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4707,7 +4748,7 @@ paths:
         description: A unique integer value identifying this station.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4719,7 +4760,7 @@ paths:
                 $ref: '#/components/schemas/Station'
           description: ''
     put:
-      operationId: v1_stations_update
+      operationId: api_v1_stations_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4729,7 +4770,7 @@ paths:
         description: A unique integer value identifying this station.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4753,7 +4794,7 @@ paths:
                 $ref: '#/components/schemas/Station'
           description: ''
     patch:
-      operationId: v1_stations_partial_update
+      operationId: api_v1_stations_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4763,7 +4804,7 @@ paths:
         description: A unique integer value identifying this station.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4786,7 +4827,7 @@ paths:
                 $ref: '#/components/schemas/Station'
           description: ''
     delete:
-      operationId: v1_stations_destroy
+      operationId: api_v1_stations_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4796,7 +4837,7 @@ paths:
         description: A unique integer value identifying this station.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4805,7 +4846,7 @@ paths:
           description: No response body
   /api/v1/users/:
     get:
-      operationId: v1_users_list
+      operationId: api_v1_users_list
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: query
@@ -4853,7 +4894,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4865,10 +4906,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedUserList'
           description: ''
     post:
-      operationId: v1_users_create
+      operationId: api_v1_users_create
       description: ModelViewSet scoped to ``request.user.department``.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4893,7 +4934,7 @@ paths:
           description: ''
   /api/v1/users/{id}/:
     get:
-      operationId: v1_users_retrieve
+      operationId: api_v1_users_retrieve
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4903,7 +4944,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4915,7 +4956,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
     put:
-      operationId: v1_users_update
+      operationId: api_v1_users_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4925,7 +4966,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4949,7 +4990,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
     patch:
-      operationId: v1_users_partial_update
+      operationId: api_v1_users_partial_update
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4959,7 +5000,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -4982,7 +5023,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
     delete:
-      operationId: v1_users_destroy
+      operationId: api_v1_users_destroy
       description: ModelViewSet scoped to ``request.user.department``.
       parameters:
       - in: path
@@ -4992,7 +5033,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -5001,7 +5042,7 @@ paths:
           description: No response body
   /api/v1/work-orders/:
     get:
-      operationId: v1_work_orders_list
+      operationId: api_v1_work_orders_list
       description: Any member can report a problem; only officers can delete.
       parameters:
       - in: query
@@ -5072,7 +5113,7 @@ paths:
         schema:
           type: boolean
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -5084,10 +5125,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedWorkOrderList'
           description: ''
     post:
-      operationId: v1_work_orders_create
+      operationId: api_v1_work_orders_create
       description: Any member can report a problem; only officers can delete.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -5112,7 +5153,7 @@ paths:
           description: ''
   /api/v1/work-orders/{id}/:
     get:
-      operationId: v1_work_orders_retrieve
+      operationId: api_v1_work_orders_retrieve
       description: Any member can report a problem; only officers can delete.
       parameters:
       - in: path
@@ -5122,7 +5163,7 @@ paths:
         description: A unique integer value identifying this work order.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -5134,7 +5175,7 @@ paths:
                 $ref: '#/components/schemas/WorkOrder'
           description: ''
     put:
-      operationId: v1_work_orders_update
+      operationId: api_v1_work_orders_update
       description: Any member can report a problem; only officers can delete.
       parameters:
       - in: path
@@ -5144,7 +5185,7 @@ paths:
         description: A unique integer value identifying this work order.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -5168,7 +5209,7 @@ paths:
                 $ref: '#/components/schemas/WorkOrder'
           description: ''
     patch:
-      operationId: v1_work_orders_partial_update
+      operationId: api_v1_work_orders_partial_update
       description: Any member can report a problem; only officers can delete.
       parameters:
       - in: path
@@ -5178,7 +5219,7 @@ paths:
         description: A unique integer value identifying this work order.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -5201,7 +5242,7 @@ paths:
                 $ref: '#/components/schemas/WorkOrder'
           description: ''
     delete:
-      operationId: v1_work_orders_destroy
+      operationId: api_v1_work_orders_destroy
       description: Any member can report a problem; only officers can delete.
       parameters:
       - in: path
@@ -5211,13 +5252,36 @@ paths:
         description: A unique integer value identifying this work order.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - cookieAuth: []
       responses:
         '204':
           description: No response body
+  /calendar/{token}.ics:
+    get:
+      operationId: calendar_.ics_retrieve
+      description: |-
+        The member's personal iCalendar feed. The secret token in the URL is the only credential,
+        so calendar apps can subscribe; members can regenerate it to revoke an old link.
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - calendar
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            text/calendar:
+              schema:
+                type: string
+          description: ''
 components:
   schemas:
     Apparatus:
@@ -5501,6 +5565,19 @@ components:
     BlankEnum:
       enum:
       - ''
+    CalendarLink:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: https link, for Google Calendar's “From URL”
+        webcal_url:
+          type: string
+          description: webcal:// link that opens Apple Calendar or Outlook directly
+      required:
+      - url
+      - webcal_url
     Certification:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -5946,12 +6023,18 @@ components:
           type: string
           nullable: true
           readOnly: true
+        series:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
       required:
       - attendance
       - created_by
       - ends_at
       - id
       - my_status
+      - series
       - starts_at
       - title
     EventCategoryEnum:
@@ -6017,6 +6100,36 @@ components:
           writeOnly: true
           description: Members to invite. Mandatory events invite every active member
             automatically.
+        repeat:
+          allOf:
+          - $ref: '#/components/schemas/RepeatEnum'
+          writeOnly: true
+          default: none
+          description: |-
+            Only when creating
+
+            * `none` - Doesn't repeat
+            * `weekly` - Weekly
+            * `monthly_date` - Monthly on the same date
+            * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
+        repeat_interval:
+          type: integer
+          maximum: 12
+          minimum: 1
+          writeOnly: true
+          default: 1
+          description: Every N weeks or months
+        repeat_until:
+          type: string
+          format: date
+          writeOnly: true
+          nullable: true
+        repeat_count:
+          type: integer
+          maximum: 104
+          minimum: 2
+          writeOnly: true
+          nullable: true
       required:
       - ends_at
       - starts_at
@@ -7337,6 +7450,36 @@ components:
           writeOnly: true
           description: Members to invite. Mandatory events invite every active member
             automatically.
+        repeat:
+          allOf:
+          - $ref: '#/components/schemas/RepeatEnum'
+          writeOnly: true
+          default: none
+          description: |-
+            Only when creating
+
+            * `none` - Doesn't repeat
+            * `weekly` - Weekly
+            * `monthly_date` - Monthly on the same date
+            * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
+        repeat_interval:
+          type: integer
+          maximum: 12
+          minimum: 1
+          writeOnly: true
+          default: 1
+          description: Every N weeks or months
+        repeat_until:
+          type: string
+          format: date
+          writeOnly: true
+          nullable: true
+        repeat_count:
+          type: integer
+          maximum: 104
+          minimum: 2
+          writeOnly: true
+          nullable: true
     PatchedItemRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -7780,6 +7923,18 @@ components:
         * `transfer_in` - Transfer in
         * `transfer_out` - Transfer out
         * `count` - Count correction
+    RepeatEnum:
+      enum:
+      - none
+      - weekly
+      - monthly_date
+      - monthly_weekday
+      type: string
+      description: |-
+        * `none` - Doesn't repeat
+        * `weekly` - Weekly
+        * `monthly_date` - Monthly on the same date
+        * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
     Report:
       type: object
       properties:

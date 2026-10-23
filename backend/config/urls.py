@@ -51,6 +51,7 @@ api_v1 = [
     path("auth/csrf/", CsrfView.as_view(), name="csrf"),
     path("auth/session/", SessionView.as_view(), name="session"),
     path("me/", core.MeView.as_view(), name="me"),
+    path("me/calendar-feed/", events.MyCalendarFeedView.as_view(), name="my-calendar-feed"),
     path("department/", core.DepartmentView.as_view(), name="department"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
@@ -67,6 +68,7 @@ api_v1 = [
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(api_v1)),
+    path("calendar/<str:token>.ics", events.CalendarFeedView.as_view(), name="calendar-feed"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="api-docs"),
 ]

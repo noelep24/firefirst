@@ -17,7 +17,7 @@ export interface paths {
          *     - YAML: application/vnd.oai.openapi
          *     - JSON: application/vnd.oai.openapi+json
          */
-        get: operations["schema_retrieve"];
+        get: operations["api_schema_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -34,10 +34,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_apparatus_list"];
+        get: operations["api_v1_apparatus_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_apparatus_create"];
+        post: operations["api_v1_apparatus_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -52,16 +52,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_apparatus_retrieve"];
+        get: operations["api_v1_apparatus_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_apparatus_update"];
+        put: operations["api_v1_apparatus_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_apparatus_destroy"];
+        delete: operations["api_v1_apparatus_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_apparatus_partial_update"];
+        patch: operations["api_v1_apparatus_partial_update"];
         trace?: never;
     };
     "/api/v1/apparatus/{id}/checklists/": {
@@ -72,7 +72,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Active checklists that can be used for this apparatus. */
-        get: operations["v1_apparatus_checklists_list"];
+        get: operations["api_v1_apparatus_checklists_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -89,10 +89,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_assignments_list"];
+        get: operations["api_v1_assignments_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_assignments_create"];
+        post: operations["api_v1_assignments_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -107,16 +107,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_assignments_retrieve"];
+        get: operations["api_v1_assignments_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_assignments_update"];
+        put: operations["api_v1_assignments_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_assignments_destroy"];
+        delete: operations["api_v1_assignments_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_assignments_partial_update"];
+        patch: operations["api_v1_assignments_partial_update"];
         trace?: never;
     };
     "/api/v1/audit-log/": {
@@ -127,7 +127,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Who changed what. Department admins only. */
-        get: operations["v1_audit_log_list"];
+        get: operations["api_v1_audit_log_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -144,7 +144,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Who changed what. Department admins only. */
-        get: operations["v1_audit_log_retrieve"];
+        get: operations["api_v1_audit_log_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -161,7 +161,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Sets the ``csrftoken`` cookie. Call once before logging in. */
-        get: operations["v1_auth_csrf_retrieve"];
+        get: operations["api_v1_auth_csrf_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -179,8 +179,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["v1_auth_session_create"];
-        delete: operations["v1_auth_session_destroy"];
+        post: operations["api_v1_auth_session_create"];
+        delete: operations["api_v1_auth_session_destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -199,7 +199,7 @@ export interface paths {
          * @description Takes a set of user credentials and returns an access and refresh JSON web
          *     token pair to prove the authentication of those credentials.
          */
-        post: operations["v1_auth_token_create"];
+        post: operations["api_v1_auth_token_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -219,7 +219,7 @@ export interface paths {
          * @description Takes a refresh type JSON web token and returns an access type JSON web
          *     token if the refresh token is valid.
          */
-        post: operations["v1_auth_token_refresh_create"];
+        post: operations["api_v1_auth_token_refresh_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -234,10 +234,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_certification_types_list"];
+        get: operations["api_v1_certification_types_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_certification_types_create"];
+        post: operations["api_v1_certification_types_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -252,16 +252,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_certification_types_retrieve"];
+        get: operations["api_v1_certification_types_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_certification_types_update"];
+        put: operations["api_v1_certification_types_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_certification_types_destroy"];
+        delete: operations["api_v1_certification_types_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_certification_types_partial_update"];
+        patch: operations["api_v1_certification_types_partial_update"];
         trace?: never;
     };
     "/api/v1/certifications/": {
@@ -272,10 +272,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description Officers manage everyone's certifications; members see their own. */
-        get: operations["v1_certifications_list"];
+        get: operations["api_v1_certifications_list"];
         put?: never;
         /** @description Officers manage everyone's certifications; members see their own. */
-        post: operations["v1_certifications_create"];
+        post: operations["api_v1_certifications_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -290,16 +290,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description Officers manage everyone's certifications; members see their own. */
-        get: operations["v1_certifications_retrieve"];
+        get: operations["api_v1_certifications_retrieve"];
         /** @description Officers manage everyone's certifications; members see their own. */
-        put: operations["v1_certifications_update"];
+        put: operations["api_v1_certifications_update"];
         post?: never;
         /** @description Officers manage everyone's certifications; members see their own. */
-        delete: operations["v1_certifications_destroy"];
+        delete: operations["api_v1_certifications_destroy"];
         options?: never;
         head?: never;
         /** @description Officers manage everyone's certifications; members see their own. */
-        patch: operations["v1_certifications_partial_update"];
+        patch: operations["api_v1_certifications_partial_update"];
         trace?: never;
     };
     "/api/v1/certifications/compliance/": {
@@ -310,7 +310,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Members with certifications that are expiring, expired, or required but missing. */
-        get: operations["v1_certifications_compliance_list"];
+        get: operations["api_v1_certifications_compliance_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -327,10 +327,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_checklists_list"];
+        get: operations["api_v1_checklists_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_checklists_create"];
+        post: operations["api_v1_checklists_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -345,16 +345,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_checklists_retrieve"];
+        get: operations["api_v1_checklists_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_checklists_update"];
+        put: operations["api_v1_checklists_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_checklists_destroy"];
+        delete: operations["api_v1_checklists_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_checklists_partial_update"];
+        patch: operations["api_v1_checklists_partial_update"];
         trace?: never;
     };
     "/api/v1/dashboard/": {
@@ -365,7 +365,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description The station-officer morning view: what needs attention today. */
-        get: operations["v1_dashboard_retrieve"];
+        get: operations["api_v1_dashboard_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -381,13 +381,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["v1_department_retrieve"];
+        get: operations["api_v1_department_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["v1_department_partial_update"];
+        patch: operations["api_v1_department_partial_update"];
         trace?: never;
     };
     "/api/v1/events/": {
@@ -398,10 +398,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        get: operations["v1_events_list"];
+        get: operations["api_v1_events_list"];
         put?: never;
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        post: operations["v1_events_create"];
+        post: operations["api_v1_events_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -416,16 +416,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        get: operations["v1_events_retrieve"];
+        get: operations["api_v1_events_retrieve"];
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        put: operations["v1_events_update"];
+        put: operations["api_v1_events_update"];
         post?: never;
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        delete: operations["v1_events_destroy"];
+        delete: operations["api_v1_events_destroy"];
         options?: never;
         head?: never;
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        patch: operations["v1_events_partial_update"];
+        patch: operations["api_v1_events_partial_update"];
         trace?: never;
     };
     "/api/v1/events/{id}/attendance/": {
@@ -438,7 +438,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Officers record who actually showed up. Attended members earn the event's training hours. */
-        post: operations["v1_events_attendance_create"];
+        post: operations["api_v1_events_attendance_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -455,7 +455,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description ``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range. */
-        post: operations["v1_events_rsvp_create"];
+        post: operations["api_v1_events_rsvp_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -470,7 +470,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Training hours per member from attended events, optionally within ``?start=&end=``. */
-        get: operations["v1_events_training_hours_list"];
+        get: operations["api_v1_events_training_hours_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -487,7 +487,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description The available importers and the columns each understands. */
-        get: operations["v1_imports_list"];
+        get: operations["api_v1_imports_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -506,7 +506,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Upload a CSV or XLSX. Without ``commit`` this only previews; with it, valid rows are saved. */
-        post: operations["v1_imports_create"];
+        post: operations["api_v1_imports_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -521,7 +521,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description A CSV with the expected headers and an example row. */
-        get: operations["v1_imports_template_retrieve"];
+        get: operations["api_v1_imports_template_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -538,10 +538,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description Any member can log a rig check. Inspections are a record, so they can't be edited afterwards. */
-        get: operations["v1_inspections_list"];
+        get: operations["api_v1_inspections_list"];
         put?: never;
         /** @description Any member can log a rig check. Inspections are a record, so they can't be edited afterwards. */
-        post: operations["v1_inspections_create"];
+        post: operations["api_v1_inspections_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -556,7 +556,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Any member can log a rig check. Inspections are a record, so they can't be edited afterwards. */
-        get: operations["v1_inspections_retrieve"];
+        get: operations["api_v1_inspections_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -573,10 +573,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_items_list"];
+        get: operations["api_v1_inventory_items_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_inventory_items_create"];
+        post: operations["api_v1_inventory_items_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -591,16 +591,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_items_retrieve"];
+        get: operations["api_v1_inventory_items_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_inventory_items_update"];
+        put: operations["api_v1_inventory_items_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_inventory_items_destroy"];
+        delete: operations["api_v1_inventory_items_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_inventory_items_partial_update"];
+        patch: operations["api_v1_inventory_items_partial_update"];
         trace?: never;
     };
     "/api/v1/inventory/locations/": {
@@ -611,10 +611,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_locations_list"];
+        get: operations["api_v1_inventory_locations_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_inventory_locations_create"];
+        post: operations["api_v1_inventory_locations_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -629,16 +629,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_locations_retrieve"];
+        get: operations["api_v1_inventory_locations_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_inventory_locations_update"];
+        put: operations["api_v1_inventory_locations_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_inventory_locations_destroy"];
+        delete: operations["api_v1_inventory_locations_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_inventory_locations_partial_update"];
+        patch: operations["api_v1_inventory_locations_partial_update"];
         trace?: never;
     };
     "/api/v1/inventory/stock/": {
@@ -649,10 +649,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_stock_list"];
+        get: operations["api_v1_inventory_stock_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_inventory_stock_create"];
+        post: operations["api_v1_inventory_stock_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -667,16 +667,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_inventory_stock_retrieve"];
+        get: operations["api_v1_inventory_stock_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_inventory_stock_update"];
+        put: operations["api_v1_inventory_stock_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_inventory_stock_destroy"];
+        delete: operations["api_v1_inventory_stock_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_inventory_stock_partial_update"];
+        patch: operations["api_v1_inventory_stock_partial_update"];
         trace?: never;
     };
     "/api/v1/inventory/stock/{id}/adjust/": {
@@ -689,7 +689,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Record usage, restocking, disposal or a count correction. Any member can do this. */
-        post: operations["v1_inventory_stock_adjust_create"];
+        post: operations["api_v1_inventory_stock_adjust_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -704,7 +704,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Stock expiring within ``?days=`` (default 30), including already expired. */
-        get: operations["v1_inventory_stock_expiring_list"];
+        get: operations["api_v1_inventory_stock_expiring_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -721,7 +721,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Read-only audit trail of stock movements. */
-        get: operations["v1_inventory_transactions_list"];
+        get: operations["api_v1_inventory_transactions_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -738,7 +738,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Read-only audit trail of stock movements. */
-        get: operations["v1_inventory_transactions_retrieve"];
+        get: operations["api_v1_inventory_transactions_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -755,10 +755,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        get: operations["v1_leave_requests_list"];
+        get: operations["api_v1_leave_requests_list"];
         put?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        post: operations["v1_leave_requests_create"];
+        post: operations["api_v1_leave_requests_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -773,16 +773,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        get: operations["v1_leave_requests_retrieve"];
+        get: operations["api_v1_leave_requests_retrieve"];
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        put: operations["v1_leave_requests_update"];
+        put: operations["api_v1_leave_requests_update"];
         post?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        delete: operations["v1_leave_requests_destroy"];
+        delete: operations["api_v1_leave_requests_destroy"];
         options?: never;
         head?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        patch: operations["v1_leave_requests_partial_update"];
+        patch: operations["api_v1_leave_requests_partial_update"];
         trace?: never;
     };
     "/api/v1/leave-requests/{id}/approve/": {
@@ -795,7 +795,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        post: operations["v1_leave_requests_approve_create"];
+        post: operations["api_v1_leave_requests_approve_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -812,7 +812,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        post: operations["v1_leave_requests_cancel_create"];
+        post: operations["api_v1_leave_requests_cancel_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -829,7 +829,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see and file their own leave; officers see everyone's and approve or deny. */
-        post: operations["v1_leave_requests_deny_create"];
+        post: operations["api_v1_leave_requests_deny_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -844,7 +844,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Staffing shortfalls approving this leave would cause, by day. */
-        get: operations["v1_leave_requests_impact_list"];
+        get: operations["api_v1_leave_requests_impact_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -861,10 +861,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_maintenance_schedules_list"];
+        get: operations["api_v1_maintenance_schedules_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_maintenance_schedules_create"];
+        post: operations["api_v1_maintenance_schedules_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -879,16 +879,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_maintenance_schedules_retrieve"];
+        get: operations["api_v1_maintenance_schedules_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_maintenance_schedules_update"];
+        put: operations["api_v1_maintenance_schedules_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_maintenance_schedules_destroy"];
+        delete: operations["api_v1_maintenance_schedules_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_maintenance_schedules_partial_update"];
+        patch: operations["api_v1_maintenance_schedules_partial_update"];
         trace?: never;
     };
     "/api/v1/maintenance-schedules/due/": {
@@ -899,7 +899,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Schedules that are due now, or within ``?days=`` (default 14). */
-        get: operations["v1_maintenance_schedules_due_list"];
+        get: operations["api_v1_maintenance_schedules_due_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -915,13 +915,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["v1_me_retrieve"];
+        get: operations["api_v1_me_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["v1_me_partial_update"];
+        patch: operations["api_v1_me_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/me/calendar-feed/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``GET`` the personal calendar link (created on first use); ``POST`` to replace it with a new one. */
+        get: operations["api_v1_me_calendar_feed_retrieve"];
+        put?: never;
+        /** @description ``GET`` the personal calendar link (created on first use); ``POST`` to replace it with a new one. */
+        post: operations["api_v1_me_calendar_feed_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/platoons/": {
@@ -932,10 +950,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_platoons_list"];
+        get: operations["api_v1_platoons_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_platoons_create"];
+        post: operations["api_v1_platoons_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -950,16 +968,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_platoons_retrieve"];
+        get: operations["api_v1_platoons_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_platoons_update"];
+        put: operations["api_v1_platoons_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_platoons_destroy"];
+        delete: operations["api_v1_platoons_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_platoons_partial_update"];
+        patch: operations["api_v1_platoons_partial_update"];
         trace?: never;
     };
     "/api/v1/reports/": {
@@ -969,7 +987,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["v1_reports_list"];
+        get: operations["api_v1_reports_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -986,7 +1004,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description A report as JSON, or as CSV with ``?export=csv``. Dates default to the year to date. */
-        get: operations["v1_reports_retrieve"];
+        get: operations["api_v1_reports_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1003,7 +1021,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description ``GET /roster/?date=YYYY-MM-DD`` – who is on duty (defaults to today). */
-        get: operations["v1_roster_retrieve"];
+        get: operations["api_v1_roster_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1020,10 +1038,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_rotation_patterns_list"];
+        get: operations["api_v1_rotation_patterns_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_rotation_patterns_create"];
+        post: operations["api_v1_rotation_patterns_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1038,16 +1056,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_rotation_patterns_retrieve"];
+        get: operations["api_v1_rotation_patterns_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_rotation_patterns_update"];
+        put: operations["api_v1_rotation_patterns_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_rotation_patterns_destroy"];
+        delete: operations["api_v1_rotation_patterns_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_rotation_patterns_partial_update"];
+        patch: operations["api_v1_rotation_patterns_partial_update"];
         trace?: never;
     };
     "/api/v1/service-records/": {
@@ -1058,10 +1076,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_service_records_list"];
+        get: operations["api_v1_service_records_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_service_records_create"];
+        post: operations["api_v1_service_records_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1076,16 +1094,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_service_records_retrieve"];
+        get: operations["api_v1_service_records_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_service_records_update"];
+        put: operations["api_v1_service_records_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_service_records_destroy"];
+        delete: operations["api_v1_service_records_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_service_records_partial_update"];
+        patch: operations["api_v1_service_records_partial_update"];
         trace?: never;
     };
     "/api/v1/shift-calendar/": {
@@ -1096,7 +1114,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description ``GET /shift-calendar/?start=&end=`` – the on-duty platoon for each day in a range. */
-        get: operations["v1_shift_calendar_list"];
+        get: operations["api_v1_shift_calendar_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1113,10 +1131,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description Members see trades they're part of; officers see all. */
-        get: operations["v1_shift_trades_list"];
+        get: operations["api_v1_shift_trades_list"];
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_create"];
+        post: operations["api_v1_shift_trades_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1131,7 +1149,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Members see trades they're part of; officers see all. */
-        get: operations["v1_shift_trades_retrieve"];
+        get: operations["api_v1_shift_trades_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1150,7 +1168,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_accept_create"];
+        post: operations["api_v1_shift_trades_accept_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1167,7 +1185,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_approve_create"];
+        post: operations["api_v1_shift_trades_approve_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1184,7 +1202,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_cancel_create"];
+        post: operations["api_v1_shift_trades_cancel_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1201,7 +1219,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_decline_create"];
+        post: operations["api_v1_shift_trades_decline_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1218,7 +1236,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
-        post: operations["v1_shift_trades_deny_create"];
+        post: operations["api_v1_shift_trades_deny_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1233,7 +1251,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description ``GET /staffing/?start=&end=`` – days in the range whose crew misses a staffing rule. */
-        get: operations["v1_staffing_list"];
+        get: operations["api_v1_staffing_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1250,10 +1268,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_staffing_rules_list"];
+        get: operations["api_v1_staffing_rules_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_staffing_rules_create"];
+        post: operations["api_v1_staffing_rules_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1268,16 +1286,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_staffing_rules_retrieve"];
+        get: operations["api_v1_staffing_rules_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_staffing_rules_update"];
+        put: operations["api_v1_staffing_rules_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_staffing_rules_destroy"];
+        delete: operations["api_v1_staffing_rules_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_staffing_rules_partial_update"];
+        patch: operations["api_v1_staffing_rules_partial_update"];
         trace?: never;
     };
     "/api/v1/stations/": {
@@ -1288,10 +1306,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_stations_list"];
+        get: operations["api_v1_stations_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_stations_create"];
+        post: operations["api_v1_stations_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1306,16 +1324,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_stations_retrieve"];
+        get: operations["api_v1_stations_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_stations_update"];
+        put: operations["api_v1_stations_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_stations_destroy"];
+        delete: operations["api_v1_stations_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_stations_partial_update"];
+        patch: operations["api_v1_stations_partial_update"];
         trace?: never;
     };
     "/api/v1/users/": {
@@ -1326,10 +1344,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_users_list"];
+        get: operations["api_v1_users_list"];
         put?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        post: operations["v1_users_create"];
+        post: operations["api_v1_users_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1344,16 +1362,16 @@ export interface paths {
             cookie?: never;
         };
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        get: operations["v1_users_retrieve"];
+        get: operations["api_v1_users_retrieve"];
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        put: operations["v1_users_update"];
+        put: operations["api_v1_users_update"];
         post?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        delete: operations["v1_users_destroy"];
+        delete: operations["api_v1_users_destroy"];
         options?: never;
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
-        patch: operations["v1_users_partial_update"];
+        patch: operations["api_v1_users_partial_update"];
         trace?: never;
     };
     "/api/v1/work-orders/": {
@@ -1364,10 +1382,10 @@ export interface paths {
             cookie?: never;
         };
         /** @description Any member can report a problem; only officers can delete. */
-        get: operations["v1_work_orders_list"];
+        get: operations["api_v1_work_orders_list"];
         put?: never;
         /** @description Any member can report a problem; only officers can delete. */
-        post: operations["v1_work_orders_create"];
+        post: operations["api_v1_work_orders_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1382,16 +1400,36 @@ export interface paths {
             cookie?: never;
         };
         /** @description Any member can report a problem; only officers can delete. */
-        get: operations["v1_work_orders_retrieve"];
+        get: operations["api_v1_work_orders_retrieve"];
         /** @description Any member can report a problem; only officers can delete. */
-        put: operations["v1_work_orders_update"];
+        put: operations["api_v1_work_orders_update"];
         post?: never;
         /** @description Any member can report a problem; only officers can delete. */
-        delete: operations["v1_work_orders_destroy"];
+        delete: operations["api_v1_work_orders_destroy"];
         options?: never;
         head?: never;
         /** @description Any member can report a problem; only officers can delete. */
-        patch: operations["v1_work_orders_partial_update"];
+        patch: operations["api_v1_work_orders_partial_update"];
+        trace?: never;
+    };
+    "/calendar/{token}.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description The member's personal iCalendar feed. The secret token in the URL is the only credential,
+         *     so calendar apps can subscribe; members can regenerate it to revoke an old link.
+         */
+        get: operations["calendar_.ics_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -1518,6 +1556,15 @@ export interface components {
         AuditEntryActionEnum: "create" | "update" | "delete";
         /** @enum {unknown} */
         BlankEnum: "";
+        CalendarLink: {
+            /**
+             * Format: uri
+             * @description https link, for Google Calendar's “From URL”
+             */
+            url: string;
+            /** @description webcal:// link that opens Apple Calendar or Outlook directly */
+            webcal_url: string;
+        };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Certification: {
             readonly id: number;
@@ -1719,6 +1766,8 @@ export interface components {
             readonly created_by: number;
             readonly attendance: components["schemas"]["Attendance"][];
             readonly my_status: string | null;
+            /** Format: uuid */
+            readonly series: string | null;
         };
         /**
          * @description * `training` - Training
@@ -1753,6 +1802,24 @@ export interface components {
             training_hours?: string | null;
             /** @description Members to invite. Mandatory events invite every active member automatically. */
             invitees?: number[];
+            /**
+             * @description Only when creating
+             *
+             *     * `none` - Doesn't repeat
+             *     * `weekly` - Weekly
+             *     * `monthly_date` - Monthly on the same date
+             *     * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
+             * @default none
+             */
+            repeat: components["schemas"]["RepeatEnum"];
+            /**
+             * @description Every N weeks or months
+             * @default 1
+             */
+            repeat_interval: number;
+            /** Format: date */
+            repeat_until?: string | null;
+            repeat_count?: number | null;
         };
         ImportColumn: {
             key: string;
@@ -2434,6 +2501,24 @@ export interface components {
             training_hours?: string | null;
             /** @description Members to invite. Mandatory events invite every active member automatically. */
             invitees?: number[];
+            /**
+             * @description Only when creating
+             *
+             *     * `none` - Doesn't repeat
+             *     * `weekly` - Weekly
+             *     * `monthly_date` - Monthly on the same date
+             *     * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
+             * @default none
+             */
+            repeat: components["schemas"]["RepeatEnum"];
+            /**
+             * @description Every N weeks or months
+             * @default 1
+             */
+            repeat_interval: number;
+            /** Format: date */
+            repeat_until?: string | null;
+            repeat_count?: number | null;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedItemRequest: {
@@ -2653,6 +2738,14 @@ export interface components {
          * @enum {string}
          */
         ReasonEnum: "restock" | "used" | "expired" | "damaged" | "transfer_in" | "transfer_out" | "count";
+        /**
+         * @description * `none` - Doesn't repeat
+         *     * `weekly` - Weekly
+         *     * `monthly_date` - Monthly on the same date
+         *     * `monthly_weekday` - Monthly on the same weekday (e.g. 2nd Tuesday)
+         * @enum {string}
+         */
+        RepeatEnum: "none" | "weekly" | "monthly_date" | "monthly_weekday";
         Report: {
             slug: string;
             title: string;
@@ -3082,7 +3175,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    schema_retrieve: {
+    api_schema_retrieve: {
         parameters: {
             query?: {
                 format?: "json" | "yaml";
@@ -3115,7 +3208,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_list: {
+    api_v1_apparatus_list: {
         parameters: {
             query?: {
                 /**
@@ -3165,7 +3258,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_create: {
+    api_v1_apparatus_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3190,7 +3283,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_retrieve: {
+    api_v1_apparatus_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3212,7 +3305,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_update: {
+    api_v1_apparatus_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3240,7 +3333,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_destroy: {
+    api_v1_apparatus_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -3261,7 +3354,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_partial_update: {
+    api_v1_apparatus_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3289,7 +3382,7 @@ export interface operations {
             };
         };
     };
-    v1_apparatus_checklists_list: {
+    api_v1_apparatus_checklists_list: {
         parameters: {
             query?: {
                 /**
@@ -3338,7 +3431,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_list: {
+    api_v1_assignments_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -3379,7 +3472,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_create: {
+    api_v1_assignments_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3404,7 +3497,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_retrieve: {
+    api_v1_assignments_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3426,7 +3519,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_update: {
+    api_v1_assignments_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3454,7 +3547,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_destroy: {
+    api_v1_assignments_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -3475,7 +3568,7 @@ export interface operations {
             };
         };
     };
-    v1_assignments_partial_update: {
+    api_v1_assignments_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3503,7 +3596,7 @@ export interface operations {
             };
         };
     };
-    v1_audit_log_list: {
+    api_v1_audit_log_list: {
         parameters: {
             query?: {
                 /**
@@ -3544,7 +3637,7 @@ export interface operations {
             };
         };
     };
-    v1_audit_log_retrieve: {
+    api_v1_audit_log_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3566,7 +3659,7 @@ export interface operations {
             };
         };
     };
-    v1_auth_csrf_retrieve: {
+    api_v1_auth_csrf_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3584,7 +3677,7 @@ export interface operations {
             };
         };
     };
-    v1_auth_session_create: {
+    api_v1_auth_session_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3616,7 +3709,7 @@ export interface operations {
             };
         };
     };
-    v1_auth_session_destroy: {
+    api_v1_auth_session_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -3634,7 +3727,7 @@ export interface operations {
             };
         };
     };
-    v1_auth_token_create: {
+    api_v1_auth_token_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3659,7 +3752,7 @@ export interface operations {
             };
         };
     };
-    v1_auth_token_refresh_create: {
+    api_v1_auth_token_refresh_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3684,7 +3777,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_list: {
+    api_v1_certification_types_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -3712,7 +3805,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_create: {
+    api_v1_certification_types_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3737,7 +3830,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_retrieve: {
+    api_v1_certification_types_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3759,7 +3852,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_update: {
+    api_v1_certification_types_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3787,7 +3880,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_destroy: {
+    api_v1_certification_types_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -3808,7 +3901,7 @@ export interface operations {
             };
         };
     };
-    v1_certification_types_partial_update: {
+    api_v1_certification_types_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3836,7 +3929,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_list: {
+    api_v1_certifications_list: {
         parameters: {
             query?: {
                 certification_type?: number;
@@ -3866,7 +3959,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_create: {
+    api_v1_certifications_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -3891,7 +3984,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_retrieve: {
+    api_v1_certifications_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -3913,7 +4006,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_update: {
+    api_v1_certifications_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3941,7 +4034,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_destroy: {
+    api_v1_certifications_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -3962,7 +4055,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_partial_update: {
+    api_v1_certifications_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3990,7 +4083,7 @@ export interface operations {
             };
         };
     };
-    v1_certifications_compliance_list: {
+    api_v1_certifications_compliance_list: {
         parameters: {
             query?: {
                 certification_type?: number;
@@ -4016,7 +4109,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_list: {
+    api_v1_checklists_list: {
         parameters: {
             query?: {
                 /**
@@ -4061,7 +4154,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_create: {
+    api_v1_checklists_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4086,7 +4179,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_retrieve: {
+    api_v1_checklists_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4108,7 +4201,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_update: {
+    api_v1_checklists_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4136,7 +4229,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_destroy: {
+    api_v1_checklists_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -4157,7 +4250,7 @@ export interface operations {
             };
         };
     };
-    v1_checklists_partial_update: {
+    api_v1_checklists_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4185,7 +4278,7 @@ export interface operations {
             };
         };
     };
-    v1_dashboard_retrieve: {
+    api_v1_dashboard_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4204,7 +4297,7 @@ export interface operations {
             };
         };
     };
-    v1_department_retrieve: {
+    api_v1_department_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4223,7 +4316,7 @@ export interface operations {
             };
         };
     };
-    v1_department_partial_update: {
+    api_v1_department_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4248,7 +4341,7 @@ export interface operations {
             };
         };
     };
-    v1_events_list: {
+    api_v1_events_list: {
         parameters: {
             query?: {
                 /**
@@ -4293,7 +4386,7 @@ export interface operations {
             };
         };
     };
-    v1_events_create: {
+    api_v1_events_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4318,7 +4411,7 @@ export interface operations {
             };
         };
     };
-    v1_events_retrieve: {
+    api_v1_events_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4340,7 +4433,7 @@ export interface operations {
             };
         };
     };
-    v1_events_update: {
+    api_v1_events_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4368,9 +4461,12 @@ export interface operations {
             };
         };
     };
-    v1_events_destroy: {
+    api_v1_events_destroy: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description For repeating events */
+                scope?: "following" | "this";
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this event. */
@@ -4389,7 +4485,7 @@ export interface operations {
             };
         };
     };
-    v1_events_partial_update: {
+    api_v1_events_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4417,7 +4513,7 @@ export interface operations {
             };
         };
     };
-    v1_events_attendance_create: {
+    api_v1_events_attendance_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4445,7 +4541,7 @@ export interface operations {
             };
         };
     };
-    v1_events_rsvp_create: {
+    api_v1_events_rsvp_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4473,7 +4569,7 @@ export interface operations {
             };
         };
     };
-    v1_events_training_hours_list: {
+    api_v1_events_training_hours_list: {
         parameters: {
             query?: {
                 /**
@@ -4510,7 +4606,7 @@ export interface operations {
             };
         };
     };
-    v1_imports_list: {
+    api_v1_imports_list: {
         parameters: {
             query?: never;
             header?: never;
@@ -4529,7 +4625,7 @@ export interface operations {
             };
         };
     };
-    v1_imports_create: {
+    api_v1_imports_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4554,7 +4650,7 @@ export interface operations {
             };
         };
     };
-    v1_imports_template_retrieve: {
+    api_v1_imports_template_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4575,7 +4671,7 @@ export interface operations {
             };
         };
     };
-    v1_inspections_list: {
+    api_v1_inspections_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -4606,7 +4702,7 @@ export interface operations {
             };
         };
     };
-    v1_inspections_create: {
+    api_v1_inspections_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4631,7 +4727,7 @@ export interface operations {
             };
         };
     };
-    v1_inspections_retrieve: {
+    api_v1_inspections_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4653,7 +4749,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_list: {
+    api_v1_inventory_items_list: {
         parameters: {
             query?: {
                 barcode?: string;
@@ -4693,7 +4789,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_create: {
+    api_v1_inventory_items_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4718,7 +4814,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_retrieve: {
+    api_v1_inventory_items_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4740,7 +4836,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_update: {
+    api_v1_inventory_items_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4768,7 +4864,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_destroy: {
+    api_v1_inventory_items_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -4789,7 +4885,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_items_partial_update: {
+    api_v1_inventory_items_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4817,7 +4913,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_list: {
+    api_v1_inventory_locations_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -4847,7 +4943,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_create: {
+    api_v1_inventory_locations_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4872,7 +4968,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_retrieve: {
+    api_v1_inventory_locations_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -4894,7 +4990,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_update: {
+    api_v1_inventory_locations_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4922,7 +5018,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_destroy: {
+    api_v1_inventory_locations_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -4943,7 +5039,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_locations_partial_update: {
+    api_v1_inventory_locations_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -4971,7 +5067,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_list: {
+    api_v1_inventory_stock_list: {
         parameters: {
             query?: {
                 /** @description Only stock below its par level */
@@ -5015,7 +5111,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_create: {
+    api_v1_inventory_stock_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5040,7 +5136,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_retrieve: {
+    api_v1_inventory_stock_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5062,7 +5158,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_update: {
+    api_v1_inventory_stock_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5090,7 +5186,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_destroy: {
+    api_v1_inventory_stock_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -5111,7 +5207,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_partial_update: {
+    api_v1_inventory_stock_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5139,7 +5235,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_adjust_create: {
+    api_v1_inventory_stock_adjust_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5167,7 +5263,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_stock_expiring_list: {
+    api_v1_inventory_stock_expiring_list: {
         parameters: {
             query?: {
                 /** @description Window in days (default 30) */
@@ -5207,7 +5303,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_transactions_list: {
+    api_v1_inventory_transactions_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -5249,7 +5345,7 @@ export interface operations {
             };
         };
     };
-    v1_inventory_transactions_retrieve: {
+    api_v1_inventory_transactions_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5271,7 +5367,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_list: {
+    api_v1_leave_requests_list: {
         parameters: {
             query?: {
                 /** @description Overlapping on or before this date */
@@ -5322,7 +5418,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_create: {
+    api_v1_leave_requests_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5347,7 +5443,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_retrieve: {
+    api_v1_leave_requests_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5369,7 +5465,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_update: {
+    api_v1_leave_requests_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5397,7 +5493,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_destroy: {
+    api_v1_leave_requests_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -5418,7 +5514,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_partial_update: {
+    api_v1_leave_requests_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5446,7 +5542,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_approve_create: {
+    api_v1_leave_requests_approve_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5474,7 +5570,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_cancel_create: {
+    api_v1_leave_requests_cancel_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5496,7 +5592,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_deny_create: {
+    api_v1_leave_requests_deny_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5524,7 +5620,7 @@ export interface operations {
             };
         };
     };
-    v1_leave_requests_impact_list: {
+    api_v1_leave_requests_impact_list: {
         parameters: {
             query?: {
                 /**
@@ -5570,7 +5666,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_list: {
+    api_v1_maintenance_schedules_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -5599,7 +5695,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_create: {
+    api_v1_maintenance_schedules_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5624,7 +5720,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_retrieve: {
+    api_v1_maintenance_schedules_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5646,7 +5742,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_update: {
+    api_v1_maintenance_schedules_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5674,7 +5770,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_destroy: {
+    api_v1_maintenance_schedules_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -5695,7 +5791,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_partial_update: {
+    api_v1_maintenance_schedules_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5723,7 +5819,7 @@ export interface operations {
             };
         };
     };
-    v1_maintenance_schedules_due_list: {
+    api_v1_maintenance_schedules_due_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -5750,7 +5846,7 @@ export interface operations {
             };
         };
     };
-    v1_me_retrieve: {
+    api_v1_me_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5769,7 +5865,7 @@ export interface operations {
             };
         };
     };
-    v1_me_partial_update: {
+    api_v1_me_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5794,7 +5890,45 @@ export interface operations {
             };
         };
     };
-    v1_platoons_list: {
+    api_v1_me_calendar_feed_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarLink"];
+                };
+            };
+        };
+    };
+    api_v1_me_calendar_feed_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarLink"];
+                };
+            };
+        };
+    };
+    api_v1_platoons_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -5822,7 +5956,7 @@ export interface operations {
             };
         };
     };
-    v1_platoons_create: {
+    api_v1_platoons_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5847,7 +5981,7 @@ export interface operations {
             };
         };
     };
-    v1_platoons_retrieve: {
+    api_v1_platoons_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -5869,7 +6003,7 @@ export interface operations {
             };
         };
     };
-    v1_platoons_update: {
+    api_v1_platoons_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5897,7 +6031,7 @@ export interface operations {
             };
         };
     };
-    v1_platoons_destroy: {
+    api_v1_platoons_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -5918,7 +6052,7 @@ export interface operations {
             };
         };
     };
-    v1_platoons_partial_update: {
+    api_v1_platoons_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -5946,7 +6080,7 @@ export interface operations {
             };
         };
     };
-    v1_reports_list: {
+    api_v1_reports_list: {
         parameters: {
             query?: never;
             header?: never;
@@ -5965,7 +6099,7 @@ export interface operations {
             };
         };
     };
-    v1_reports_retrieve: {
+    api_v1_reports_retrieve: {
         parameters: {
             query?: {
                 end?: string;
@@ -5990,7 +6124,7 @@ export interface operations {
             };
         };
     };
-    v1_roster_retrieve: {
+    api_v1_roster_retrieve: {
         parameters: {
             query?: {
                 date?: string;
@@ -6011,7 +6145,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_list: {
+    api_v1_rotation_patterns_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -6039,7 +6173,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_create: {
+    api_v1_rotation_patterns_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6064,7 +6198,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_retrieve: {
+    api_v1_rotation_patterns_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6086,7 +6220,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_update: {
+    api_v1_rotation_patterns_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6114,7 +6248,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_destroy: {
+    api_v1_rotation_patterns_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -6135,7 +6269,7 @@ export interface operations {
             };
         };
     };
-    v1_rotation_patterns_partial_update: {
+    api_v1_rotation_patterns_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6163,7 +6297,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_list: {
+    api_v1_service_records_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -6193,7 +6327,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_create: {
+    api_v1_service_records_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6218,7 +6352,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_retrieve: {
+    api_v1_service_records_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6240,7 +6374,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_update: {
+    api_v1_service_records_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6268,7 +6402,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_destroy: {
+    api_v1_service_records_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -6289,7 +6423,7 @@ export interface operations {
             };
         };
     };
-    v1_service_records_partial_update: {
+    api_v1_service_records_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6317,7 +6451,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_calendar_list: {
+    api_v1_shift_calendar_list: {
         parameters: {
             query: {
                 end: string;
@@ -6339,7 +6473,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_list: {
+    api_v1_shift_trades_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -6377,7 +6511,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_create: {
+    api_v1_shift_trades_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6402,7 +6536,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_retrieve: {
+    api_v1_shift_trades_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6424,7 +6558,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_accept_create: {
+    api_v1_shift_trades_accept_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6446,7 +6580,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_approve_create: {
+    api_v1_shift_trades_approve_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6468,7 +6602,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_cancel_create: {
+    api_v1_shift_trades_cancel_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6490,7 +6624,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_decline_create: {
+    api_v1_shift_trades_decline_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6512,7 +6646,7 @@ export interface operations {
             };
         };
     };
-    v1_shift_trades_deny_create: {
+    api_v1_shift_trades_deny_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6534,7 +6668,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_list: {
+    api_v1_staffing_list: {
         parameters: {
             query: {
                 end: string;
@@ -6556,7 +6690,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_list: {
+    api_v1_staffing_rules_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -6584,7 +6718,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_create: {
+    api_v1_staffing_rules_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6609,7 +6743,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_retrieve: {
+    api_v1_staffing_rules_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6631,7 +6765,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_update: {
+    api_v1_staffing_rules_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6659,7 +6793,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_destroy: {
+    api_v1_staffing_rules_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -6680,7 +6814,7 @@ export interface operations {
             };
         };
     };
-    v1_staffing_rules_partial_update: {
+    api_v1_staffing_rules_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6708,7 +6842,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_list: {
+    api_v1_stations_list: {
         parameters: {
             query?: {
                 /** @description Which field to use when ordering the results. */
@@ -6736,7 +6870,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_create: {
+    api_v1_stations_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6761,7 +6895,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_retrieve: {
+    api_v1_stations_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6783,7 +6917,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_update: {
+    api_v1_stations_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6811,7 +6945,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_destroy: {
+    api_v1_stations_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -6832,7 +6966,7 @@ export interface operations {
             };
         };
     };
-    v1_stations_partial_update: {
+    api_v1_stations_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6860,7 +6994,7 @@ export interface operations {
             };
         };
     };
-    v1_users_list: {
+    api_v1_users_list: {
         parameters: {
             query?: {
                 home_station?: number;
@@ -6896,7 +7030,7 @@ export interface operations {
             };
         };
     };
-    v1_users_create: {
+    api_v1_users_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6921,7 +7055,7 @@ export interface operations {
             };
         };
     };
-    v1_users_retrieve: {
+    api_v1_users_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -6943,7 +7077,7 @@ export interface operations {
             };
         };
     };
-    v1_users_update: {
+    api_v1_users_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -6971,7 +7105,7 @@ export interface operations {
             };
         };
     };
-    v1_users_destroy: {
+    api_v1_users_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -6992,7 +7126,7 @@ export interface operations {
             };
         };
     };
-    v1_users_partial_update: {
+    api_v1_users_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -7020,7 +7154,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_list: {
+    api_v1_work_orders_list: {
         parameters: {
             query?: {
                 apparatus?: number;
@@ -7067,7 +7201,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_create: {
+    api_v1_work_orders_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7092,7 +7226,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_retrieve: {
+    api_v1_work_orders_retrieve: {
         parameters: {
             query?: never;
             header?: never;
@@ -7114,7 +7248,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_update: {
+    api_v1_work_orders_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -7142,7 +7276,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_destroy: {
+    api_v1_work_orders_destroy: {
         parameters: {
             query?: never;
             header?: never;
@@ -7163,7 +7297,7 @@ export interface operations {
             };
         };
     };
-    v1_work_orders_partial_update: {
+    api_v1_work_orders_partial_update: {
         parameters: {
             query?: never;
             header?: never;
@@ -7187,6 +7321,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkOrder"];
+                };
+            };
+        };
+    };
+    "calendar_.ics_retrieve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": string;
                 };
             };
         };

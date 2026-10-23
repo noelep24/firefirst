@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 import { api, type Schemas, unwrap } from '@/api/client';
-import { Badge, Card, Empty, Label, QueryState, Row, Screen, Section } from '@/components/ui';
+import { Badge, Button, Card, Empty, ErrorBox, Label, QueryState, Row, Screen, Section } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { addDays, formatDay, formatTime, humanize, isoDate, parseDate } from '@/lib/format';
@@ -38,6 +39,7 @@ export default function CalendarScreen() {
       <QueryState query={shifts}>
         {(shiftsData) => <ShiftStrip days={shiftsData} platoons={platoons.data?.results ?? []} />}
       </QueryState>
+      <AddToCalendar />
       <QueryState query={events}>{(eventsData) => <EventList events={eventsData.results} />}</QueryState>
     </Screen>
   );
@@ -98,6 +100,57 @@ function EventList({ events }: { events: Schemas['Event'][] }) {
         </Section>
       ))}
     </>
+  );
+}
+
+/** Subscribe the phone's calendar app to the member's shifts and events. */
+function AddToCalendar() {
+  const [error, setError] = useState<unknown>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function link() {
+    setError(null);
+    setBusy(true);
+    try {
+      return await unwrap(api().GET('/api/v1/me/calendar-feed/'));
+    } catch (e) {
+      setError(e);
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <Label type="smallBold">Your shifts in your phone&apos;s calendar</Label>
+      <Label type="small" color="textSecondary">
+        Shifts (with leave and trades applied) and department events, kept up to date automatically.
+      </Label>
+      <Row>
+        <Button
+          title="Add to calendar"
+          small
+          loading={busy}
+          onPress={async () => {
+            const l = await link();
+            // webcal:// opens a subscription in Apple Calendar (and Outlook).
+            if (l) await Linking.openURL(l.webcal_url).catch(() => Share.share({ message: l.url }));
+          }}
+        />
+        <Button
+          title="Share link"
+          small
+          variant="secondary"
+          onPress={async () => {
+            const l = await link();
+            // For Google Calendar: Other calendars → From URL on the web.
+            if (l) await Share.share({ message: l.url });
+          }}
+        />
+      </Row>
+      {error ? <ErrorBox error={error} /> : null}
+    </Card>
   );
 }
 

@@ -10,6 +10,25 @@ import { personLabel, stationLabel } from '@/lib/fields';
 import { addDays, formatDateTime, formatTime, isoDate } from '@/lib/format';
 import { eventCategories, labelFor } from '@/lib/labels';
 
+// Only offered when creating: each occurrence is then a separate event.
+const repeatFields: FieldSpec[] = [
+  {
+    name: 'repeat',
+    label: 'Repeat',
+    type: 'select',
+    required: true,
+    options: [
+      { value: 'none', label: "Doesn't repeat" },
+      { value: 'weekly', label: 'Weekly' },
+      { value: 'monthly_date', label: 'Monthly on the same date' },
+      { value: 'monthly_weekday', label: 'Monthly on the same weekday (e.g. 2nd Tuesday)' },
+    ],
+  },
+  { name: 'repeat_interval', label: 'Every (weeks or months)', type: 'number', step: '1', min: 1 },
+  { name: 'repeat_until', label: 'Repeat until', type: 'date' },
+  { name: 'repeat_count', label: 'Or number of times', type: 'number', step: '1', min: 2 },
+];
+
 const eventFields: FieldSpec[] = [
   { name: 'title', label: 'Title', type: 'text', required: true, wide: true },
   { name: 'category', label: 'Type', type: 'select', options: eventCategories, required: true },
@@ -96,9 +115,15 @@ export default function Events() {
         <RecordModal<Schemas['Event']>
           title={editing === 'new' ? 'New event' : 'Edit event'}
           endpoint="/api/v1/events/"
-          fields={eventFields}
+          fields={editing === 'new' ? [...eventFields, ...repeatFields] : eventFields}
           record={editing === 'new' ? null : editing}
-          defaults={{ category: 'training' }}
+          defaults={{ category: 'training', repeat: 'none', repeat_interval: '1' }}
+          prepare={(body) => {
+            if (body.repeat === undefined || body.repeat === 'none') {
+              for (const key of ['repeat', 'repeat_interval', 'repeat_until', 'repeat_count']) delete body[key];
+            }
+            return body;
+          }}
           onClose={() => setEditing(null)}
           onSaved={() => {
             queryClient.invalidateQueries();
@@ -191,6 +216,13 @@ function EventModal({
       queryClient.invalidateQueries();
     },
   });
+  const removeFollowing = useMutation({
+    mutationFn: () => http.delete(`/api/v1/events/${id}/?scope=following`),
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      onClose();
+    },
+  });
 
   return (
     <Modal
@@ -200,7 +232,19 @@ function EventModal({
       footer={
         event.data ? (
           <>
-            <Button onClick={() => onEdit(event.data!)}>Edit event</Button>
+            <div className="row">
+              <Button onClick={() => onEdit(event.data!)}>Edit event</Button>
+              {event.data.series ? (
+                <Button
+                  variant="danger"
+                  loading={removeFollowing.isPending}
+                  onClick={() =>
+                    window.confirm('Delete this event and every later one in the series?') && removeFollowing.mutate()
+                  }>
+                  Delete this and following
+                </Button>
+              ) : null}
+            </div>
             <Button
               variant="primary"
               onClick={() => save.mutate()}

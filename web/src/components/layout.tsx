@@ -5,6 +5,7 @@ import { NavLink, Outlet, useLocation } from 'react-router';
 import { http, type Schemas } from '@/api/http';
 import { useMe } from '@/auth';
 
+import { CalendarFeedButton } from './calendar-feed';
 import { Badge, Button } from './ui';
 
 type NavItem = { to: string; label: string; adminOnly?: boolean; badge?: number };
@@ -105,6 +106,7 @@ export function Layout() {
             <div style={{ fontWeight: 600 }}>{me.full_name || me.username}</div>
             <div className="muted small">{me.role === 'admin' ? 'Department admin' : 'Officer'}</div>
           </div>
+          <CalendarFeedButton />
           <Button small onClick={logout}>
             Sign out
           </Button>

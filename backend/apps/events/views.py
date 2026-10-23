@@ -1,17 +1,25 @@
+import secrets
+
 from django.db.models import Sum
+from django.http import HttpResponse
+from django.urls import reverse
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from apps.core.models import User
 from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
+from .ical import build_feed
 from .models import Attendance, Event
-from .serializers import AttendanceMarkSerializer, EventSerializer, RsvpSerializer
+from .serializers import AttendanceMarkSerializer, CalendarLinkSerializer, EventSerializer, RsvpSerializer
 
 
 @extend_schema_view(
@@ -20,7 +28,12 @@ from .serializers import AttendanceMarkSerializer, EventSerializer, RsvpSerializ
             OpenApiParameter("start", OpenApiTypes.DATE, description="Overlapping on or after this date"),
             OpenApiParameter("end", OpenApiTypes.DATE, description="Overlapping on or before this date"),
         ]
-    )
+    ),
+    destroy=extend_schema(
+        parameters=[
+            OpenApiParameter("scope", OpenApiTypes.STR, enum=["this", "following"], description="For repeating events")
+        ]
+    ),
 )
 class EventViewSet(TenantViewSet):
     """``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range."""
@@ -43,6 +56,14 @@ class EventViewSet(TenantViewSet):
 
     def perform_create(self, serializer):
         serializer.save(department=self.request.user.department, created_by=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.series and self.request.query_params.get("scope") == "following":
+            Event.objects.filter(
+                department=instance.department, series=instance.series, starts_at__gte=instance.starts_at
+            ).delete()
+        else:
+            instance.delete()
 
     @extend_schema(request=RsvpSerializer, responses=EventSerializer)
     @action(detail=True, methods=["post"], permission_classes=[IsDepartmentMember], serializer_class=RsvpSerializer)
@@ -113,3 +134,45 @@ class EventViewSet(TenantViewSet):
                 for r in rows
             ]
         )
+
+
+class CalendarFeedView(APIView):
+    """The member's personal iCalendar feed. The secret token in the URL is the only credential,
+    so calendar apps can subscribe; members can regenerate it to revoke an old link."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    @extend_schema(responses={(200, "text/calendar"): OpenApiTypes.STR})
+    def get(self, request, token):
+        user = User.objects.filter(calendar_token=token, is_active=True, department__isnull=False).first()
+        if not token or user is None:
+            raise NotFound("This calendar link is no longer valid.")
+        response = HttpResponse(build_feed(user), content_type="text/calendar; charset=utf-8")
+        response["Content-Disposition"] = 'inline; filename="firefirst.ics"'
+        return response
+
+
+class MyCalendarFeedView(APIView):
+    """``GET`` the personal calendar link (created on first use); ``POST`` to replace it with a new one."""
+
+    permission_classes = [IsDepartmentMember]
+
+    def _response(self, request, user):
+        url = request.build_absolute_uri(reverse("calendar-feed", args=[user.calendar_token]))
+        return Response({"url": url, "webcal_url": "webcal://" + url.split("://", 1)[1]})
+
+    @extend_schema(responses=CalendarLinkSerializer)
+    def get(self, request):
+        user = request.user
+        if not user.calendar_token:
+            user.calendar_token = secrets.token_urlsafe(24)
+            user.save(update_fields=["calendar_token"])
+        return self._response(request, user)
+
+    @extend_schema(request=None, responses=CalendarLinkSerializer)
+    def post(self, request):
+        user = request.user
+        user.calendar_token = secrets.token_urlsafe(24)
+        user.save(update_fields=["calendar_token"])
+        return self._response(request, user)

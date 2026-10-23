@@ -58,6 +58,8 @@ class User(AbstractUser):
     rank = models.CharField(max_length=60, blank=True)
     phone = models.CharField(max_length=40, blank=True)
     home_station = models.ForeignKey(Station, null=True, blank=True, on_delete=models.SET_NULL, related_name="members")
+    # Secret for the personal calendar (iCal) feed URL. Blank until first requested; regenerating revokes the old link.
+    calendar_token = models.CharField(max_length=64, blank=True, db_index=True)
 
     @property
     def is_officer(self):

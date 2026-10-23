@@ -136,7 +136,8 @@ ruff check . && ruff format --check .
 - [x] Minimum-staffing rules (by station, position or certification) with shortfall warnings on the roster, calendar and leave approvals
 - [ ] Scheduling: overtime callback lists and hiring, Kelly-day automation, leave balances and accruals, payroll export
 - [x] Certification tracking with expirations, renewal periods, required-for-all types and a compliance view
-- [ ] Events: recurring events, iCal feeds, ISO training reports
+- [x] Recurring events (weekly, monthly by date, monthly by weekday) and a personal calendar feed with each member's real shifts
+- [ ] Events: ISO training reports
 
 **Selling to other departments**
 - [ ] Self-serve department sign-up and onboarding

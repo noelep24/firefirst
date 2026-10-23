@@ -39,6 +39,8 @@ class Event(TenantModel):
         help_text="Credit hours awarded to attendees (training and drills)",
     )
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+    # Occurrences of a repeating event share a series id; each is a full event with its own attendance.
+    series = models.UUIDField(null=True, blank=True, db_index=True)
 
     class Meta:
         ordering = ["starts_at"]

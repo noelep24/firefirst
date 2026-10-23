@@ -2,6 +2,8 @@
 
 import datetime
 
+from django.db import models
+
 from apps.certifications.models import Certification
 
 from .models import Assignment, LeaveRequest, RotationPattern, ShiftTrade, StaffingRule
@@ -130,3 +132,38 @@ def _person(user, assignment):
         "station_number": assignment.station.number if assignment.station else None,
         "position": assignment.position,
     }
+
+
+def member_shifts(user, start, end):
+    """The days ``user`` actually works between start and end: their platoon's days, minus approved leave
+    and shifts traded away, plus shifts they cover for someone else. Returns [(date, note)]."""
+    pattern = RotationPattern.active_for(user.department)
+    if pattern is None:
+        return []
+    assignment = Assignment.objects.filter(user=user).select_related("platoon").first()
+    leave = list(
+        LeaveRequest.objects.filter(
+            user=user, status=LeaveRequest.Status.APPROVED, start_date__lte=end, end_date__gte=start
+        )
+    )
+    trades = list(
+        ShiftTrade.objects.filter(status=ShiftTrade.Status.APPROVED, shift_date__range=(start, end))
+        .filter(models.Q(requester=user) | models.Q(covering_member=user))
+        .select_related("requester")
+    )
+    traded_away = {t.shift_date for t in trades if t.requester_id == user.id}
+    covering = {t.shift_date: t for t in trades if t.covering_member_id == user.id}
+    shifts = []
+    day = start
+    while day <= end:
+        if day in covering:
+            shifts.append((day, f"Covering for {covering[day].requester}"))
+        elif (
+            assignment
+            and pattern.platoon_code_on(day) == assignment.platoon.code
+            and day not in traded_away
+            and not any(lv.start_date <= day <= lv.end_date for lv in leave)
+        ):
+            shifts.append((day, ""))
+        day += datetime.timedelta(days=1)
+    return shifts
