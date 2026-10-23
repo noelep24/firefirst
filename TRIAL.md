@@ -55,6 +55,13 @@ order appear), try the barcode scanner in Supplies, request leave, RSVP to an ev
 and turn on airplane mode, log a rig check, then turn it off and watch it
 sync.
 
+**The officer web app** runs at the same time: open http://localhost:8000 in a
+browser on the computer running the trial and sign in as `demo-chief` (admin)
+or `demo-a1-captain` (officer). That's where you set up stations, apparatus
+(Apparatus → a rig → **Edit details** → Station), people, riding assignments
+(Schedule → Assignments → **Rides**), checklists and schedules. Officers can
+also move a rig between stations from its screen in the phone app.
+
 Press **Ctrl+C** in the terminal to stop. Run `python3 trial.py` again any
 time to pick up where you left off, or `python3 trial.py --reset` for a fresh
 demo department.

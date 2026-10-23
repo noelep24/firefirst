@@ -1,14 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 
 import { api, unwrap } from '@/api/client';
-import { Badge, Button, Card, Empty, Label, QueryState, Row, Screen, Section } from '@/components/ui';
+import { useMe } from '@/auth/auth-context';
+import { Badge, Button, Card, Empty, ErrorBox, Label, QueryState, Row, Screen, Section } from '@/components/ui';
 import { formatDateTime, humanize } from '@/lib/format';
 import { apparatusStatus, priorityTone, workOrderStatus } from '@/lib/labels';
 import { checklistsFor, useChecklists, useRig } from '@/lib/queries';
 
 export default function RigScreen() {
   const id = Number(useLocalSearchParams<{ id: string }>().id);
+  const { isOfficer } = useMe();
   const rig = useRig(id);
   const checklists = useChecklists();
   const workOrders = useQuery({
@@ -53,6 +55,8 @@ export default function RigScreen() {
           );
         }}
       </QueryState>
+
+      {isOfficer ? <MoveRig id={id} station={rig.data?.station ?? null} /> : null}
 
       <Section title="Rig check">
         <QueryState query={checklists}>
@@ -134,5 +138,45 @@ export default function RigScreen() {
         </QueryState>
       </Section>
     </Screen>
+  );
+}
+
+/** Officers move a rig between stations; the Today screen follows. */
+function MoveRig({ id, station }: { id: number; station: number | null }) {
+  const queryClient = useQueryClient();
+  const stations = useQuery({
+    queryKey: ['stations'],
+    queryFn: () => unwrap(api().GET('/api/v1/stations/', { params: { query: { page_size: 100 } } })),
+  });
+  const move = useMutation({
+    mutationFn: (to: number) =>
+      unwrap(api().PATCH('/api/v1/apparatus/{id}/', { params: { path: { id } }, body: { station: to } })),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['apparatus', id], data);
+      for (const key of ['apparatus', 'station-board', 'dashboard']) queryClient.invalidateQueries({ queryKey: [key] });
+    },
+  });
+
+  return (
+    <Section title="Station">
+      <QueryState query={stations}>
+        {(stationsData) => (
+          <Row>
+            {stationsData.results.map((s) => (
+              <Button
+                key={s.id}
+                title={`Station ${s.number}`}
+                small
+                variant={s.id === station ? 'primary' : 'secondary'}
+                loading={move.isPending && move.variables === s.id}
+                disabled={move.isPending}
+                onPress={() => (s.id === station ? undefined : move.mutate(s.id))}
+              />
+            ))}
+          </Row>
+        )}
+      </QueryState>
+      {move.error ? <ErrorBox error={move.error} /> : null}
+    </Section>
   );
 }
