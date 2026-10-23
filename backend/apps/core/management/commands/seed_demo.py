@@ -38,6 +38,35 @@ ITEMS = [
 ]
 
 
+# Shift / station / position order: A1 captain, engineer, firefighter, paramedic, then A2, B1, ...
+CREW_NAMES = [
+    ("Alex", "Smith"),
+    ("Maria", "Lopez"),
+    ("Derek", "Nguyen"),
+    ("Tasha", "Brooks"),
+    ("Ray", "Okafor"),
+    ("Jen", "Walsh"),
+    ("Luis", "Ortega"),
+    ("Kim", "Patel"),
+    ("Dana", "Fischer"),
+    ("Marcus", "Hill"),
+    ("Erin", "Kowalski"),
+    ("Sam", "Reyes"),
+    ("Tom", "Bradley"),
+    ("Priya", "Shah"),
+    ("Cole", "Jensen"),
+    ("Nina", "Castillo"),
+    ("Grant", "Murphy"),
+    ("Leah", "Owens"),
+    ("Victor", "Diaz"),
+    ("Amy", "Chen"),
+    ("Hank", "Roberts"),
+    ("Sofia", "Morales"),
+    ("Ben", "Carter"),
+    ("Jade", "Kim"),
+]
+
+
 class Command(BaseCommand):
     help = "Create a demo department with sample stations, members, apparatus, inventory and events."
 
@@ -81,11 +110,12 @@ class Command(BaseCommand):
                     (Assignment.Position.FIREFIGHTER, "Firefighter", User.Role.MEMBER),
                     (Assignment.Position.PARAMEDIC, "FF/Paramedic", User.Role.MEMBER),
                 ):
+                    first, last = CREW_NAMES[crew]
                     crew += 1
                     u = user(
                         f"{code.lower()}{station.number}-{position}",
-                        "Crew",
-                        f"{code}{station.number}-{crew:02d}",
+                        first,
+                        last,
                         role,
                         rank,
                         home_station=station,
@@ -139,6 +169,16 @@ class Command(BaseCommand):
             mileage=88_100,
             engine_hours=7_400,
         )
+
+        # Riding assignments: Station 1 staffs E1 and M1 (L1 is cross-staffed), Station 2 staffs E2.
+        for assignment in Assignment.objects.filter(department=dept).select_related("station"):
+            if assignment.station == st2:
+                assignment.apparatus = e2
+            elif assignment.position == Assignment.Position.PARAMEDIC:
+                assignment.apparatus = m1
+            else:
+                assignment.apparatus = e1
+            assignment.save(update_fields=["apparatus"])
 
         template = ChecklistTemplate.objects.create(department=dept, name="Engine daily check", apparatus_type="engine")
         order = 0

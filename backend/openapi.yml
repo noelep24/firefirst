@@ -4714,6 +4714,34 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/station-board/:
+    get:
+      operationId: api_v1_station_board_retrieve
+      description: |-
+        ``GET /station-board/?station=&date=`` – the Today screen: the member's own assignment, and who is
+        riding which rig at a station (defaults to where the member works).
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: station
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationBoard'
+          description: ''
   /api/v1/stations/:
     get:
       operationId: api_v1_stations_list
@@ -5491,7 +5519,15 @@ components:
           readOnly: true
         position:
           $ref: '#/components/schemas/PositionEnum'
+        apparatus:
+          type: integer
+          nullable: true
+          description: The rig this member rides
+        apparatus_unit:
+          type: string
+          readOnly: true
       required:
+      - apparatus_unit
       - id
       - platoon
       - station_name
@@ -5510,6 +5546,10 @@ components:
           nullable: true
         position:
           $ref: '#/components/schemas/PositionEnum'
+        apparatus:
+          type: integer
+          nullable: true
+          description: The rig this member rides
       required:
       - platoon
       - user
@@ -5611,6 +5651,83 @@ components:
     BlankEnum:
       enum:
       - ''
+    BoardApparatus:
+      type: object
+      properties:
+        id:
+          type: integer
+        unit_number:
+          type: string
+        apparatus_type:
+          type: string
+        status:
+          type: string
+        crew:
+          type: array
+          items:
+            $ref: '#/components/schemas/RosterPerson'
+      required:
+      - apparatus_type
+      - crew
+      - id
+      - status
+      - unit_number
+    BoardMember:
+      type: object
+      description: The signed-in member's standing assignment and whether they work
+        today.
+      properties:
+        name:
+          type: string
+        rank:
+          type: string
+        platoon:
+          type: string
+          nullable: true
+        station:
+          allOf:
+          - $ref: '#/components/schemas/BoardStation'
+          nullable: true
+        position:
+          type: string
+          nullable: true
+        apparatus:
+          type: integer
+          nullable: true
+        apparatus_unit:
+          type: string
+          nullable: true
+        on_duty:
+          type: boolean
+        status:
+          type: string
+          description: on_duty, covering, on_leave, traded_off or off_duty
+        note:
+          type: string
+      required:
+      - apparatus
+      - apparatus_unit
+      - name
+      - note
+      - on_duty
+      - platoon
+      - position
+      - rank
+      - station
+      - status
+    BoardStation:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+      - number
     CalendarLink:
       type: object
       properties:
@@ -7379,6 +7496,10 @@ components:
           nullable: true
         position:
           $ref: '#/components/schemas/PositionEnum'
+        apparatus:
+          type: integer
+          nullable: true
+          description: The rig this member rides
     PatchedCertificationRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -8123,12 +8244,24 @@ components:
           nullable: true
         position:
           type: string
+        rank:
+          type: string
+        apparatus:
+          type: integer
+          nullable: true
+          description: The rig this person rides
+        apparatus_unit:
+          type: string
+          nullable: true
         covering_for:
           type: integer
           description: Member this person is covering on a trade
       required:
+      - apparatus
+      - apparatus_unit
       - name
       - position
+      - rank
       - station
       - station_number
       - user
@@ -8577,6 +8710,57 @@ components:
       required:
       - id
       - number
+    StationBoard:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        platoon:
+          type: string
+          nullable: true
+        me:
+          $ref: '#/components/schemas/BoardMember'
+        stations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoardStation'
+        station:
+          allOf:
+          - $ref: '#/components/schemas/BoardStation'
+          nullable: true
+        apparatus:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoardApparatus'
+        unassigned:
+          type: array
+          items:
+            $ref: '#/components/schemas/RosterPerson'
+          description: Working at this station without a rig here
+        on_leave:
+          type: array
+          items:
+            $ref: '#/components/schemas/RosterPerson'
+        traded_off:
+          type: array
+          items:
+            $ref: '#/components/schemas/RosterPerson'
+        shortfalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shortfall'
+      required:
+      - apparatus
+      - date
+      - me
+      - on_leave
+      - platoon
+      - shortfalls
+      - station
+      - stations
+      - traded_off
+      - unassigned
     StationRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

@@ -82,6 +82,9 @@ def test_roster_with_leave_and_trade(client_for, officer, department, crew):
             "station": a2.assignment.station_id,
             "station_number": "1",
             "position": "firefighter",
+            "rank": "",
+            "apparatus": None,
+            "apparatus_unit": None,
             "covering_for": a2.id,
         }
     ]
@@ -274,3 +277,85 @@ def test_staffing_rule_validation_and_description(client_for, officer, station, 
         "/api/v1/staffing-rules/", {"station": station.id, "certification_type": medic_cert.id, "minimum": 1}
     ).json()
     assert created["description"] == "Station 1 – Headquarters: at least 1 Paramedic"
+
+
+@pytest.fixture
+def rigs(department, station):
+    from apps.apparatus.models import Apparatus
+
+    return {
+        "E1": Apparatus.objects.create(
+            department=department, unit_number="E1", apparatus_type="engine", station=station
+        ),
+        "L1": Apparatus.objects.create(
+            department=department, unit_number="L1", apparatus_type="ladder", station=station
+        ),
+    }
+
+
+def board(client, **params):
+    query = "&".join(f"{k}={v}" for k, v in {"date": A_DAY, **params}.items())
+    response = client.get(f"/api/v1/station-board/?{query}")
+    assert response.status_code == 200, response.content
+    return response.json()
+
+
+def test_station_board_shows_my_seat_and_the_crew_by_rig(client_for, department, station, crew, rigs):
+    a1, a2 = crew["a1"], crew["a2"]
+    a1.rank = "Engineer"
+    a1.save()
+    Assignment.objects.filter(user=a1).update(position="engineer", apparatus=rigs["L1"])
+    Assignment.objects.filter(user=a2).update(apparatus=rigs["E1"])
+
+    data = board(client_for(a1))
+    assert data["platoon"] == "A"
+    assert data["station"]["id"] == station.id
+    me = data["me"]
+    assert (me["rank"], me["platoon"], me["position"], me["apparatus_unit"]) == ("Engineer", "A", "engineer", "L1")
+    assert (me["on_duty"], me["status"], me["station"]["number"]) == (True, "on_duty", "1")
+    crews = {rig["unit_number"]: [p["user"] for p in rig["crew"]] for rig in data["apparatus"]}
+    assert crews == {"E1": [a2.id], "L1": [a1.id]}
+    assert data["unassigned"] == []
+
+
+def test_station_board_when_off_duty_and_covering(client_for, department, station, crew, rigs):
+    a1, b1 = crew["a1"], crew["b1"]
+    Assignment.objects.filter(user=a1).update(apparatus=rigs["E1"])
+    assert board(client_for(b1))["me"]["status"] == "off_duty"
+
+    ShiftTrade.objects.create(
+        department=department, requester=a1, covering_member=b1, shift_date=A_DAY, status="approved"
+    )
+    data = board(client_for(b1))
+    assert (data["me"]["status"], data["me"]["apparatus_unit"]) == ("covering", "E1")
+    assert data["me"]["note"] == f"Covering for {a1}"
+    assert [p["user"] for p in data["traded_off"]] == [a1.id]
+    e1 = next(rig for rig in data["apparatus"] if rig["unit_number"] == "E1")
+    assert [p["user"] for p in e1["crew"]] == [b1.id]
+    assert board(client_for(a1))["me"]["status"] == "traded_off"
+
+
+def test_station_board_other_station_and_isolation(client_for, department, other_department, station, crew, rigs):
+    from apps.core.models import Station
+
+    st2 = Station.objects.create(department=department, number="2", name="Northside")
+    data = board(client_for(crew["a1"]), station=st2.id)
+    assert data["station"]["number"] == "2"
+    assert data["apparatus"] == [] and data["unassigned"] == []
+    assert [s["number"] for s in data["stations"]] == ["1", "2"]
+
+    elsewhere = Station.objects.create(department=other_department, number="9")
+    response = client_for(crew["a1"]).get(f"/api/v1/station-board/?station={elsewhere.id}")
+    assert response.status_code == 400
+    assert client_for(crew["a1"]).get("/api/v1/station-board/?station=abc").status_code == 400
+
+
+def test_assignment_apparatus_must_be_in_department(client_for, officer, other_department, crew):
+    from apps.apparatus.models import Apparatus
+
+    foreign = Apparatus.objects.create(department=other_department, unit_number="X9", apparatus_type="engine")
+    assignment = Assignment.objects.get(user=crew["a1"])
+    response = client_for(officer).patch(
+        f"/api/v1/assignments/{assignment.id}/", {"apparatus": foreign.id}, format="json"
+    )
+    assert response.status_code == 400

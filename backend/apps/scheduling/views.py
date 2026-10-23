@@ -10,12 +10,13 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.models import Station
 from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
 from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade, StaffingRule
-from .roster import build_roster, leave_impact
+from .roster import build_roster, leave_impact, station_board
 from .serializers import (
     AssignmentSerializer,
     LeaveRequestSerializer,
@@ -27,6 +28,7 @@ from .serializers import (
     ShiftTradeSerializer,
     StaffingDaySerializer,
     StaffingRuleSerializer,
+    StationBoardSerializer,
 )
 
 MAX_CALENDAR_DAYS = 400
@@ -45,7 +47,7 @@ class RotationPatternViewSet(TenantViewSet):
 
 
 class AssignmentViewSet(TenantViewSet):
-    queryset = Assignment.objects.select_related("user", "platoon", "station")
+    queryset = Assignment.objects.select_related("user", "platoon", "station", "apparatus")
     serializer_class = AssignmentSerializer
     permission_classes = [IsOfficerOrReadOnly]
     filterset_fields = ["platoon", "station", "position", "user"]
@@ -100,6 +102,37 @@ class RosterView(APIView):
         raw = request.query_params.get("date")
         date = parse_date(raw, "date") if raw else timezone.localdate()
         return Response(build_roster(request.user.department, date))
+
+
+class StationBoardView(APIView):
+    """``GET /station-board/?station=&date=`` – the Today screen: the member's own assignment, and who is
+    riding which rig at a station (defaults to where the member works)."""
+
+    permission_classes = [IsDepartmentMember]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("station", OpenApiTypes.INT, required=False),
+            OpenApiParameter("date", OpenApiTypes.DATE, required=False),
+        ],
+        responses=StationBoardSerializer,
+    )
+    def get(self, request):
+        raw = request.query_params.get("date")
+        date = parse_date(raw, "date") if raw else timezone.localdate()
+        station = None
+        if raw_station := request.query_params.get("station"):
+            station = Station.objects.filter(department=request.user.department, pk=_int(raw_station)).first()
+            if station is None:
+                raise ValidationError({"station": "No such station."})
+        return Response(station_board(request.user, date, station))
+
+
+def _int(value):
+    try:
+        return int(value)
+    except ValueError:
+        raise ValidationError({"station": "Must be a station id."}) from None
 
 
 class ShiftCalendarView(APIView):

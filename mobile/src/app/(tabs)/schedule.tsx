@@ -85,6 +85,7 @@ function Roster() {
                         {p.covering_for ? <Badge text="Trade" tone="warning" /> : null}
                         <Label type="small" color="textSecondary">
                           {humanize(p.position)}
+                          {p.apparatus_unit ? ` · ${p.apparatus_unit}` : ''}
                         </Label>
                       </Row>
                     </Row>

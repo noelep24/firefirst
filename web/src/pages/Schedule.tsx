@@ -230,7 +230,10 @@ function Roster() {
                           <span>
                             {p.name} {p.covering_for ? <Badge tone="warning">Trade</Badge> : null}
                           </span>
-                          <span className="muted small">{labelFor(positions, p.position)}</span>
+                          <span className="muted small">
+                            {labelFor(positions, p.position)}
+                            {p.apparatus_unit ? ` · ${p.apparatus_unit}` : ''}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -301,6 +304,14 @@ function Assignments() {
           optionLabel: stationLabel as (row: never) => string,
         },
         { name: 'position', label: 'Position', type: 'select', options: positions, required: true },
+        {
+          name: 'apparatus',
+          label: 'Rides',
+          type: 'relation',
+          endpoint: '/api/v1/apparatus/',
+          optionLabel: ((a: Schemas['Apparatus']) => a.unit_number) as (row: never) => string,
+          help: 'The rig this member is assigned to ride',
+        },
       ]}
       defaults={{ position: 'firefighter' }}
       columns={[
@@ -323,6 +334,7 @@ function Assignments() {
         },
         { header: 'Station', cell: (a) => a.station_name ?? '—' },
         { header: 'Position', cell: (a) => labelFor(positions, a.position) },
+        { header: 'Rides', cell: (a) => a.apparatus_unit ?? '—' },
       ]}
     />
   );
