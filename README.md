@@ -19,6 +19,7 @@ This repository holds:
 | **Apparatus** | Fleet records, configurable rig-check checklists, inspections that open work orders automatically for deficient items, work orders that take a rig out of service and put it back, and preventive maintenance due by date, mileage or engine hours (pump tests, ladder tests, oil changes…) |
 | **Scheduling** | Platoons, rotation patterns (24/48, 48/96, Kelly, or any custom sequence), standing assignments, a live daily roster, a leave request → approval workflow, and shift trades (requester → covering member → officer) |
 | **Events** | Department calendar (training, drills, meetings, public ed, inspections), invitations, mandatory events, RSVPs, attendance and training-hour totals |
+| **Reports** | Fleet (check rate, out-of-service days, repair and maintenance cost), inventory usage, training hours, leave taken, maintenance status; CSV export |
 | **Dashboard** | One call for the morning view: platoon on duty, rigs out of service, open work orders, maintenance due, low and expiring stock, upcoming events and pending approvals |
 
 ## Architecture

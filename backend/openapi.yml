@@ -3719,6 +3719,62 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/reports/:
+    get:
+      operationId: v1_reports_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportInfo'
+          description: ''
+  /api/v1/reports/{slug}/:
+    get:
+      operationId: v1_reports_retrieve
+      description: A report as JSON, or as CSV with ``?export=csv``. Dates default
+        to the year to date.
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: export
+        schema:
+          type: string
+          enum:
+          - csv
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+          format: date
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+          description: ''
   /api/v1/roster/:
     get:
       operationId: v1_roster_retrieve
@@ -7724,6 +7780,63 @@ components:
         * `transfer_in` - Transfer in
         * `transfer_out` - Transfer out
         * `count` - Count correction
+    Report:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        start:
+          type: string
+          format: date
+          nullable: true
+        end:
+          type: string
+          format: date
+          nullable: true
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportColumn'
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - columns
+      - end
+      - rows
+      - slug
+      - start
+      - title
+    ReportColumn:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+      required:
+      - key
+      - label
+    ReportInfo:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        uses_dates:
+          type: boolean
+      required:
+      - description
+      - slug
+      - title
+      - uses_dates
     ReviewRequest:
       type: object
       properties:

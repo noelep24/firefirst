@@ -962,6 +962,39 @@ export interface paths {
         patch: operations["v1_platoons_partial_update"];
         trace?: never;
     };
+    "/api/v1/reports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_reports_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/{slug}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description A report as JSON, or as CSV with ``?export=csv``. Dates default to the year to date. */
+        get: operations["v1_reports_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/roster/": {
         parameters: {
             query?: never;
@@ -2620,6 +2653,28 @@ export interface components {
          * @enum {string}
          */
         ReasonEnum: "restock" | "used" | "expired" | "damaged" | "transfer_in" | "transfer_out" | "count";
+        Report: {
+            slug: string;
+            title: string;
+            /** Format: date */
+            start: string | null;
+            /** Format: date */
+            end: string | null;
+            columns: components["schemas"]["ReportColumn"][];
+            rows: {
+                [key: string]: unknown;
+            }[];
+        };
+        ReportColumn: {
+            key: string;
+            label: string;
+        };
+        ReportInfo: {
+            slug: string;
+            title: string;
+            description: string;
+            uses_dates: boolean;
+        };
         ReviewRequest: {
             note?: string;
         };
@@ -5887,6 +5942,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Platoon"];
+                };
+            };
+        };
+    };
+    v1_reports_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportInfo"][];
+                };
+            };
+        };
+    };
+    v1_reports_retrieve: {
+        parameters: {
+            query?: {
+                end?: string;
+                export?: "csv";
+                start?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
                 };
             };
         };

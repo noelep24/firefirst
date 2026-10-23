@@ -24,6 +24,7 @@ const People = lazy(() => import('@/pages/People'));
 const Stations = lazy(() => import('@/pages/Stations'));
 const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const Import = lazy(() => import('@/pages/Import'));
+const Reports = lazy(() => import('@/pages/Reports'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
 const queryClient = new QueryClient({
@@ -51,6 +52,7 @@ function App() {
           <Route path="inventory" element={<Inventory />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="approvals" element={<Approvals />} />
+          <Route path="reports" element={<Reports />} />
           <Route path="events" element={<Events />} />
           <Route path="checklists" element={<Checklists />} />
           <Route path="people" element={<People />} />

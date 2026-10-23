@@ -28,7 +28,13 @@ export function Layout() {
   const pending = (dashboard.data?.pending_leave_requests ?? 0) + (dashboard.data?.pending_shift_trades ?? 0);
 
   const groups: { title: string; items: NavItem[] }[] = [
-    { title: 'Overview', items: [{ to: '/', label: 'Dashboard' }] },
+    {
+      title: 'Overview',
+      items: [
+        { to: '/', label: 'Dashboard' },
+        { to: '/reports', label: 'Reports' },
+      ],
+    },
     {
       title: 'Operations',
       items: [

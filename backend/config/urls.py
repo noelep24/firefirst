@@ -13,6 +13,7 @@ from apps.core.session_auth import CsrfView, SessionView
 from apps.events import views as events
 from apps.imports import views as imports
 from apps.inventory import views as inventory
+from apps.reports import views as reports
 from apps.scheduling import views as scheduling
 
 router = DefaultRouter()
@@ -55,6 +56,8 @@ api_v1 = [
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),
+    path("reports/", reports.ReportListView.as_view(), name="reports"),
+    path("reports/<slug:slug>/", reports.ReportView.as_view(), name="report"),
     path("imports/", imports.ImportKindsView.as_view(), name="imports"),
     path("imports/<slug:kind>/", imports.ImportView.as_view(), name="import"),
     path("imports/<slug:kind>/template/", imports.ImportTemplateView.as_view(), name="import-template"),
