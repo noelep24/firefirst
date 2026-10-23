@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
+import { OnboardingCard } from '@/components/onboarding';
 import { Badge, Card, DataTable, Empty, PageHeader, QueryState } from '@/components/ui';
 import { formatDateTime, formatDay } from '@/lib/format';
 import { labelFor, eventCategories } from '@/lib/labels';
@@ -29,6 +30,7 @@ export default function Dashboard() {
               title="Dashboard"
               subtitle={`${formatDay(d.date, { weekday: 'long' })} · ${d.platoon_on_duty ? `${d.platoon_on_duty} Shift on duty` : 'No rotation set up'}`}
             />
+            <OnboardingCard />
             <div className="grid">
               <StatLink to="/apparatus" label="Rigs out of service" value={d.apparatus_out_of_service.length} danger />
               <StatLink to="/work-orders" label="Open work orders" value={d.open_work_orders} />

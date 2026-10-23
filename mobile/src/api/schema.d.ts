@@ -942,6 +942,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/onboarding/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description What a new department still has to set up. */
+        get: operations["api_v1_onboarding_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/platoons/": {
         parameters: {
             query?: never;
@@ -1237,6 +1254,23 @@ export interface paths {
         put?: never;
         /** @description Members see trades they're part of; officers see all. */
         post: operations["api_v1_shift_trades_deny_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/signup/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Create a department and its first admin, and sign them in (session cookie). */
+        post: operations["api_v1_signup_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2074,6 +2108,13 @@ export interface components {
              */
             readonly is_active: boolean;
             readonly department: components["schemas"]["Department"];
+        };
+        OnboardingStep: {
+            key: string;
+            title: string;
+            done: boolean;
+            /** @description Web app path where it's done */
+            link: string;
         };
         PaginatedApparatusList: {
             /** @example 123 */
@@ -2928,6 +2969,21 @@ export interface components {
             required: number;
             scheduled: number;
         };
+        SignupRequest: {
+            department_name: string;
+            timezone: components["schemas"]["TimezoneEnum"];
+            first_name: string;
+            last_name: string;
+            /** Format: email */
+            email: string;
+            username: string;
+            password: string;
+            /**
+             * @description A/B/C platoons on a 24/48, a sample engine checklist and common certifications
+             * @default true
+             */
+            starter_kit: boolean;
+        };
         StaffingDay: {
             /** Format: date */
             date: string;
@@ -3057,6 +3113,18 @@ export interface components {
             station?: number | null;
             apparatus?: number | null;
         };
+        /**
+         * @description * `America/New_York` - America/New_York
+         *     * `America/Chicago` - America/Chicago
+         *     * `America/Denver` - America/Denver
+         *     * `America/Phoenix` - America/Phoenix
+         *     * `America/Los_Angeles` - America/Los_Angeles
+         *     * `America/Anchorage` - America/Anchorage
+         *     * `Pacific/Honolulu` - Pacific/Honolulu
+         *     * `America/Puerto_Rico` - America/Puerto_Rico
+         * @enum {string}
+         */
+        TimezoneEnum: "America/New_York" | "America/Chicago" | "America/Denver" | "America/Phoenix" | "America/Los_Angeles" | "America/Anchorage" | "Pacific/Honolulu" | "America/Puerto_Rico";
         TokenObtainPair: {
             readonly access: string;
             readonly refresh: string;
@@ -5928,6 +5996,25 @@ export interface operations {
             };
         };
     };
+    api_v1_onboarding_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingStep"][];
+                };
+            };
+        };
+    };
     api_v1_platoons_list: {
         parameters: {
             query?: {
@@ -6664,6 +6751,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ShiftTrade"];
+                };
+            };
+        };
+    };
+    api_v1_signup_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SignupRequest"];
+                "multipart/form-data": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
                 };
             };
         };

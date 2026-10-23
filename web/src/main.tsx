@@ -1,7 +1,7 @@
 import './index.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { lazy, StrictMode, Suspense } from 'react';
+import { lazy, StrictMode, Suspense, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 
@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/auth';
 import { Layout } from '@/components/layout';
 import { Loading } from '@/components/ui';
 import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
 
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ApparatusList = lazy(() => import('@/pages/ApparatusList'));
@@ -38,8 +39,11 @@ const queryClient = new QueryClient({
 
 function App() {
   const auth = useAuth();
+  const [signingUp, setSigningUp] = useState(false);
   if (auth.status === 'loading') return <Loading />;
-  if (auth.status === 'signedOut') return <Login />;
+  if (auth.status === 'signedOut') {
+    return signingUp ? <Signup onCancel={() => setSigningUp(false)} /> : <Login onSignup={() => setSigningUp(true)} />;
+  }
   const isAdmin = auth.me.role === 'admin';
   return (
     <Suspense fallback={<Loading />}>

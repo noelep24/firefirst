@@ -3584,6 +3584,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalendarLink'
           description: ''
+  /api/v1/onboarding/:
+    get:
+      operationId: api_v1_onboarding_list
+      description: What a new department still has to set up.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OnboardingStep'
+          description: ''
   /api/v1/platoons/:
     get:
       operationId: api_v1_platoons_list
@@ -4459,6 +4477,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ShiftTrade'
+          description: ''
+  /api/v1/signup/:
+    post:
+      operationId: api_v1_signup_create
+      description: Create a department and its first admin, and sign them in (session
+        cookie).
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
           description: ''
   /api/v1/staffing/:
     get:
@@ -6755,6 +6801,23 @@ components:
       - rank
       - role
       - username
+    OnboardingStep:
+      type: object
+      properties:
+        key:
+          type: string
+        title:
+          type: string
+        done:
+          type: boolean
+        link:
+          type: string
+          description: Web app path where it's done
+      required:
+      - done
+      - key
+      - link
+      - title
     PaginatedApparatusList:
       type: object
       required:
@@ -8361,6 +8424,49 @@ components:
       - rule
       - scheduled
       - station
+    SignupRequest:
+      type: object
+      properties:
+        department_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        timezone:
+          $ref: '#/components/schemas/TimezoneEnum'
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+          pattern: ^[\w.@+-]+$
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        starter_kit:
+          type: boolean
+          default: true
+          description: A/B/C platoons on a 24/48, a sample engine checklist and common
+            certifications
+      required:
+      - department_name
+      - email
+      - first_name
+      - last_name
+      - password
+      - timezone
+      - username
     StaffingDay:
       type: object
       properties:
@@ -8660,6 +8766,26 @@ components:
           nullable: true
       required:
       - name
+    TimezoneEnum:
+      enum:
+      - America/New_York
+      - America/Chicago
+      - America/Denver
+      - America/Phoenix
+      - America/Los_Angeles
+      - America/Anchorage
+      - Pacific/Honolulu
+      - America/Puerto_Rico
+      type: string
+      description: |-
+        * `America/New_York` - America/New_York
+        * `America/Chicago` - America/Chicago
+        * `America/Denver` - America/Denver
+        * `America/Phoenix` - America/Phoenix
+        * `America/Los_Angeles` - America/Los_Angeles
+        * `America/Anchorage` - America/Anchorage
+        * `Pacific/Honolulu` - Pacific/Honolulu
+        * `America/Puerto_Rico` - America/Puerto_Rico
     TokenObtainPair:
       type: object
       properties:

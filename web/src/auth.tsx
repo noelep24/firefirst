@@ -9,6 +9,7 @@ type AuthState = { status: 'loading' } | { status: 'signedOut' } | { status: 'si
 
 type AuthValue = AuthState & {
   login: (username: string, password: string) => Promise<void>;
+  signup: (form: Schemas['SignupRequest']) => Promise<void>;
   logout: () => Promise<void>;
   refreshMe: () => Promise<void>;
 };
@@ -40,6 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new ApiError('The web app is for officers and admins. Members use the FireFirst mobile app.', 403);
       }
       setState({ status: 'signedIn', me });
+    },
+    async signup(form) {
+      await http.get('/api/v1/auth/csrf/');
+      setState({ status: 'signedIn', me: await http.post<Me>('/api/v1/signup/', form) });
     },
     async logout() {
       await http.delete('/api/v1/auth/session/').catch(() => {});

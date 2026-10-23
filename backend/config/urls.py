@@ -10,6 +10,7 @@ from apps.certifications import views as certifications
 from apps.core import views as core
 from apps.core.dashboard import DashboardView
 from apps.core.session_auth import CsrfView, SessionView
+from apps.core.signup import OnboardingView, SignupView
 from apps.events import views as events
 from apps.imports import views as imports
 from apps.inventory import views as inventory
@@ -50,6 +51,8 @@ api_v1 = [
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/csrf/", CsrfView.as_view(), name="csrf"),
     path("auth/session/", SessionView.as_view(), name="session"),
+    path("signup/", SignupView.as_view(), name="signup"),
+    path("onboarding/", OnboardingView.as_view(), name="onboarding"),
     path("me/", core.MeView.as_view(), name="me"),
     path("me/calendar-feed/", events.MyCalendarFeedView.as_view(), name="my-calendar-feed"),
     path("department/", core.DepartmentView.as_view(), name="department"),

@@ -3,7 +3,7 @@ import { type FormEvent, useState } from 'react';
 import { useAuth } from '@/auth';
 import { Button, Card, ErrorBox } from '@/components/ui';
 
-export default function Login() {
+export default function Login({ onSignup }: { onSignup: () => void }) {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -57,6 +57,9 @@ export default function Login() {
           <ErrorBox error={error} />
           <Button variant="primary" type="submit" loading={busy}>
             Sign in
+          </Button>
+          <Button variant="ghost" onClick={onSignup}>
+            New to FireFirst? Create your department
           </Button>
         </form>
       </Card>
