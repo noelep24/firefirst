@@ -85,6 +85,14 @@ AUTH_USER_MODEL = "core.User"
 
 # The native apps don't need CORS; this is for the web build of the mobile app
 # (``npx expo start --web``) and, later, the officer web app.
+# The officer web app is served from the same site as the API (Vite proxies
+# /api in development), so its session and CSRF cookies are first-party.
+CSRF_TRUSTED_ORIGINS = [
+    o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o
+]
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_AGE = 60 * 60 * 12  # one shift
+
 CORS_ALLOWED_ORIGINS = [
     o for o in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:8081,http://127.0.0.1:8081").split(",") if o
 ]

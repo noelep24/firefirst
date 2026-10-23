@@ -7,9 +7,8 @@ replace ESO's station-side modules.
 This repository holds:
 
 - **`backend/`**: the API (Django + Postgres), shared by every client
+- **`web/`**: the officer and admin app for the browser (React). See [web/README.md](web/README.md)
 - **`mobile/`**: the crew app for iOS and Android (Expo / React Native). See [mobile/README.md](mobile/README.md)
-
-The officer web app is next on the [roadmap](#roadmap).
 
 ## What's in v0.1
 
@@ -119,7 +118,7 @@ ruff check . && ruff format --check .
 ## Roadmap
 
 **Next: clients**
-- [ ] Web app for officers and admins (React + TypeScript, typed client generated from the OpenAPI schema)
+- [x] Web app for officers and admins (React + TypeScript, types generated from the OpenAPI schema)
 - [x] Mobile app (Expo for iOS and Android): rig checks, work orders, stock usage with barcode scanning, roster, leave and trades, calendar
 - [ ] Mobile: offline rig checks and stock changes that sync when back in coverage, photos, date picker, store builds (EAS)
 - [ ] Push notifications (trade requests, approvals, work orders, maintenance due)
@@ -137,7 +136,7 @@ ruff check . && ruff format --check .
 **Selling to other departments**
 - [ ] Self-serve department sign-up and onboarding
 - [ ] Subscription billing (e.g. Stripe), plans and limits
-- [ ] Audit log of who changed what
+- [x] Audit log of who changed what
 - [ ] SSO (Azure AD and Google Workspace are common in municipal IT), MFA
 - [ ] Per-department data export, backups, and a published security and data-retention policy (city IT and procurement will send security questionnaires)
 - [ ] Production deployment (container, managed Postgres, object storage for attachments, error monitoring)

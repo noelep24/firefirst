@@ -200,7 +200,7 @@ function Trades() {
     if (t.status === 'pending_partner' && t.covering_member === me.id) {
       list.push({ action: 'accept', label: 'Accept' }, { action: 'decline', label: 'Decline', variant: 'secondary' });
     }
-    if (t.status === 'pending_approval' && isOfficer && t.requester !== me.id) {
+    if (t.status === 'pending_approval' && isOfficer && t.requester !== me.id && t.covering_member !== me.id) {
       list.push({ action: 'approve', label: 'Approve' }, { action: 'deny', label: 'Deny', variant: 'secondary' });
     }
     if (t.requester === me.id && ['pending_partner', 'pending_approval', 'approved'].includes(t.status ?? '')) {

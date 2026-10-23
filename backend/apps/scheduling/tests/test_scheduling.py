@@ -166,3 +166,26 @@ def test_trade_partner_cannot_already_be_working(client_for, crew):
 def test_uninvolved_members_cannot_see_trades(client_for, department, crew, make_user):
     ShiftTrade.objects.create(department=department, requester=crew["a1"], covering_member=crew["b1"], shift_date=A_DAY)
     assert client_for(make_user("bystander")).get("/api/v1/shift-trades/").json()["results"] == []
+
+
+def test_officers_cannot_review_their_own_leave(client_for, officer):
+    created = client_for(officer).post(
+        "/api/v1/leave-requests/", {"leave_type": "vacation", "start_date": "2026-11-01", "end_date": "2026-11-01"}
+    )
+    leave_id = created.json()["id"]
+    assert client_for(officer).post(f"/api/v1/leave-requests/{leave_id}/approve/").status_code == 403
+    assert LeaveRequest.objects.get(id=leave_id).status == "pending"
+
+
+def test_officers_cannot_review_trades_they_are_part_of(client_for, department, crew, make_user, platoons, station):
+    captain = make_user("cap-b", "officer")
+    Assignment.objects.create(department=department, user=captain, platoon=platoons["B"], station=station)
+    trade = ShiftTrade.objects.create(
+        department=department,
+        requester=crew["a1"],
+        covering_member=captain,
+        shift_date=A_DAY,
+        status="pending_approval",
+    )
+    assert client_for(captain).post(f"/api/v1/shift-trades/{trade.id}/approve/").status_code == 403
+    assert client_for(captain).post(f"/api/v1/shift-trades/{trade.id}/deny/").status_code == 403

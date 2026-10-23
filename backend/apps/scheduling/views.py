@@ -132,6 +132,8 @@ class LeaveRequestViewSet(TenantViewSet):
 
     def _review(self, request, new_status):
         leave = self.get_object()
+        if leave.user_id == request.user.id:
+            raise PermissionDenied("Another officer must review your own leave.")
         if leave.status != LeaveRequest.Status.PENDING:
             raise ValidationError("This request has already been reviewed.")
         review = ReviewSerializer(data=request.data)
@@ -213,10 +215,15 @@ class ShiftTradeViewSet(TenantViewSet):
         self._covering_member_only(trade)
         return self._transition(trade, [ShiftTrade.Status.PENDING_PARTNER], ShiftTrade.Status.DECLINED)
 
+    def _not_a_party(self, trade):
+        if self.request.user.id in (trade.requester_id, trade.covering_member_id):
+            raise PermissionDenied("Another officer must review a trade you're part of.")
+
     @extend_schema(request=None)
     @action(detail=True, methods=["post"], permission_classes=[IsOfficer])
     def approve(self, request, pk=None):
         trade = self.get_object()
+        self._not_a_party(trade)
         return self._transition(
             trade, [ShiftTrade.Status.PENDING_APPROVAL], ShiftTrade.Status.APPROVED, reviewer=request.user
         )
@@ -225,6 +232,7 @@ class ShiftTradeViewSet(TenantViewSet):
     @action(detail=True, methods=["post"], permission_classes=[IsOfficer])
     def deny(self, request, pk=None):
         trade = self.get_object()
+        self._not_a_party(trade)
         return self._transition(
             trade,
             [ShiftTrade.Status.PENDING_PARTNER, ShiftTrade.Status.PENDING_APPROVAL],

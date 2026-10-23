@@ -127,3 +127,28 @@ def test_platoon_with_members_cannot_be_deleted_on_its_own(department, make_user
     Assignment.objects.create(department=department, user=make_user("ff9"), platoon=platoon)
     with pytest.raises(RestrictedError):
         platoon.delete()
+
+
+def test_web_session_login_requires_csrf_and_works(db, member):
+    from rest_framework.test import APIClient
+
+    client = APIClient(enforce_csrf_checks=True)
+    # Without the CSRF cookie/header the login is refused.
+    assert client.post("/api/v1/auth/session/", {"username": "ff1", "password": "test-pass-123"}).status_code == 403
+
+    client.get("/api/v1/auth/csrf/")
+    token = client.cookies["csrftoken"].value
+    bad = client.post("/api/v1/auth/session/", {"username": "ff1", "password": "nope"}, HTTP_X_CSRFTOKEN=token)
+    assert bad.status_code == 400
+    ok = client.post("/api/v1/auth/session/", {"username": "ff1", "password": "test-pass-123"}, HTTP_X_CSRFTOKEN=token)
+    assert ok.status_code == 200
+    assert ok.json()["username"] == "ff1"
+    assert client.cookies["sessionid"]["httponly"]
+
+    # Login rotates the CSRF token; authenticated writes need the new one.
+    token = client.cookies["csrftoken"].value
+    assert client.patch("/api/v1/me/", {"phone": "555"}, format="json").status_code == 403
+    assert client.patch("/api/v1/me/", {"phone": "555"}, format="json", HTTP_X_CSRFTOKEN=token).status_code == 200
+
+    assert client.delete("/api/v1/auth/session/", HTTP_X_CSRFTOKEN=token).status_code == 204
+    assert client.get("/api/v1/me/").status_code in (401, 403)

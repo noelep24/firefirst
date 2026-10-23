@@ -153,6 +153,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/csrf/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Sets the ``csrftoken`` cookie. Call once before logging in. */
+        get: operations["v1_auth_csrf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/session/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_auth_session_create"];
+        delete: operations["v1_auth_session_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/token/": {
         parameters: {
             query?: never;
@@ -1188,6 +1221,7 @@ export interface components {
             readonly user_name: string;
             platoon: number;
             station?: number | null;
+            readonly station_name: string;
             position?: components["schemas"]["PositionEnum"];
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
@@ -2253,6 +2287,10 @@ export interface components {
             passed?: boolean | null;
             notes?: string;
         };
+        SessionLoginRequestRequest: {
+            username: string;
+            password: string;
+        };
         ShiftDay: {
             /** Format: date */
             date: string;
@@ -2972,6 +3010,74 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AuditEntry"];
                 };
+            };
+        };
+    };
+    v1_auth_csrf_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_auth_session_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionLoginRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SessionLoginRequestRequest"];
+                "multipart/form-data": components["schemas"]["SessionLoginRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_auth_session_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

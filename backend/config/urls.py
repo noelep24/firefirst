@@ -8,6 +8,7 @@ from apps.apparatus import views as apparatus
 from apps.audit.views import AuditEntryViewSet
 from apps.core import views as core
 from apps.core.dashboard import DashboardView
+from apps.core.session_auth import CsrfView, SessionView
 from apps.events import views as events
 from apps.inventory import views as inventory
 from apps.scheduling import views as scheduling
@@ -40,6 +41,8 @@ router.register("audit-log", AuditEntryViewSet)
 api_v1 = [
     path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/csrf/", CsrfView.as_view(), name="csrf"),
+    path("auth/session/", SessionView.as_view(), name="session"),
     path("me/", core.MeView.as_view(), name="me"),
     path("department/", core.DepartmentView.as_view(), name="department"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),

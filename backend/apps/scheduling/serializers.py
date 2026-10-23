@@ -43,10 +43,11 @@ class RotationPatternSerializer(TenantSerializer):
 
 class AssignmentSerializer(TenantSerializer):
     user_name = serializers.CharField(source="user.__str__", read_only=True)
+    station_name = serializers.StringRelatedField(source="station", read_only=True)
 
     class Meta:
         model = Assignment
-        fields = ["id", "user", "user_name", "platoon", "station", "position"]
+        fields = ["id", "user", "user_name", "platoon", "station", "station_name", "position"]
 
 
 class LeaveRequestSerializer(TenantSerializer):
