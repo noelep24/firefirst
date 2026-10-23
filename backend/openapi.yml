@@ -7457,11 +7457,13 @@ components:
           type: string
           description: The department's NERIS ID, e.g. FD12345678
           maxLength: 10
-        logo:
+        logo_url:
           type: string
-          description: 'The department''s patch or logo, as a data: URL'
+          nullable: true
+          readOnly: true
       required:
       - id
+      - logo_url
       - name
       - slug
     DepartmentRequest:
@@ -7481,7 +7483,7 @@ components:
           maxLength: 10
         logo:
           type: string
-          description: 'The department''s patch or logo, as a data: URL'
+          writeOnly: true
       required:
       - name
     Event:
@@ -9788,7 +9790,7 @@ components:
           maxLength: 10
         logo:
           type: string
-          description: 'The department''s patch or logo, as a data: URL'
+          writeOnly: true
     PatchedEventRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

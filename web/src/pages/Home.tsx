@@ -46,11 +46,11 @@ export default function Home() {
   return (
     <div className="home">
       <div className="home-backdrop" aria-hidden="true">
-        {department?.logo ? <img src={department.logo} alt="" /> : <MalteseCross size={640} />}
+        {department?.logo_url ? <img src={department.logo_url} alt="" /> : <MalteseCross size={640} />}
       </div>
 
       <header className="home-head">
-        <DepartmentEmblem logo={department?.logo} name={department?.name} size={64} />
+        <DepartmentEmblem logo={department?.logo_url} name={department?.name} size={64} />
         <div>
           <h1>
             {greeting(now)}, {firstName}
@@ -84,7 +84,7 @@ export default function Home() {
         </section>
       ) : null}
 
-      {isAdmin && !department?.logo ? (
+      {isAdmin && !department?.logo_url ? (
         <Link to="/settings" className="home-hint">
           Add your department's patch or logo in Department settings.
           <ChevronRight size={16} aria-hidden="true" />

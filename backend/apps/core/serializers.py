@@ -1,5 +1,6 @@
 import base64
 import binascii
+import hashlib
 import re
 
 from rest_framework import serializers
@@ -8,17 +9,32 @@ from .models import Department, Station, User
 from .tenancy import TenantSerializer
 
 
+def logo_url(department):
+    """Where the department's logo is served. The version in the URL changes with the image, so it caches forever."""
+    if not department.logo:
+        return None
+    version = hashlib.sha256(department.logo.encode()).hexdigest()[:12]
+    return f"/api/v1/departments/{department.slug}/logo/?v={version}"
+
+
 class DepartmentSerializer(serializers.ModelSerializer):
+    # The image is uploaded here but served from its own URL, so it isn't sent with every profile and page.
+    logo = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    logo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Department
-        fields = ["id", "name", "slug", "timezone", "neris_id", "logo"]
+        fields = ["id", "name", "slug", "timezone", "neris_id", "logo", "logo_url"]
         read_only_fields = ["slug"]
+
+    def get_logo_url(self, department) -> str | None:
+        return logo_url(department)
 
     LOGO_MAX_BYTES = 512 * 1024
     LOGO_PATTERN = re.compile(r"^data:image/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$")
 
     def validate_logo(self, value):
-        """PNG, JPEG or WebP only (no SVG, which can carry script), and small enough to send with every page."""
+        """PNG, JPEG or WebP only (no SVG, which can carry script), and small enough to load quickly."""
         if not value:
             return ""
         match = self.LOGO_PATTERN.match(value)
