@@ -37,12 +37,22 @@ The image has a `HEALTHCHECK`; point your load balancer at `GET /healthz`
 | `CORS_ALLOWED_ORIGINS` | *(empty)* | Only needed if something other than the native apps or the same-site web app calls the API from a browser |
 | `WEB_CONCURRENCY` | `3` | gunicorn workers (about 2 × CPU cores) |
 | `PORT` | `8000` | Set by most platforms |
+| `PUSH_NOTIFICATIONS_ENABLED` | `true` | Sends phone notifications (overtime offers and the like) through Expo's push service |
 
 With debug off you get HTTPS redirects, HSTS, `nosniff`, `X-Frame-Options:
 DENY`, a same-origin referrer policy, secure httpOnly session cookies,
 year-long caching for fingerprinted web assets, and logs on stdout.
 
 ## Scheduled jobs
+
+Run every 5 minutes:
+
+```bash
+python manage.py process_overtime   # closes volunteering on vacancies whose answer time is up, and hires
+```
+
+Deadlines are also acted on whenever someone opens the overtime list or their offers, so a missed run only
+delays a hire until the next look.
 
 Run daily (cron, a platform scheduler, or a one-off container):
 

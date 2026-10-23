@@ -9,6 +9,7 @@ import { useMe } from '@/auth';
 import { DepartmentEmblem } from './brand';
 
 import { CalendarFeedButton } from './calendar-feed';
+import { NotificationsBell } from './notifications';
 import { SECTION_GROUPS } from './sections';
 import { Button } from './ui';
 
@@ -76,6 +77,7 @@ export function Layout() {
               {pending}
             </Link>
           ) : null}
+          <NotificationsBell />
           <UserMenu />
         </div>
       </header>

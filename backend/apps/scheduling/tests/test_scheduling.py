@@ -578,3 +578,148 @@ def test_overtime_can_be_corrected_or_removed(client_for, officer, ot_crew):
     assert client.patch(f"{url}{shift['id']}/", {"user": c["cap_a"].id}, format="json").status_code == 400  # on duty
     assert client.delete(f"{url}{shift['id']}/").status_code == 204
     assert ot_lists(client)["officers"]["next_up"] == c["eng_b"].id
+
+
+# ---------- Overtime offers ----------
+
+TODAY = datetime.date.today()
+NEXT_A = A_DAY + datetime.timedelta(days=3 * ((TODAY - A_DAY).days // 3 + 2))  # an A shift day ahead of us
+VACANCIES = "/api/v1/vacancies/"
+
+
+def post_vacancy(client, **fields):
+    response = client.post(VACANCIES, {"date": str(NEXT_A), **fields}, format="json")
+    assert response.status_code == 201, response.content
+    return response.json()
+
+
+def test_vacancy_is_offered_to_volunteers_and_the_highest_on_the_list_is_hired(client_for, officer, ot_crew):
+    from apps.notifications.models import Notification
+
+    c = ot_crew
+    # Blank choices from a form count as "not given".
+    vacancy = post_vacancy(client_for(officer), filling_for=c["cap_a"].id, overtime_list="", station=None)
+    # The empty seat tells us the list, position and station.
+    assert (vacancy["overtime_list"], vacancy["position"], vacancy["status"]) == ("officers", "captain", "offered")
+    assert vacancy["station"] == c["cap_a"].assignment.station_id
+    assert {o["user"] for o in vacancy["offers"]} == {c["eng_b"].id, c["eng_c"].id}
+    assert Notification.objects.filter(user=c["eng_b"], title__startswith="Overtime available").exists()
+
+    # Members see only their own offers.
+    mine = client_for(c["eng_c"]).get("/api/v1/overtime-offers/").json()["results"]
+    assert [o["user"] for o in mine] == [c["eng_c"].id]
+    assert client_for(c["eng_b"]).post(f"/api/v1/overtime-offers/{mine[0]['id']}/accept/").status_code == 404
+
+    # Both volunteer: eng_b is higher on the list (alphabetical, neither has worked overtime).
+    for member in (c["eng_c"], c["eng_b"]):
+        offer = client_for(member).get("/api/v1/overtime-offers/").json()["results"][0]
+        assert client_for(member).post(f"/api/v1/overtime-offers/{offer['id']}/accept/").status_code == 200
+    filled = client_for(officer).get(f"{VACANCIES}{vacancy['id']}/").json()
+    assert (filled["status"], filled["hired_name"], filled["hired_mandatory"]) == ("filled", str(c["eng_b"]), False)
+    assert {o["user"]: o["status"] for o in filled["offers"]} == {c["eng_b"].id: "accepted", c["eng_c"].id: "withdrawn"}
+    assert Notification.objects.filter(user=c["eng_b"], title__startswith="You're working overtime").exists()
+    # Too late to change an answer now.
+    offer = client_for(c["eng_c"]).get("/api/v1/overtime-offers/").json()["results"][0]
+    assert client_for(c["eng_c"]).post(f"/api/v1/overtime-offers/{offer['id']}/decline/").status_code == 400
+
+
+def test_no_volunteers_by_the_deadline_hires_the_next_one_up(client_for, officer, member, ot_crew):
+    from apps.scheduling.models import Vacancy
+
+    c = ot_crew
+    vacancy = post_vacancy(client_for(officer), overtime_list="officers", station=c["eng_b"].assignment.station_id)
+    offer = client_for(c["eng_b"]).get("/api/v1/overtime-offers/").json()["results"][0]
+    client_for(c["eng_b"]).post(f"/api/v1/overtime-offers/{offer['id']}/decline/")
+    # Time runs out for eng_c; the next look at overtime acts on it.
+    Vacancy.objects.filter(pk=vacancy["id"]).update(respond_by=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC))
+    client_for(member).get(f"/api/v1/overtime-list/?date={NEXT_A}")
+    filled = client_for(officer).get(f"{VACANCIES}{vacancy['id']}/").json()
+    # Turning it down doesn't protect you from being forced: eng_b is still first on the list.
+    assert (filled["hired_name"], filled["hired_mandatory"]) == (str(c["eng_b"]), True)
+    assert {o["user"]: o["status"] for o in filled["offers"]}[c["eng_c"].id] == "expired"
+
+
+def test_overtime_settings(client_for, admin_user, officer, member, ot_crew):
+    c = ot_crew
+    url = "/api/v1/overtime-settings/"
+    assert client_for(member).get(url).json() == {
+        "response_hours": 4,
+        "voluntary_first": True,
+        "refusal_moves_to_bottom": False,
+        "vacancy_from_leave": True,
+    }
+    assert client_for(officer).patch(url, {"response_hours": 2}, format="json").status_code == 403
+    assert client_for(admin_user).patch(url, {"response_hours": 0}, format="json").status_code == 400
+    assert client_for(admin_user).patch(url, {"response_hours": 8}, format="json").json()["response_hours"] == 8
+
+    # Without a voluntary round the next one up is hired straight away.
+    client_for(admin_user).patch(url, {"voluntary_first": False}, format="json")
+    vacancy = post_vacancy(client_for(officer), filling_for=c["ff_a"].id)
+    assert (vacancy["status"], vacancy["hired_name"], vacancy["hired_mandatory"]) == ("filled", str(c["medic_b"]), True)
+    assert vacancy["offers"] == []
+
+
+def test_refusing_moves_you_down_only_when_the_department_says_so(client_for, admin_user, officer, member, ot_crew):
+    c = ot_crew
+    vacancy = post_vacancy(client_for(officer), filling_for=c["cap_a"].id)
+    offer = client_for(c["eng_b"]).get("/api/v1/overtime-offers/").json()["results"][0]
+    client_for(c["eng_b"]).post(f"/api/v1/overtime-offers/{offer['id']}/decline/")
+    client_for(officer).post(f"{VACANCIES}{vacancy['id']}/cancel/")
+    later = NEXT_A + datetime.timedelta(days=1)
+
+    def order():
+        members = ot_lists(client_for(member), later)["officers"]["members"]
+        return [m["user"] for m in members if m["user"] in (c["eng_b"].id, c["eng_c"].id)]
+
+    assert order() == [c["eng_b"].id, c["eng_c"].id]
+    client_for(admin_user).patch("/api/v1/overtime-settings/", {"refusal_moves_to_bottom": True}, format="json")
+    assert order() == [c["eng_c"].id, c["eng_b"].id]
+
+
+def test_approved_leave_opens_vacancies_and_cancelling_it_closes_them(client_for, officer, member, ot_crew):
+    from apps.scheduling.models import Vacancy
+
+    c = ot_crew
+    leave = LeaveRequest.objects.create(
+        department=c["cap_a"].department,
+        user=c["cap_a"],
+        leave_type="vacation",
+        start_date=NEXT_A,
+        end_date=NEXT_A + datetime.timedelta(days=3),
+    )
+    assert client_for(officer).post(f"/api/v1/leave-requests/{leave.id}/approve/", {}).status_code == 200
+    # A shift works two of those four days.
+    vacancies = Vacancy.objects.filter(leave_request=leave)
+    assert sorted(v.date for v in vacancies) == [NEXT_A, NEXT_A + datetime.timedelta(days=3)]
+    assert {v.filling_for_id for v in vacancies} == {c["cap_a"].id}
+    assert client_for(officer).post(f"/api/v1/leave-requests/{leave.id}/cancel/").status_code == 200
+    assert set(Vacancy.objects.filter(leave_request=leave).values_list("status", flat=True)) == {"cancelled"}
+
+
+def test_vacancy_permissions_and_manual_hiring(client_for, officer, member, ot_crew):
+    c = ot_crew
+    assert client_for(member).post(VACANCIES, {"date": str(NEXT_A), "overtime_list": "officers"}).status_code == 403
+    client = client_for(officer)
+    assert client.post(VACANCIES, {"date": str(NEXT_A)}, format="json").status_code == 400  # which list?
+    past = {"date": str(TODAY - datetime.timedelta(days=1)), "overtime_list": "officers"}
+    assert client.post(VACANCIES, past, format="json").status_code == 400
+    bad = {"date": str(NEXT_A), "overtime_list": "officers", "position": "paramedic"}
+    assert client.post(VACANCIES, bad, format="json").status_code == 400
+
+    vacancy = post_vacancy(client, filling_for=c["cap_a"].id)
+    url = f"{VACANCIES}{vacancy['id']}/"
+    assert client.post(url + "hire/", {"user": c["cap_a"].id}, format="json").status_code == 400  # on duty
+    hired = client.post(url + "hire/", {"user": c["eng_c"].id}, format="json").json()
+    # Hired without volunteering: that's mandatory.
+    assert (hired["status"], hired["hired_name"], hired["hired_mandatory"]) == ("filled", str(c["eng_c"]), True)
+    assert client.post(url + "cancel/").status_code == 400
+
+    # Nobody left to hire: the officers hear about it.
+    from apps.notifications.models import Notification
+    from apps.scheduling.models import OvertimeSettings
+
+    OvertimeSettings.objects.filter(department=officer.department).update(voluntary_first=False)
+    assert post_vacancy(client, overtime_list="officers")["hired_name"] == str(c["eng_b"])
+    empty = post_vacancy(client, overtime_list="officers")
+    assert (empty["status"], empty["hired_name"]) == ("unfilled", None)
+    assert Notification.objects.filter(user=officer, title__startswith="Vacancy still open").exists()

@@ -1,9 +1,23 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.core.tenancy import TenantSerializer
 
-from .models import Assignment, LeaveRequest, OvertimeShift, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from .models import (
+    Assignment,
+    LeaveRequest,
+    OvertimeOffer,
+    OvertimeSettings,
+    OvertimeShift,
+    Platoon,
+    RotationPattern,
+    ShiftTrade,
+    StaffingRule,
+    Vacancy,
+)
+from .offers import describe
+from .overtime import list_for
 from .roster import build_roster, platoon_on
 
 
@@ -317,3 +331,120 @@ class OvertimeBoardSerializer(serializers.Serializer):
     date = serializers.DateField()
     platoon = serializers.CharField(allow_null=True)
     lists = OvertimeListSerializer(many=True)
+
+
+class OvertimeSettingsSerializer(serializers.ModelSerializer):
+    response_hours = serializers.IntegerField(min_value=1, max_value=72)
+
+    class Meta:
+        model = OvertimeSettings
+        fields = ["response_hours", "voluntary_first", "refusal_moves_to_bottom", "vacancy_from_leave"]
+
+
+class VacancyOfferSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source="user.__str__", read_only=True)
+
+    class Meta:
+        model = OvertimeOffer
+        fields = ["id", "user", "user_name", "status", "responded_at"]
+        read_only_fields = fields
+
+
+class VacancySerializer(TenantSerializer):
+    description = serializers.SerializerMethodField()
+    filling_for_name = serializers.StringRelatedField(source="filling_for", read_only=True)
+    station_name = serializers.StringRelatedField(source="station", read_only=True)
+    hired_name = serializers.SerializerMethodField()
+    hired_mandatory = serializers.SerializerMethodField()
+    offers = VacancyOfferSerializer(many=True, read_only=True)
+    overtime_list = serializers.ChoiceField(choices=Vacancy.List.choices, required=False, allow_blank=True)
+
+    class Meta:
+        model = Vacancy
+        fields = [
+            "id",
+            "date",
+            "overtime_list",
+            "position",
+            "station",
+            "station_name",
+            "filling_for",
+            "filling_for_name",
+            "leave_request",
+            "hours",
+            "note",
+            "status",
+            "respond_by",
+            "description",
+            "hired_name",
+            "hired_mandatory",
+            "offers",
+            "created_at",
+        ]
+        read_only_fields = ["leave_request", "status", "respond_by"]
+
+    def get_description(self, vacancy) -> str:
+        return describe(vacancy)
+
+    def get_hired_name(self, vacancy) -> str | None:
+        return str(vacancy.overtime_shift.user) if vacancy.overtime_shift else None
+
+    def get_hired_mandatory(self, vacancy) -> bool | None:
+        return vacancy.overtime_shift.mandatory if vacancy.overtime_shift else None
+
+    def validate_date(self, value):
+        if value < timezone.localdate():
+            raise serializers.ValidationError("That day has already passed.")
+        return value
+
+    def validate(self, attrs):
+        # The empty seat's member tells us the list, position and station when they aren't given.
+        for key in ("overtime_list", "position", "station"):
+            if not attrs.get(key):
+                attrs.pop(key, None)
+        member = attrs.get("filling_for")
+        assignment = Assignment.objects.filter(user=member).first() if member else None
+        if assignment:
+            attrs.setdefault("overtime_list", list_for(assignment.position))
+            attrs.setdefault("position", assignment.position)
+            attrs.setdefault("station", assignment.station)
+        if not attrs.get("overtime_list"):
+            raise serializers.ValidationError({"overtime_list": "Choose which overtime list fills this seat."})
+        if attrs.get("position") and list_for(attrs["position"]) != attrs["overtime_list"]:
+            raise serializers.ValidationError({"position": "That position isn't filled from this overtime list."})
+        return attrs
+
+
+class HireSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+
+
+class OvertimeOfferSerializer(serializers.ModelSerializer):
+    """An offer as the member sees it: what the vacancy is and when to answer by."""
+
+    user_name = serializers.CharField(source="user.__str__", read_only=True)
+    date = serializers.DateField(source="vacancy.date", read_only=True)
+    description = serializers.SerializerMethodField()
+    respond_by = serializers.DateTimeField(source="vacancy.respond_by", read_only=True)
+    hours = serializers.DecimalField(source="vacancy.hours", max_digits=5, decimal_places=2, read_only=True)
+    vacancy_status = serializers.CharField(source="vacancy.status", read_only=True)
+
+    class Meta:
+        model = OvertimeOffer
+        fields = [
+            "id",
+            "vacancy",
+            "user",
+            "user_name",
+            "status",
+            "responded_at",
+            "date",
+            "description",
+            "respond_by",
+            "hours",
+            "vacancy_status",
+        ]
+        read_only_fields = fields
+
+    def get_description(self, offer) -> str:
+        return describe(offer.vacancy)

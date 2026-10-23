@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.core.models import Station, TenantModel
+from apps.core.models import Department, Station, TenantModel
 
 
 class Platoon(TenantModel):
@@ -235,3 +235,96 @@ class OvertimeShift(TenantModel):
 
     def __str__(self):
         return f"{self.user} overtime {self.date}"
+
+
+class OvertimeSettings(models.Model):
+    """How a department fills overtime. Every agency runs its list a little differently."""
+
+    department = models.OneToOneField(Department, on_delete=models.CASCADE, related_name="overtime_settings")
+    response_hours = models.PositiveSmallIntegerField(
+        default=4, help_text="How long members have to answer an overtime offer"
+    )
+    voluntary_first = models.BooleanField(
+        default=True, help_text="Offer overtime to volunteers before forcing anyone off the list"
+    )
+    refusal_moves_to_bottom = models.BooleanField(
+        default=False, help_text="Turning down an offer counts like working it, sending the member to the bottom"
+    )
+    vacancy_from_leave = models.BooleanField(
+        default=True, help_text="Open a vacancy automatically when leave is approved for someone on duty"
+    )
+
+    def __str__(self):
+        return f"Overtime settings for {self.department}"
+
+    @classmethod
+    def for_department(cls, department):
+        return cls.objects.get_or_create(department=department)[0]
+
+
+class Vacancy(TenantModel):
+    """A seat that needs filling with overtime. FireFirst offers it to volunteers, then hires off the list."""
+
+    class List(models.TextChoices):
+        OFFICERS = "officers", "Captains & engineers"
+        FIREFIGHTERS = "firefighters", "Firefighters & medics"
+
+    class Status(models.TextChoices):
+        OFFERED = "offered", "Offered to volunteers"
+        FILLED = "filled", "Filled"
+        UNFILLED = "unfilled", "No one available"
+        CANCELLED = "cancelled", "Cancelled"
+
+    date = models.DateField()
+    overtime_list = models.CharField(max_length=20, choices=List.choices)
+    position = models.CharField(max_length=20, choices=Assignment.Position.choices, blank=True)
+    station = models.ForeignKey(Station, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    filling_for = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="The member whose seat is empty",
+    )
+    leave_request = models.ForeignKey(
+        LeaveRequest, null=True, blank=True, on_delete=models.SET_NULL, related_name="vacancies"
+    )
+    hours = models.DecimalField(max_digits=5, decimal_places=2, default=24)
+    note = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.OFFERED)
+    respond_by = models.DateTimeField(null=True, blank=True, help_text="When volunteering closes")
+    overtime_shift = models.OneToOneField(
+        OvertimeShift, null=True, blank=True, on_delete=models.SET_NULL, related_name="vacancy"
+    )
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        ordering = ["date", "id"]
+        verbose_name_plural = "vacancies"
+
+    def __str__(self):
+        return f"{self.get_overtime_list_display()} vacancy {self.date}"
+
+
+class OvertimeOffer(TenantModel):
+    """One member's chance to volunteer for a vacancy."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Waiting for an answer"
+        ACCEPTED = "accepted", "Volunteered"
+        DECLINED = "declined", "Turned down"
+        EXPIRED = "expired", "No answer"
+        WITHDRAWN = "withdrawn", "No longer needed"
+
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="offers")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="overtime_offers")
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["vacancy", "id"]
+        constraints = [models.UniqueConstraint(fields=["vacancy", "user"], name="one_offer_per_member")]
+
+    def __str__(self):
+        return f"{self.user}: {self.vacancy}"

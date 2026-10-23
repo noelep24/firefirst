@@ -20,6 +20,8 @@ def env_bool(name, default=False):
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me-do-not-use-in-production")
 DEBUG = env_bool("DJANGO_DEBUG", True)
+# Push notifications go to phones through Expo's push service. Tests turn this off.
+PUSH_NOTIFICATIONS_ENABLED = env_bool("PUSH_NOTIFICATIONS_ENABLED", True)
 ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
 
 if not DEBUG and SECRET_KEY.startswith("dev-insecure"):
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     "apps.certifications",
     "apps.reports",
     "apps.incidents",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -187,4 +190,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Fire department station administration: inventory, apparatus, scheduling and events.",
     "VERSION": "0.1.0",
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "VacancyStatusEnum": "apps.scheduling.models.Vacancy.Status",
+        "OvertimeOfferStatusEnum": "apps.scheduling.models.OvertimeOffer.Status",
+    },
 }

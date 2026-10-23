@@ -16,6 +16,7 @@ from apps.events import views as events
 from apps.imports import views as imports
 from apps.incidents import views as incidents
 from apps.inventory import views as inventory
+from apps.notifications import views as notifications
 from apps.reports import views as reports
 from apps.scheduling import views as scheduling
 
@@ -42,6 +43,9 @@ router.register("leave-requests", scheduling.LeaveRequestViewSet)
 router.register("shift-trades", scheduling.ShiftTradeViewSet)
 router.register("staffing-rules", scheduling.StaffingRuleViewSet)
 router.register("overtime-shifts", scheduling.OvertimeShiftViewSet)
+router.register("vacancies", scheduling.VacancyViewSet)
+router.register("overtime-offers", scheduling.OvertimeOfferViewSet)
+router.register("notifications", notifications.NotificationViewSet)
 
 router.register("certification-types", certifications.CertificationTypeViewSet)
 router.register("certifications", certifications.CertificationViewSet)
@@ -65,6 +69,8 @@ api_v1 = [
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("station-board/", scheduling.StationBoardView.as_view(), name="station-board"),
     path("overtime-list/", scheduling.OvertimeListView.as_view(), name="overtime-list"),
+    path("overtime-settings/", scheduling.OvertimeSettingsView.as_view(), name="overtime-settings"),
+    path("push-devices/", notifications.PushDeviceView.as_view(), name="push-devices"),
     path("neris/value-sets/", incidents.NerisValueSetsView.as_view(), name="neris-value-sets"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),

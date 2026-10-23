@@ -2,12 +2,13 @@
 
 Members are split into two lists by riding position: officers and engineers can fill each other's seats,
 and firefighters and medics can fill each other's. Whoever worked overtime longest ago (or never) is at
-the top; working an overtime shift sends them to the bottom.
+the top; working an overtime shift sends them to the bottom (and, where the department says so, so does
+turning one down).
 """
 
 from django.db.models import Max
 
-from .models import Assignment, LeaveRequest, OvertimeShift
+from .models import Assignment, LeaveRequest, OvertimeOffer, OvertimeSettings, OvertimeShift
 from .roster import build_roster
 
 P = Assignment.Position
@@ -38,6 +39,20 @@ def overtime_list(department, date):
         .annotate(last=Max("date"))
         .values_list("user", "last")
     )
+    if OvertimeSettings.for_department(department).refusal_moves_to_bottom:
+        # Turning down an offer counts like working it.
+        refused = (
+            OvertimeOffer.objects.filter(
+                department=department,
+                status__in=[OvertimeOffer.Status.DECLINED, OvertimeOffer.Status.EXPIRED],
+                vacancy__date__lt=date,
+            )
+            .values("user")
+            .annotate(last=Max("vacancy__date"))
+            .values_list("user", "last")
+        )
+        for user, day in refused:
+            last[user] = max(last.get(user, day), day)
     hired_today = set(OvertimeShift.objects.filter(department=department, date=date).values_list("user_id", flat=True))
     assignments = Assignment.objects.filter(department=department, user__is_active=True).select_related(
         "user", "station", "platoon"

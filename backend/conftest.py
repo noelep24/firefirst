@@ -4,6 +4,11 @@ from rest_framework.test import APIClient
 from apps.core.models import Department, Station, User
 
 
+@pytest.fixture(autouse=True)
+def _no_push(settings):
+    settings.PUSH_NOTIFICATIONS_ENABLED = False
+
+
 @pytest.fixture
 def department(db):
     return Department.objects.create(name="Riverside Fire", slug="riverside")
