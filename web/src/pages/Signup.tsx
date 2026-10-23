@@ -1,3 +1,4 @@
+import { Brand } from '@/components/brand';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
@@ -62,9 +63,7 @@ export default function Signup({ onCancel }: { onCancel: () => void }) {
       <Card className="login-card">
         <div className="stack" style={{ width: 'min(560px, calc(100vw - 64px))' }}>
           <div className="stack-sm">
-            <div className="brand" style={{ padding: 0, fontSize: '1.8rem' }}>
-              FireFirst
-            </div>
+            <Brand large />
             <h1>Create your department</h1>
             <p className="muted">You&apos;ll be its admin. You can import your people, apparatus and inventory next.</p>
           </div>

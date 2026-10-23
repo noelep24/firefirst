@@ -5,6 +5,8 @@ import { NavLink, Outlet, useLocation } from 'react-router';
 import { http, type Schemas } from '@/api/http';
 import { useMe } from '@/auth';
 
+import { Brand } from './brand';
+
 import { CalendarFeedButton } from './calendar-feed';
 import { Badge, Button } from './ui';
 
@@ -72,12 +74,10 @@ export function Layout() {
         <Button variant="ghost" small onClick={() => setMenuOpen(true)} aria-label="Open menu">
           ☰
         </Button>
-        <strong className="brand" style={{ padding: 0 }}>
-          FireFirst
-        </strong>
+        <Brand />
       </div>
       <nav className={`sidebar ${menuOpen ? 'open' : ''}`} aria-label="Main">
-        <div className="brand">FireFirst</div>
+        <Brand />
         <div className="brand-sub">{me.department?.name}</div>
         {groups.map((group) => {
           const items = group.items.filter((i) => !i.adminOnly || isAdmin);

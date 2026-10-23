@@ -1,5 +1,5 @@
 /**
- * App colors for light and dark mode. `accent` is the FireFirst brand red.
+ * App colors for light and dark mode. `accent` is the FireFirst engine red; the web app uses the same palette.
  */
 
 import '@/global.css';
@@ -7,27 +7,28 @@ import '@/global.css';
 import { Platform } from 'react-native';
 
 export const Colors = {
+  // Modern firehouse: engine red and gold leaf on warm, paper-white surfaces (charcoal in dark mode).
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    border: '#D9D9E0',
-    accent: '#C62828',
+    text: '#1B1A19',
+    background: '#FBF9F6',
+    backgroundElement: '#F3EFE9',
+    backgroundSelected: '#E7E1D7',
+    textSecondary: '#645D54',
+    border: '#D9D1C4',
+    accent: '#B3161D',
     accentText: '#ffffff',
-    success: '#1B7F3B',
-    warning: '#A15C00',
-    danger: '#C62828',
+    success: '#2E7D32',
+    warning: '#A86B00',
+    danger: '#B3161D',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    border: '#3A3D42',
-    accent: '#EF5350',
+    text: '#F3EFE8',
+    background: '#121110',
+    backgroundElement: '#22201D',
+    backgroundSelected: '#2F2C28',
+    textSecondary: '#B4AC9F',
+    border: '#3D3933',
+    accent: '#E0453B',
     accentText: '#ffffff',
     success: '#4CC38A',
     warning: '#F5A524',
