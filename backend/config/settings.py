@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.imports",
     "apps.certifications",
     "apps.reports",
+    "apps.incidents",
 ]
 
 MIDDLEWARE = [

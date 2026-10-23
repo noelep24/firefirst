@@ -39,6 +39,7 @@ export function Layout() {
     {
       title: 'Operations',
       items: [
+        { to: '/incidents', label: 'Incidents' },
         { to: '/apparatus', label: 'Apparatus' },
         { to: '/work-orders', label: 'Work orders' },
         { to: '/inventory', label: 'Inventory' },

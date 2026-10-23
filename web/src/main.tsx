@@ -27,6 +27,8 @@ const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const Import = lazy(() => import('@/pages/Import'));
 const Reports = lazy(() => import('@/pages/Reports'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Incidents = lazy(() => import('@/pages/Incidents'));
+const IncidentDetail = lazy(() => import('@/pages/IncidentDetail'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +52,8 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="incidents" element={<Incidents />} />
+          <Route path="incidents/:id" element={<IncidentDetail />} />
           <Route path="apparatus" element={<ApparatusList />} />
           <Route path="apparatus/:id" element={<ApparatusDetail />} />
           <Route path="work-orders" element={<WorkOrders />} />

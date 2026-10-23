@@ -78,7 +78,8 @@ class Command(BaseCommand):
         if Department.objects.filter(slug=slug).exists():
             raise CommandError(f"Department '{slug}' already exists.")
         today = timezone.localdate()
-        dept = Department.objects.create(name="Demo Fire Rescue", slug=slug)
+        # A placeholder NERIS ID, so demo incident reports can be completed.
+        dept = Department.objects.create(name="Demo Fire Rescue", slug=slug, neris_id="FD00000000")
         st1 = Station.objects.create(department=dept, number="1", name="Headquarters", address="100 Main St")
         st2 = Station.objects.create(department=dept, number="2", name="Northside", address="2200 N Oak Ave")
 

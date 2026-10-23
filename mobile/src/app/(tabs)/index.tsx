@@ -18,6 +18,10 @@ export default function TodayScreen() {
     queryKey: ['station-board', station ?? 'mine'],
     queryFn: () => unwrap(api().GET('/api/v1/station-board/', { params: { query: station ? { station } : {} } })),
   });
+  const drafts = useQuery({
+    queryKey: ['incidents', 'drafts'],
+    queryFn: () => unwrap(api().GET('/api/v1/incidents/', { params: { query: { status: 'draft', page_size: 1 } } })),
+  });
   const dashboard = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => unwrap(api().GET('/api/v1/dashboard/')),
@@ -31,11 +35,22 @@ export default function TodayScreen() {
       refreshing={board.isRefetching || dashboard.isRefetching}
       onRefresh={() => {
         board.refetch();
+        drafts.refetch();
         dashboard.refetch();
       }}>
       <QueryState query={board}>
         {(boardData) => <StationBoard board={boardData} myId={me.id} onPickStation={setStation} />}
       </QueryState>
+
+      <Card onPress={() => router.push('/incidents')}>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <Label type="heading">Incident reports</Label>
+          {drafts.data?.count ? <Badge text={`${drafts.data.count} to finish`} tone="warning" /> : null}
+        </Row>
+        <Label type="small" color="textSecondary">
+          Start a report or finish a draft. Units and crews fill in from the roster.
+        </Label>
+      </Card>
 
       <QueryState query={dashboard}>
         {(dashboardData) => {

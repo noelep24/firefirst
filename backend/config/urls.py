@@ -14,6 +14,7 @@ from apps.core.signup import OnboardingView, SignupView
 from apps.core.site import healthz, web_app
 from apps.events import views as events
 from apps.imports import views as imports
+from apps.incidents import views as incidents
 from apps.inventory import views as inventory
 from apps.reports import views as reports
 from apps.scheduling import views as scheduling
@@ -44,6 +45,8 @@ router.register("overtime-shifts", scheduling.OvertimeShiftViewSet)
 
 router.register("certification-types", certifications.CertificationTypeViewSet)
 router.register("certifications", certifications.CertificationViewSet)
+router.register("incidents", incidents.IncidentViewSet)
+router.register("incident-units", incidents.IncidentUnitViewSet)
 
 router.register("events", events.EventViewSet)
 router.register("audit-log", AuditEntryViewSet)
@@ -62,6 +65,7 @@ api_v1 = [
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("station-board/", scheduling.StationBoardView.as_view(), name="station-board"),
     path("overtime-list/", scheduling.OvertimeListView.as_view(), name="overtime-list"),
+    path("neris/value-sets/", incidents.NerisValueSetsView.as_view(), name="neris-value-sets"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),
     path("reports/", reports.ReportListView.as_view(), name="reports"),

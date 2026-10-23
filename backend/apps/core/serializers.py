@@ -7,8 +7,14 @@ from .tenancy import TenantSerializer
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ["id", "name", "slug", "timezone"]
+        fields = ["id", "name", "slug", "timezone", "neris_id"]
         read_only_fields = ["slug"]
+
+    def validate_neris_id(self, value):
+        value = value.strip().upper()
+        if value and not (len(value) == 10 and value[:2].isalpha() and value[2:].isdigit()):
+            raise serializers.ValidationError("A NERIS ID is 2 letters and 8 digits, e.g. FD12345678.")
+        return value
 
 
 class StationSerializer(TenantSerializer):

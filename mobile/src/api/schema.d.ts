@@ -564,6 +564,133 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/incident-units/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        get: operations["api_v1_incident_units_list"];
+        put?: never;
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        post: operations["api_v1_incident_units_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incident-units/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        get: operations["api_v1_incident_units_retrieve"];
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        put: operations["api_v1_incident_units_update"];
+        post?: never;
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        delete: operations["api_v1_incident_units_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Units on an incident. A rig added without a crew gets the crew riding it that day. */
+        patch: operations["api_v1_incident_units_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/incidents/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        get: operations["api_v1_incidents_list"];
+        put?: never;
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        post: operations["api_v1_incidents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        get: operations["api_v1_incidents_retrieve"];
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        put: operations["api_v1_incidents_update"];
+        post?: never;
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        delete: operations["api_v1_incidents_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Incident reports. Any member can start and fill one in; officers delete and reopen. */
+        patch: operations["api_v1_incidents_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/incidents/{id}/complete/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Mark the report complete once nothing NERIS needs is missing. */
+        post: operations["api_v1_incidents_complete_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents/{id}/neris/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The report in NERIS incident format, for review or upload. */
+        get: operations["api_v1_incidents_neris_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents/{id}/reopen/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Send a completed report back to draft for changes (officers). */
+        post: operations["api_v1_incidents_reopen_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspections/": {
         parameters: {
             query?: never;
@@ -970,6 +1097,23 @@ export interface paths {
         put?: never;
         /** @description ``GET`` the personal calendar link (created on first use); ``POST`` to replace it with a new one. */
         post: operations["api_v1_me_calendar_feed_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/neris/value-sets/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``GET /neris/value-sets/`` – the NERIS choice lists the incident report uses. */
+        get: operations["api_v1_neris_value_sets_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1951,10 +2095,14 @@ export interface components {
             name: string;
             readonly slug: string;
             timezone?: string;
+            /** @description The department's NERIS ID, e.g. FD12345678 */
+            neris_id?: string;
         };
         DepartmentRequest: {
             name: string;
             timezone?: string;
+            /** @description The department's NERIS ID, e.g. FD12345678 */
+            neris_id?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Event: {
@@ -2086,6 +2234,140 @@ export interface components {
              * @default false
              */
             skip_errors: boolean;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        Incident: {
+            readonly id: number;
+            /** @description Department incident number, e.g. 2026-00123 */
+            number?: string;
+            readonly status: components["schemas"]["IncidentStatusEnum"];
+            /**
+             * Format: date-time
+             * @description When the call came in
+             */
+            alarm_at: string;
+            station?: number | null;
+            readonly station_name: string;
+            /** @description Street address, e.g. 120 N Oak Ave */
+            address?: string;
+            /** @description Apartment, floor, landmark… */
+            address_detail?: string;
+            city?: string;
+            state?: string;
+            postal_code?: string;
+            /** @description Up to 3 NERIS incident types, primary first */
+            incident_types?: unknown;
+            readonly type_labels: string[];
+            /** @description NERIS action/tactic codes */
+            actions_taken?: unknown;
+            /** @description NERIS no-action code, if none taken */
+            no_action_reason?: string;
+            people_present?: boolean | null;
+            /** @description People displaced */
+            displaced?: number | null;
+            /** @description Any rescues, injuries or deaths (civilian or firefighter) */
+            rescues_or_casualties?: boolean | null;
+            /** @description NERIS fire module answers */
+            fire?: unknown;
+            /** @description Smoke alarm, fire alarm and sprinkler presence */
+            alarms?: unknown;
+            /** @description One entry per patient: ESO report number + NERIS outcome */
+            patients?: unknown;
+            narrative?: string;
+            readonly units: components["schemas"]["IncidentUnit"][];
+            /** @description What NERIS still needs; empty when the report is ready */
+            readonly missing: string[];
+            readonly created_by_name: string;
+            /** Format: date-time */
+            readonly completed_at: string | null;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        IncidentRequest: {
+            /** @description Department incident number, e.g. 2026-00123 */
+            number?: string;
+            /**
+             * Format: date-time
+             * @description When the call came in
+             */
+            alarm_at: string;
+            station?: number | null;
+            /** @description Street address, e.g. 120 N Oak Ave */
+            address?: string;
+            /** @description Apartment, floor, landmark… */
+            address_detail?: string;
+            city?: string;
+            state?: string;
+            postal_code?: string;
+            /** @description Up to 3 NERIS incident types, primary first */
+            incident_types?: unknown;
+            /** @description NERIS action/tactic codes */
+            actions_taken?: unknown;
+            /** @description NERIS no-action code, if none taken */
+            no_action_reason?: string;
+            people_present?: boolean | null;
+            /** @description People displaced */
+            displaced?: number | null;
+            /** @description Any rescues, injuries or deaths (civilian or firefighter) */
+            rescues_or_casualties?: boolean | null;
+            /** @description NERIS fire module answers */
+            fire?: unknown;
+            /** @description Smoke alarm, fire alarm and sprinkler presence */
+            alarms?: unknown;
+            /** @description One entry per patient: ESO report number + NERIS outcome */
+            patients?: unknown;
+            narrative?: string;
+        };
+        /**
+         * @description * `draft` - Draft
+         *     * `complete` - Complete
+         * @enum {string}
+         */
+        IncidentStatusEnum: "draft" | "complete";
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        IncidentUnit: {
+            readonly id: number;
+            incident: number;
+            apparatus?: number | null;
+            /** @description Unit designation, e.g. E1 or a mutual-aid unit */
+            unit?: string;
+            /** @description NERIS response mode code */
+            response_mode?: string;
+            crew?: number[];
+            readonly crew_names: string[];
+            /** @description People on the unit */
+            staffing?: number | null;
+            /** Format: date-time */
+            dispatched_at?: string | null;
+            /** Format: date-time */
+            enroute_at?: string | null;
+            /** Format: date-time */
+            on_scene_at?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            cleared_at?: string | null;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        IncidentUnitRequest: {
+            incident: number;
+            apparatus?: number | null;
+            /** @description Unit designation, e.g. E1 or a mutual-aid unit */
+            unit?: string;
+            /** @description NERIS response mode code */
+            response_mode?: string;
+            crew?: number[];
+            /** @description People on the unit */
+            staffing?: number | null;
+            /** Format: date-time */
+            dispatched_at?: string | null;
+            /** Format: date-time */
+            enroute_at?: string | null;
+            /** Format: date-time */
+            on_scene_at?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            cleared_at?: string | null;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Inspection: {
@@ -2307,6 +2589,30 @@ export interface components {
             covering_for?: number | null;
             reason?: string;
         };
+        NerisValue: {
+            value: string;
+            label: string;
+        };
+        /** @description Every NERIS choice list the incident report uses. */
+        NerisValueSets: {
+            incident_type: components["schemas"]["NerisValue"][];
+            action: components["schemas"]["NerisValue"][];
+            no_action: components["schemas"]["NerisValue"][];
+            response_mode: components["schemas"]["NerisValue"][];
+            patient_care: components["schemas"]["NerisValue"][];
+            patient_status: components["schemas"]["NerisValue"][];
+            medical_disposition: components["schemas"]["NerisValue"][];
+            investigation_need: components["schemas"]["NerisValue"][];
+            investigation_type: components["schemas"]["NerisValue"][];
+            arrival_conditions: components["schemas"]["NerisValue"][];
+            building_damage: components["schemas"]["NerisValue"][];
+            room: components["schemas"]["NerisValue"][];
+            structure_cause: components["schemas"]["NerisValue"][];
+            outside_cause: components["schemas"]["NerisValue"][];
+            water_supply: components["schemas"]["NerisValue"][];
+            suppression_appliance: components["schemas"]["NerisValue"][];
+            presence: components["schemas"]["NerisValue"][];
+        };
         OnboardingStep: {
             key: string;
             title: string;
@@ -2498,6 +2804,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Event"][];
+        };
+        PaginatedIncidentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Incident"][];
         };
         PaginatedInspectionList: {
             /** @example 123 */
@@ -2815,6 +3136,8 @@ export interface components {
         PatchedDepartmentRequest: {
             name?: string;
             timezone?: string;
+            /** @description The department's NERIS ID, e.g. FD12345678 */
+            neris_id?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedEventRequest: {
@@ -2855,6 +3178,64 @@ export interface components {
             /** Format: date */
             repeat_until?: string | null;
             repeat_count?: number | null;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedIncidentRequest: {
+            /** @description Department incident number, e.g. 2026-00123 */
+            number?: string;
+            /**
+             * Format: date-time
+             * @description When the call came in
+             */
+            alarm_at?: string;
+            station?: number | null;
+            /** @description Street address, e.g. 120 N Oak Ave */
+            address?: string;
+            /** @description Apartment, floor, landmark… */
+            address_detail?: string;
+            city?: string;
+            state?: string;
+            postal_code?: string;
+            /** @description Up to 3 NERIS incident types, primary first */
+            incident_types?: unknown;
+            /** @description NERIS action/tactic codes */
+            actions_taken?: unknown;
+            /** @description NERIS no-action code, if none taken */
+            no_action_reason?: string;
+            people_present?: boolean | null;
+            /** @description People displaced */
+            displaced?: number | null;
+            /** @description Any rescues, injuries or deaths (civilian or firefighter) */
+            rescues_or_casualties?: boolean | null;
+            /** @description NERIS fire module answers */
+            fire?: unknown;
+            /** @description Smoke alarm, fire alarm and sprinkler presence */
+            alarms?: unknown;
+            /** @description One entry per patient: ESO report number + NERIS outcome */
+            patients?: unknown;
+            narrative?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedIncidentUnitRequest: {
+            incident?: number;
+            apparatus?: number | null;
+            /** @description Unit designation, e.g. E1 or a mutual-aid unit */
+            unit?: string;
+            /** @description NERIS response mode code */
+            response_mode?: string;
+            crew?: number[];
+            /** @description People on the unit */
+            staffing?: number | null;
+            /** Format: date-time */
+            dispatched_at?: string | null;
+            /** Format: date-time */
+            enroute_at?: string | null;
+            /** Format: date-time */
+            on_scene_at?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            cleared_at?: string | null;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedItemRequest: {
@@ -5121,6 +5502,381 @@ export interface operations {
             };
         };
     };
+    api_v1_incident_units_list: {
+        parameters: {
+            query?: {
+                incident?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentUnit"][];
+                };
+            };
+        };
+    };
+    api_v1_incident_units_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentUnitRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["IncidentUnitRequest"];
+                "multipart/form-data": components["schemas"]["IncidentUnitRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentUnit"];
+                };
+            };
+        };
+    };
+    api_v1_incident_units_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident unit. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentUnit"];
+                };
+            };
+        };
+    };
+    api_v1_incident_units_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident unit. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentUnitRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["IncidentUnitRequest"];
+                "multipart/form-data": components["schemas"]["IncidentUnitRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentUnit"];
+                };
+            };
+        };
+    };
+    api_v1_incident_units_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident unit. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_v1_incident_units_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident unit. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedIncidentUnitRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedIncidentUnitRequest"];
+                "multipart/form-data": components["schemas"]["PatchedIncidentUnitRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncidentUnit"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                station?: number;
+                /**
+                 * @description * `draft` - Draft
+                 *     * `complete` - Complete
+                 */
+                status?: "complete" | "draft";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedIncidentList"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["IncidentRequest"];
+                "multipart/form-data": components["schemas"]["IncidentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["IncidentRequest"];
+                "multipart/form-data": components["schemas"]["IncidentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_v1_incidents_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedIncidentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedIncidentRequest"];
+                "multipart/form-data": components["schemas"]["PatchedIncidentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_complete_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
+    api_v1_incidents_neris_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    api_v1_incidents_reopen_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this incident. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+        };
+    };
     api_v1_inspections_list: {
         parameters: {
             query?: {
@@ -6374,6 +7130,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CalendarLink"];
+                };
+            };
+        };
+    };
+    api_v1_neris_value_sets_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NerisValueSets"];
                 };
             };
         };
