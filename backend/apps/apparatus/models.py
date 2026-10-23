@@ -288,3 +288,49 @@ class ServiceRecord(TenantModel):
                 self.engine_hours if self.engine_hours is not None else self.apparatus.engine_hours
             )
             schedule.save(update_fields=["last_performed_on", "last_mileage", "last_engine_hours", "updated_at"])
+
+
+class ApparatusMove(TenantModel):
+    """A rig temporarily at another station, e.g. a reserve engine covering while a frontline rig is in the
+    shop. The rig's ``station`` stays its home; while a move is active it counts as being at ``station``.
+    Permanent moves just change ``Apparatus.station``."""
+
+    apparatus = models.ForeignKey(Apparatus, on_delete=models.CASCADE, related_name="moves")
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="+")
+    starts_on = models.DateField()
+    ends_on = models.DateField(null=True, blank=True, help_text="Last day away; blank until it's returned")
+    returned_at = models.DateTimeField(null=True, blank=True)
+    covering_for = models.ForeignKey(
+        Apparatus,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="A rig out of service whose crew rides this one meanwhile",
+    )
+    crew_moves = models.BooleanField(
+        default=False, help_text="The rig's own crew goes with it (otherwise they stay at their station)"
+    )
+    reason = models.CharField(max_length=200, blank=True)
+    moved_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        ordering = ["-starts_on", "-id"]
+
+    def __str__(self):
+        return f"{self.apparatus} → {self.station}"
+
+    def is_active_on(self, date):
+        if self.starts_on > date or (self.ends_on and self.ends_on < date):
+            return False
+        return not (self.returned_at and timezone.localdate(self.returned_at) <= date)
+
+    @classmethod
+    def active_on(cls, department, date):
+        """The move in effect for each rig on ``date``, by apparatus id."""
+        moves = (
+            cls.objects.filter(department=department, starts_on__lte=date)
+            .filter(models.Q(ends_on__isnull=True) | models.Q(ends_on__gte=date))
+            .select_related("apparatus", "station", "covering_for")
+        )
+        return {m.apparatus_id: m for m in moves if m.is_active_on(date)}

@@ -240,6 +240,19 @@ function StationBoard({
                     <Badge text={rigStatus.label} tone={rigStatus.tone} />
                   ) : null}
                 </Row>
+                {rig.visiting ? (
+                  <Label type="small" color="warning">
+                    {[
+                      rig.visiting.home_station_number
+                        ? `From Station ${rig.visiting.home_station_number}`
+                        : 'Visiting',
+                      rig.visiting.covering_for_unit ? `covering for ${rig.visiting.covering_for_unit}` : null,
+                      rig.visiting.until ? `through ${formatDay(rig.visiting.until)}` : 'until returned',
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </Label>
+                ) : null}
                 {rig.crew.length === 0 ? (
                   <Label type="small" color="textSecondary">
                     Not staffed
@@ -250,6 +263,20 @@ function StationBoard({
               </Card>
             );
           })}
+
+          {board.away.length ? (
+            <Card>
+              <Label type="smallBold" color="textSecondary">
+                Away today
+              </Label>
+              {board.away.map((rig) => (
+                <Label key={rig.id} type="small" onPress={() => openRig(rig.id)}>
+                  {rig.unit_number} at Station {rig.station_number}
+                  {rig.until ? ` through ${formatDay(rig.until)}` : ' until returned'}
+                </Label>
+              ))}
+            </Card>
+          ) : null}
 
           {board.unassigned.length ? (
             <Card>

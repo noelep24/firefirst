@@ -170,6 +170,20 @@ class Command(BaseCommand):
             engine_hours=7_400,
         )
 
+        Apparatus.objects.create(
+            department=dept,
+            unit_number="E3",
+            apparatus_type="engine",
+            station=st2,
+            status="reserve",
+            make="Pierce",
+            model="Arrow XT",
+            year=2006,
+            mileage=121_300,
+            engine_hours=9_850,
+            notes="Reserve engine. Move it to cover for a frontline engine in the shop.",
+        )
+
         # Riding assignments: Station 1 staffs E1 and M1 (L1 is cross-staffed), Station 2 staffs E2.
         for assignment in Assignment.objects.filter(department=dept).select_related("station"):
             if assignment.station == st2:

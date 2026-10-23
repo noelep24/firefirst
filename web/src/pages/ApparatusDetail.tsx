@@ -1,11 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
 import { RecordModal } from '@/components/crud';
-import { Badge, Button, Card, DataTable, Empty, Modal, PageHeader, QueryState, Tabs } from '@/components/ui';
-import { maintenanceFields, priorities, serviceRecordFields, workOrderFields } from '@/lib/fields';
+import { type FieldSpec, Form, type Values } from '@/components/form';
+import { Badge, Button, Card, DataTable, Empty, ErrorBox, Modal, PageHeader, QueryState, Tabs } from '@/components/ui';
+import { maintenanceFields, priorities, serviceRecordFields, stationLabel, workOrderFields } from '@/lib/fields';
 import { formatDateTime, formatDay, isoDate } from '@/lib/format';
 import { apparatusStatus, apparatusTypes, labelFor, priorityTone, workOrderStatus } from '@/lib/labels';
 
@@ -15,6 +16,7 @@ type Tab = 'work-orders' | 'checks' | 'maintenance' | 'service';
 
 type Editing =
   | { kind: 'apparatus' }
+  | { kind: 'move' }
   | { kind: 'work-order'; record: Schemas['WorkOrder'] | null }
   | { kind: 'schedule'; record: Schemas['MaintenanceSchedule'] | null }
   | { kind: 'service'; record: Schemas['ServiceRecord'] | null; schedule?: Schemas['MaintenanceSchedule'] }
@@ -66,10 +68,12 @@ export default function ApparatusDetail() {
                     <Link to="/apparatus" className="btn btn-ghost">
                       All apparatus
                     </Link>
+                    <Button onClick={() => setEditing({ kind: 'move' })}>Move</Button>
                     <Button onClick={() => setEditing({ kind: 'apparatus' })}>Edit details</Button>
                   </>
                 }
               />
+              {r.current_move ? <AwayBanner rig={r} onReturned={saved} /> : null}
               <div className="grid">
                 <Card>
                   <div className="stat-value">{(r.mileage ?? 0).toLocaleString()}</div>
@@ -90,6 +94,7 @@ export default function ApparatusDetail() {
                   <div className="muted small">{r.license_plate ? `Plate ${r.license_plate}` : ''}</div>
                 </Card>
               </div>
+              {editing?.kind === 'move' ? <MoveModal rig={r} onClose={() => setEditing(null)} onMoved={saved} /> : null}
               {editing?.kind === 'apparatus' ? (
                 <RecordModal<Schemas['Apparatus']>
                   title={`Edit ${r.unit_number}`}
@@ -424,5 +429,117 @@ function ServiceTab({ id, onEdit }: { id: number; onEdit: (record: Schemas['Serv
         )}
       </QueryState>
     </div>
+  );
+}
+
+function AwayBanner({ rig, onReturned }: { rig: Schemas['Apparatus']; onReturned: () => void }) {
+  const move = rig.current_move!;
+  const returnHome = useMutation({
+    mutationFn: () => http.post<Schemas['Apparatus']>(`/api/v1/apparatus/${rig.id}/return/`),
+    onSuccess: onReturned,
+  });
+  return (
+    <div className="alert row spread" role="status">
+      <span>
+        <strong>
+          At {move.station_name} {move.ends_on ? `through ${formatDay(move.ends_on)}` : 'until returned'}
+        </strong>
+        {move.covering_for_unit ? ` · covering for ${move.covering_for_unit}` : ''}
+        {move.reason ? ` · ${move.reason}` : ''}
+        <span className="muted"> · home station {rig.station_name ?? 'none'}</span>
+      </span>
+      <Button small loading={returnHome.isPending} onClick={() => returnHome.mutate()}>
+        Return home
+      </Button>
+      {returnHome.error ? <ErrorBox error={returnHome.error} /> : null}
+    </div>
+  );
+}
+
+function moveFields(temporary: boolean): FieldSpec[] {
+  const fields: FieldSpec[] = [
+    {
+      name: 'station',
+      label: 'To',
+      type: 'relation',
+      required: true,
+      endpoint: '/api/v1/stations/',
+      optionLabel: stationLabel as (row: never) => string,
+    },
+    {
+      name: 'length',
+      label: 'For how long',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'temporary', label: 'Temporarily (returns on its own)' },
+        { value: 'permanent', label: 'Permanently (changes its home station)' },
+      ],
+    },
+  ];
+  if (temporary) {
+    fields.push(
+      { name: 'until', label: 'Last day away', type: 'date', help: 'Leave blank to keep it there until returned' },
+      {
+        name: 'covering_for',
+        label: 'Covering for',
+        type: 'relation',
+        endpoint: '/api/v1/apparatus/',
+        optionLabel: ((a: Schemas['Apparatus']) => a.unit_number) as (row: never) => string,
+        help: 'A rig out of service whose crew rides this one meanwhile',
+      },
+    );
+  }
+  fields.push({
+    name: 'crew_moves',
+    label: 'Crew moves with the rig',
+    type: 'checkbox',
+    help: temporary
+      ? 'Otherwise members assigned to ride it stay at their station without it'
+      : 'Otherwise members assigned to ride it stay at their station and are taken off it',
+  });
+  if (temporary) fields.push({ name: 'reason', label: 'Reason', type: 'text', placeholder: 'e.g. E1 in the shop' });
+  return fields;
+}
+
+function MoveModal({ rig, onClose, onMoved }: { rig: Schemas['Apparatus']; onClose: () => void; onMoved: () => void }) {
+  const [values, setValues] = useState<Values>({ length: 'temporary', crew_moves: false });
+  const temporary = values.length !== 'permanent';
+  const move = useMutation({
+    mutationFn: () =>
+      http.post<Schemas['Apparatus']>(`/api/v1/apparatus/${rig.id}/move/`, {
+        station: Number(values.station),
+        temporary,
+        until: temporary && values.until ? values.until : null,
+        covering_for: temporary && values.covering_for ? Number(values.covering_for) : null,
+        crew_moves: Boolean(values.crew_moves),
+        reason: temporary ? (values.reason ?? '') : '',
+      }),
+    onSuccess: onMoved,
+  });
+  return (
+    <Modal
+      title={`Move ${rig.unit_number}`}
+      open
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit" form="move-rig" loading={move.isPending}>
+            Move
+          </Button>
+        </>
+      }>
+      <Form
+        id="move-rig"
+        fields={moveFields(temporary)}
+        values={values}
+        onChange={(name, value) => setValues((v) => ({ ...v, [name]: value }))}
+        onSubmit={() => move.mutate()}
+        error={move.error}
+      />
+    </Modal>
   );
 }

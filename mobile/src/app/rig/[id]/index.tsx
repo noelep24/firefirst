@@ -4,7 +4,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { api, unwrap } from '@/api/client';
 import { useMe } from '@/auth/auth-context';
 import { Badge, Button, Card, Empty, ErrorBox, Label, QueryState, Row, Screen, Section } from '@/components/ui';
-import { formatDateTime, humanize } from '@/lib/format';
+import { formatDateTime, formatDay, humanize } from '@/lib/format';
 import { apparatusStatus, priorityTone, workOrderStatus } from '@/lib/labels';
 import { checklistsFor, useChecklists, useRig } from '@/lib/queries';
 
@@ -56,7 +56,7 @@ export default function RigScreen() {
         }}
       </QueryState>
 
-      {isOfficer ? <MoveRig id={id} station={rig.data?.station ?? null} /> : null}
+      {isOfficer ? <RigLocation id={id} /> : null}
 
       <Section title="Rig check">
         <QueryState query={checklists}>
@@ -141,42 +141,57 @@ export default function RigScreen() {
   );
 }
 
-/** Officers move a rig between stations; the Today screen follows. */
-function MoveRig({ id, station }: { id: number; station: number | null }) {
+/** Where the rig is, and (for officers) moving it or bringing it back. */
+function RigLocation({ id }: { id: number }) {
   const queryClient = useQueryClient();
-  const stations = useQuery({
-    queryKey: ['stations'],
-    queryFn: () => unwrap(api().GET('/api/v1/stations/', { params: { query: { page_size: 100 } } })),
-  });
-  const move = useMutation({
-    mutationFn: (to: number) =>
-      unwrap(api().PATCH('/api/v1/apparatus/{id}/', { params: { path: { id } }, body: { station: to } })),
+  const rig = useRig(id);
+  const returnHome = useMutation({
+    mutationFn: () => unwrap(api().POST('/api/v1/apparatus/{id}/return/', { params: { path: { id } } })),
     onSuccess: (data) => {
       queryClient.setQueryData(['apparatus', id], data);
-      for (const key of ['apparatus', 'station-board', 'dashboard']) queryClient.invalidateQueries({ queryKey: [key] });
+      for (const key of ['apparatus', 'station-board', 'roster', 'dashboard'])
+        queryClient.invalidateQueries({ queryKey: [key] });
     },
   });
+  const move = rig.data?.current_move;
 
   return (
-    <Section title="Station">
-      <QueryState query={stations}>
-        {(stationsData) => (
-          <Row>
-            {stationsData.results.map((s) => (
-              <Button
-                key={s.id}
-                title={`Station ${s.number}`}
-                small
-                variant={s.id === station ? 'primary' : 'secondary'}
-                loading={move.isPending && move.variables === s.id}
-                disabled={move.isPending}
-                onPress={() => (s.id === station ? undefined : move.mutate(s.id))}
-              />
-            ))}
-          </Row>
-        )}
-      </QueryState>
-      {move.error ? <ErrorBox error={move.error} /> : null}
+    <Section
+      title="Location"
+      action={
+        <Button
+          title="Move"
+          variant="secondary"
+          small
+          onPress={() => router.push({ pathname: '/rig/[id]/move', params: { id } })}
+        />
+      }>
+      {move ? (
+        <Card>
+          <Label type="smallBold" color="warning">
+            At {move.station_name} {move.ends_on ? `through ${formatDay(move.ends_on)}` : 'until returned'}
+          </Label>
+          {move.covering_for_unit ? <Label>Covering for {move.covering_for_unit}</Label> : null}
+          {move.reason ? (
+            <Label type="small" color="textSecondary">
+              {move.reason}
+            </Label>
+          ) : null}
+          <Label type="small" color="textSecondary">
+            Home station: {rig.data?.station_name ?? 'none'}
+          </Label>
+          <Button
+            title={`Return to ${rig.data?.station_name ?? 'home station'}`}
+            variant="secondary"
+            small
+            loading={returnHome.isPending}
+            onPress={() => returnHome.mutate()}
+          />
+          {returnHome.error ? <ErrorBox error={returnHome.error} /> : null}
+        </Card>
+      ) : (
+        <Label color="textSecondary">Based at {rig.data?.station_name ?? 'no station'}.</Label>
+      )}
     </Section>
   );
 }

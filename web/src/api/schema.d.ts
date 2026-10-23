@@ -81,6 +81,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/apparatus/{id}/move/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Move the rig to another station, permanently or for a while (officers). */
+        post: operations["api_v1_apparatus_move_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/apparatus/{id}/return/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description End a temporary move: the rig is back at its home station (officers). */
+        post: operations["api_v1_apparatus_return_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/assignments/": {
         parameters: {
             query?: never;
@@ -1508,6 +1542,26 @@ export interface components {
             engine_hours?: string;
             notes?: string;
             readonly open_work_orders: number;
+            /** @description Where the rig is temporarily, if it's away today */
+            readonly current_move: components["schemas"]["ApparatusMove"] | null;
+        };
+        ApparatusMove: {
+            readonly id: number;
+            station: number;
+            readonly station_name: string;
+            /** Format: date */
+            starts_on: string;
+            /**
+             * Format: date
+             * @description Last day away; blank until it's returned
+             */
+            ends_on?: string | null;
+            /** @description A rig out of service whose crew rides this one meanwhile */
+            covering_for?: number | null;
+            readonly covering_for_unit: string;
+            /** @description The rig's own crew goes with it (otherwise they stay at their station) */
+            crew_moves?: boolean;
+            reason?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         ApparatusRequest: {
@@ -1621,6 +1675,15 @@ export interface components {
             apparatus_type: string;
             status: string;
             crew: components["schemas"]["RosterPerson"][];
+            /** @description Set when the rig is here on a temporary move */
+            visiting: components["schemas"]["BoardVisit"] | null;
+        };
+        BoardAway: {
+            id: number;
+            unit_number: string;
+            station_number: string;
+            /** Format: date */
+            until: string | null;
         };
         /** @description The signed-in member's standing assignment and whether they work today. */
         BoardMember: {
@@ -1640,6 +1703,16 @@ export interface components {
             id: number;
             number: string;
             name: string;
+        };
+        BoardVisit: {
+            home_station_number: string | null;
+            /**
+             * Format: date
+             * @description Last day here; null until it's returned
+             */
+            until: string | null;
+            covering_for_unit: string | null;
+            reason: string;
         };
         CalendarLink: {
             /**
@@ -2159,6 +2232,25 @@ export interface components {
              */
             readonly is_active: boolean;
             readonly department: components["schemas"]["Department"];
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        MoveRequestRequest: {
+            station: number;
+            /** @description Temporary moves leave the home station alone and end on their own */
+            temporary: boolean;
+            /**
+             * Format: date
+             * @description Last day away (temporary only); blank until returned
+             */
+            until?: string | null;
+            /**
+             * @description The rig's own crew goes with it
+             * @default false
+             */
+            crew_moves: boolean;
+            /** @description Temporary only: a rig whose crew rides this one meanwhile */
+            covering_for?: number | null;
+            reason?: string;
         };
         OnboardingStep: {
             key: string;
@@ -3105,6 +3197,8 @@ export interface components {
             stations: components["schemas"]["BoardStation"][];
             station: components["schemas"]["BoardStation"] | null;
             apparatus: components["schemas"]["BoardApparatus"][];
+            /** @description Rigs based here that are at another station today */
+            away: components["schemas"]["BoardAway"][];
             /** @description Working at this station without a rig here */
             unassigned: components["schemas"]["RosterPerson"][];
             on_leave: components["schemas"]["RosterPerson"][];
@@ -3566,6 +3660,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChecklistTemplate"][];
+                };
+            };
+        };
+    };
+    api_v1_apparatus_move_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this apparatus. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MoveRequestRequest"];
+                "multipart/form-data": components["schemas"]["MoveRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Apparatus"];
+                };
+            };
+        };
+    };
+    api_v1_apparatus_return_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this apparatus. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Apparatus"];
                 };
             };
         };

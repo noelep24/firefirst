@@ -215,12 +215,27 @@ class BoardMemberSerializer(serializers.Serializer):
     note = serializers.CharField(allow_blank=True)
 
 
+class BoardVisitSerializer(serializers.Serializer):
+    home_station_number = serializers.CharField(allow_null=True)
+    until = serializers.DateField(allow_null=True, help_text="Last day here; null until it's returned")
+    covering_for_unit = serializers.CharField(allow_null=True)
+    reason = serializers.CharField(allow_blank=True)
+
+
 class BoardApparatusSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     unit_number = serializers.CharField()
     apparatus_type = serializers.CharField()
     status = serializers.CharField()
     crew = RosterPersonSerializer(many=True)
+    visiting = BoardVisitSerializer(allow_null=True, help_text="Set when the rig is here on a temporary move")
+
+
+class BoardAwaySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    unit_number = serializers.CharField()
+    station_number = serializers.CharField()
+    until = serializers.DateField(allow_null=True)
 
 
 class StationBoardSerializer(serializers.Serializer):
@@ -230,6 +245,7 @@ class StationBoardSerializer(serializers.Serializer):
     stations = BoardStationSerializer(many=True)
     station = BoardStationSerializer(allow_null=True)
     apparatus = BoardApparatusSerializer(many=True)
+    away = BoardAwaySerializer(many=True, help_text="Rigs based here that are at another station today")
     unassigned = RosterPersonSerializer(many=True, help_text="Working at this station without a rig here")
     on_leave = RosterPersonSerializer(many=True)
     traded_off = RosterPersonSerializer(many=True)
