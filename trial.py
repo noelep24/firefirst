@@ -29,6 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 BACKEND = ROOT / "backend"
 MOBILE = ROOT / "mobile"
+WEB = ROOT / "web"
 VENV = ROOT / ".venv"
 DB = BACKEND / "trial.sqlite3"
 
@@ -58,6 +59,16 @@ def lan_address():
             return s.getsockname()[0]
         except OSError:
             return "127.0.0.1"
+
+
+def web_build_is_stale():
+    """True when the officer web app has never been built, or its source changed since (e.g. after git pull)."""
+    index = WEB / "dist" / "index.html"
+    if not index.exists():
+        return True
+    sources = [WEB / "index.html", WEB / "package.json", *(WEB / "src").rglob("*")]
+    built = index.stat().st_mtime
+    return any(path.is_file() and path.stat().st_mtime > built for path in sources)
 
 
 def run(cmd, **kwargs):
@@ -118,6 +129,12 @@ def main():
             "Installing the mobile app's packages (first run only, takes a few minutes)…"
         )
         run([npm, "ci", "--no-audit", "--no-fund"], cwd=MOBILE)
+    if not (WEB / "node_modules").exists():
+        say("Installing the web app's packages (first run only)…")
+        run([npm, "ci", "--no-audit", "--no-fund"], cwd=WEB)
+    if web_build_is_stale():
+        say("Building the officer web app…")
+        run([npm, "run", "build"], cwd=WEB)
 
     env = {
         **os.environ,
@@ -181,6 +198,10 @@ def main():
   If the app can't connect: allow Node through this computer's
   firewall, and check the "Server" field on the sign-in screen
   says {server}
+
+  Officer web app (apparatus, stations, people, schedules, setup):
+    open http://localhost:{args.port} in a browser on this computer
+    and sign in as demo-chief or demo-a1-captain.
   Press Ctrl+C here to stop.
 ────────────────────────────────────────────────────────────────
 """,
