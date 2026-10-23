@@ -51,7 +51,7 @@
     "web": "expo start --web",
     "lint": "expo lint && prettier --check .",
     "typecheck": "tsc --noEmit",
-    "api:types": "npx --yes openapi-typescript@7 ../backend/openapi.yml -o src/api/schema.d.ts",
+    "api:types": "npx --yes openapi-typescript@7 ../backend/openapi.yml -o src/api/schema.d.ts && node scripts/schema-version.mjs",
     "format": "prettier --write .",
     "test": "vitest run"
   },

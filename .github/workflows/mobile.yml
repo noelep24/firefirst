@@ -22,7 +22,7 @@ jobs:
       - name: API types match the backend's OpenAPI schema
         run: |
           npm run api:types
-          git diff --exit-code src/api/schema.d.ts
+          git diff --exit-code src/api/schema.d.ts src/api/schema-version.ts
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
