@@ -1,0 +1,59 @@
+name: backend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: firefirst
+          POSTGRES_PASSWORD: firefirst
+          POSTGRES_DB: firefirst
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: postgres://firefirst:firefirst@localhost:5432/firefirst
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check . && ruff format --check .
+      - run: python manage.py makemigrations --check --dry-run
+      - name: OpenAPI schema is up to date (the mobile app's client is generated from it)
+        run: |
+          python manage.py spectacular --fail-on-warn --file /tmp/schema.yml
+          diff -u openapi.yml /tmp/schema.yml
+      - run: pytest
+
+  docker:
+    # The production image: web app build + Django + gunicorn, started against Postgres.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t firefirst:ci .
+      - name: Image starts and serves the app
+        run: |
+          docker network create ff
+          docker run -d --name db --network ff -e POSTGRES_USER=ff -e POSTGRES_PASSWORD=ff -e POSTGRES_DB=ff postgres:16
+          for i in $(seq 1 30); do docker exec db pg_isready -U ff && break; sleep 1; done
+          docker run -d --name app --network ff -p 8000:8000 \
+            -e DATABASE_URL=postgres://ff:ff@db:5432/ff -e DJANGO_SECRET_KEY=ci-only-0123456789abcdefghijklmnop \
+            -e DJANGO_ALLOWED_HOSTS=localhost -e DJANGO_SECURE_SSL_REDIRECT=false firefirst:ci
+          for i in $(seq 1 30); do curl -fs localhost:8000/healthz && break; sleep 2; done
+          curl -fs localhost:8000/healthz
+          curl -fs localhost:8000/apparatus | grep -q 'id="root"'
+          docker logs app
