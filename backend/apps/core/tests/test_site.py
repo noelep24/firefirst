@@ -24,3 +24,20 @@ def test_web_app_not_built(client, tmp_path):
 def test_api_paths_are_not_swallowed_by_the_web_app(client, db):
     assert client.get("/api/v1/nope/").status_code == 404
     assert client.get("/api/v1/me/").status_code in (401, 403)
+
+
+def test_department_logo(client_for, admin_user, member):
+    import base64
+
+    url = "/api/v1/department/"
+    client = client_for(admin_user)
+    png = "data:image/png;base64," + base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 64).decode()
+    assert client.patch(url, {"logo": png}, format="json").json()["logo"] == png
+    assert client_for(member).get("/api/v1/me/").json()["department"]["logo"] == png
+    # Not an image type we accept (SVG can carry script), not base64, or too big.
+    svg = "data:image/svg+xml;base64," + base64.b64encode(b"<svg/>").decode()
+    assert client.patch(url, {"logo": svg}, format="json").status_code == 400
+    assert client.patch(url, {"logo": "data:image/png;base64,***"}, format="json").status_code == 400
+    big = "data:image/png;base64," + base64.b64encode(b"0" * (513 * 1024)).decode()
+    assert client.patch(url, {"logo": big}, format="json").status_code == 400
+    assert client.patch(url, {"logo": ""}, format="json").json()["logo"] == ""

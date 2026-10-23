@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
-import { OnboardingCard } from '@/components/onboarding';
 import { StationBoard } from '@/components/station-board';
 import { Badge, Card, DataTable, Empty, PageHeader, QueryState } from '@/components/ui';
 import { formatDateTime, formatDay } from '@/lib/format';
@@ -31,7 +30,6 @@ export default function Dashboard() {
               title="Today"
               subtitle={d.platoon_on_duty ? `${d.platoon_on_duty} Shift on duty` : 'No rotation set up'}
             />
-            <OnboardingCard />
             <StationBoard />
             <h2>Department</h2>
             <div className="grid">

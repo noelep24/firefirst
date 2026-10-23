@@ -6944,6 +6944,9 @@ components:
           type: string
           description: The department's NERIS ID, e.g. FD12345678
           maxLength: 10
+        logo:
+          type: string
+          description: 'The department''s patch or logo, as a data: URL'
       required:
       - id
       - name
@@ -6963,6 +6966,9 @@ components:
           type: string
           description: The department's NERIS ID, e.g. FD12345678
           maxLength: 10
+        logo:
+          type: string
+          description: 'The department''s patch or logo, as a data: URL'
       required:
       - name
     Event:
@@ -9059,6 +9065,9 @@ components:
           type: string
           description: The department's NERIS ID, e.g. FD12345678
           maxLength: 10
+        logo:
+          type: string
+          description: 'The department''s patch or logo, as a data: URL'
     PatchedEventRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

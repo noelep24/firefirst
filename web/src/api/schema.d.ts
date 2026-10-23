@@ -2097,12 +2097,16 @@ export interface components {
             timezone?: string;
             /** @description The department's NERIS ID, e.g. FD12345678 */
             neris_id?: string;
+            /** @description The department's patch or logo, as a data: URL */
+            logo?: string;
         };
         DepartmentRequest: {
             name: string;
             timezone?: string;
             /** @description The department's NERIS ID, e.g. FD12345678 */
             neris_id?: string;
+            /** @description The department's patch or logo, as a data: URL */
+            logo?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Event: {
@@ -3138,6 +3142,8 @@ export interface components {
             timezone?: string;
             /** @description The department's NERIS ID, e.g. FD12345678 */
             neris_id?: string;
+            /** @description The department's patch or logo, as a data: URL */
+            logo?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedEventRequest: {

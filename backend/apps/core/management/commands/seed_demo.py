@@ -5,7 +5,9 @@
 Every demo login uses the password ``firefirst-demo``.
 """
 
+import base64
 import datetime
+from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -79,7 +81,10 @@ class Command(BaseCommand):
             raise CommandError(f"Department '{slug}' already exists.")
         today = timezone.localdate()
         # A placeholder NERIS ID, so demo incident reports can be completed.
-        dept = Department.objects.create(name="Demo Fire Rescue", slug=slug, neris_id="FD00000000")
+        patch = base64.b64encode((Path(__file__).parent / "demo_patch.png").read_bytes()).decode()
+        dept = Department.objects.create(
+            name="Demo Fire Rescue", slug=slug, neris_id="FD00000000", logo=f"data:image/png;base64,{patch}"
+        )
         st1 = Station.objects.create(department=dept, number="1", name="Headquarters", address="100 Main St")
         st2 = Station.objects.create(department=dept, number="2", name="Northside", address="2200 N Oak Ave")
 

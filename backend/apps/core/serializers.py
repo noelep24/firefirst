@@ -1,3 +1,7 @@
+import base64
+import binascii
+import re
+
 from rest_framework import serializers
 
 from .models import Department, Station, User
@@ -7,8 +11,26 @@ from .tenancy import TenantSerializer
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ["id", "name", "slug", "timezone", "neris_id"]
+        fields = ["id", "name", "slug", "timezone", "neris_id", "logo"]
         read_only_fields = ["slug"]
+
+    LOGO_MAX_BYTES = 512 * 1024
+    LOGO_PATTERN = re.compile(r"^data:image/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$")
+
+    def validate_logo(self, value):
+        """PNG, JPEG or WebP only (no SVG, which can carry script), and small enough to send with every page."""
+        if not value:
+            return ""
+        match = self.LOGO_PATTERN.match(value)
+        if not match:
+            raise serializers.ValidationError("Upload the logo as a PNG, JPEG or WebP image.")
+        try:
+            size = len(base64.b64decode(match.group(2), validate=True))
+        except binascii.Error:
+            raise serializers.ValidationError("That image couldn't be read. Try saving it again as a PNG.") from None
+        if size > self.LOGO_MAX_BYTES:
+            raise serializers.ValidationError("The logo must be 512 KB or smaller.")
+        return value
 
     def validate_neris_id(self, value):
         value = value.strip().upper()
