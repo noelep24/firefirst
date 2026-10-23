@@ -6,9 +6,9 @@ import { api, type Schemas, unwrap } from '@/api/client';
 import { useMe } from '@/auth/auth-context';
 import { Badge, Button, Card, Empty, ErrorBox, Label, QueryState, Row, Screen, Segmented } from '@/components/ui';
 import { addDays, formatDay, humanize, isoDate } from '@/lib/format';
-import { leaveTypeLabel, requestStatus } from '@/lib/labels';
+import { leaveTypeLabel, positionLabel, requestStatus } from '@/lib/labels';
 
-type Tab = 'roster' | 'leave' | 'trades';
+type Tab = 'roster' | 'overtime' | 'leave' | 'trades';
 
 export default function ScheduleScreen() {
   const [tab, setTab] = useState<Tab>('roster');
@@ -19,11 +19,15 @@ export default function ScheduleScreen() {
         onChange={setTab}
         options={[
           { value: 'roster', label: 'Roster' },
+          { value: 'overtime', label: 'OT list' },
           { value: 'leave', label: 'Leave' },
           { value: 'trades', label: 'Trades' },
         ]}
       />
-      {tab === 'roster' ? <Roster /> : tab === 'leave' ? <Leave /> : <Trades />}
+      {tab === 'roster' ? <Roster /> : null}
+      {tab === 'overtime' ? <OvertimeList /> : null}
+      {tab === 'leave' ? <Leave /> : null}
+      {tab === 'trades' ? <Trades /> : null}
     </Screen>
   );
 }
@@ -83,6 +87,7 @@ function Roster() {
                       <Label>{p.name}</Label>
                       <Row>
                         {p.covering_for ? <Badge text="Trade" tone="warning" /> : null}
+                        {p.overtime ? <Badge text="OT" tone="warning" /> : null}
                         <Label type="small" color="textSecondary">
                           {humanize(p.position)}
                           {p.apparatus_unit ? ` · ${p.apparatus_unit}` : ''}
@@ -260,6 +265,77 @@ function Trades() {
             })
           )
         }
+      </QueryState>
+    </>
+  );
+}
+
+const OT_STATUS: Record<string, { label: string; tone: 'success' | 'neutral' | 'warning' }> = {
+  available: { label: 'Available', tone: 'success' },
+  on_duty: { label: 'On duty', tone: 'neutral' },
+  on_leave: { label: 'On leave', tone: 'neutral' },
+  overtime: { label: 'On OT', tone: 'warning' },
+};
+
+/** The rolling mandatory overtime lists. Officers record overtime on the web app. */
+function OvertimeList() {
+  const { me } = useMe();
+  const [date, setDate] = useState(isoDate());
+  const board = useQuery({
+    queryKey: ['overtime-list', date],
+    queryFn: () => unwrap(api().GET('/api/v1/overtime-list/', { params: { query: { date } } })),
+  });
+
+  return (
+    <>
+      <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+        <Button title="‹" variant="secondary" small onPress={() => setDate(addDays(date, -1))} />
+        <Button
+          title={date === isoDate() ? 'Today' : formatDay(date)}
+          variant="ghost"
+          small
+          onPress={() => setDate(isoDate())}
+        />
+        <Button title="›" variant="secondary" small onPress={() => setDate(addDays(date, 1))} />
+      </Row>
+      <Label type="small" color="textSecondary">
+        Whoever worked overtime longest ago is up first. Working overtime moves you to the bottom.
+      </Label>
+      <QueryState query={board}>
+        {(boardData) => (
+          <>
+            {boardData.lists.map((list) => (
+              <Card key={list.key}>
+                <Label type="heading">{list.label}</Label>
+                {list.members.length === 0 ? <Empty text="No one in these positions." /> : null}
+                {list.members.map((m, i) => {
+                  const status = OT_STATUS[m.status] ?? OT_STATUS.on_duty;
+                  return (
+                    <Row key={m.user} style={{ flexWrap: 'nowrap', paddingVertical: 4 }}>
+                      <Label type="smallBold" color="textSecondary" style={{ width: 24, textAlign: 'center' }}>
+                        {i + 1}
+                      </Label>
+                      <Label style={{ flex: 1 }}>
+                        {m.name}
+                        {'\n'}
+                        <Label type="small" color="textSecondary">
+                          {positionLabel(m.position)} · {m.platoon} Shift · last OT{' '}
+                          {m.last_overtime ? formatDay(m.last_overtime) : 'never'}
+                        </Label>
+                      </Label>
+                      {m.user === me.id ? <Badge text="You" tone="success" /> : null}
+                      {m.user === list.next_up ? (
+                        <Badge text="Next up" tone="danger" />
+                      ) : (
+                        <Badge text={status.label} tone={status.tone} />
+                      )}
+                    </Row>
+                  );
+                })}
+              </Card>
+            ))}
+          </>
+        )}
       </QueryState>
     </>
   );

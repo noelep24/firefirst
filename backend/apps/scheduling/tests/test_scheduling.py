@@ -468,3 +468,98 @@ def test_move_validation(client_for, officer, other_department, station, st2, ri
         {"station": st2.id, "temporary": True, "covering_for": rigs["L1"].id},
     ):
         assert client.post(url, payload, format="json").status_code == 400, payload
+
+
+@pytest.fixture
+def ot_crew(department, station, platoons, pattern, make_user):
+    """A shift: captain + firefighter on duty on A_DAY. B and C: an engineer and two medics off duty."""
+
+    def member(name, platoon, position):
+        user = make_user(name, last_name=name.title())
+        Assignment.objects.create(
+            department=department, user=user, platoon=platoons[platoon], station=station, position=position
+        )
+        return user
+
+    return {
+        "cap_a": member("cap_a", "A", "captain"),
+        "ff_a": member("ff_a", "A", "firefighter"),
+        "eng_b": member("eng_b", "B", "engineer"),
+        "eng_c": member("eng_c", "C", "engineer"),
+        "medic_b": member("medic_b", "B", "paramedic"),
+        "medic_c": member("medic_c", "C", "paramedic"),
+    }
+
+
+def ot_lists(client, date=A_DAY):
+    response = client.get(f"/api/v1/overtime-list/?date={date}")
+    assert response.status_code == 200, response.content
+    return {lst["key"]: lst for lst in response.json()["lists"]}
+
+
+def test_overtime_lists_split_by_position_and_rotate(client_for, officer, member, department, ot_crew):
+    from apps.scheduling.models import OvertimeShift
+
+    c = ot_crew
+    OvertimeShift.objects.create(department=department, user=c["eng_b"], date=A_DAY - datetime.timedelta(days=10))
+    OvertimeShift.objects.create(department=department, user=c["eng_c"], date=A_DAY - datetime.timedelta(days=20))
+    OvertimeShift.objects.create(department=department, user=c["medic_c"], date=A_DAY - datetime.timedelta(days=5))
+
+    lists = ot_lists(client_for(member))
+    officers, ffs = lists["officers"], lists["firefighters"]
+    # Never worked first, then longest ago.
+    assert [m["user"] for m in officers["members"]] == [c["cap_a"].id, c["eng_c"].id, c["eng_b"].id]
+    assert [m["user"] for m in ffs["members"]] == [c["ff_a"].id, c["medic_b"].id, c["medic_c"].id]
+    # A shift is on duty, so the next one up is the first who is off.
+    statuses = {m["user"]: m["status"] for m in officers["members"] + ffs["members"]}
+    assert statuses[c["cap_a"].id] == statuses[c["ff_a"].id] == "on_duty"
+    assert (officers["next_up"], ffs["next_up"]) == (c["eng_c"].id, c["medic_b"].id)
+    assert officers["members"][1]["last_overtime"] == str(A_DAY - datetime.timedelta(days=20))
+
+    # Recording overtime for the next one up moves them to the bottom from the following day.
+    response = client_for(officer).post(
+        "/api/v1/overtime-shifts/",
+        {"user": c["eng_c"].id, "date": str(A_DAY), "filling_for": c["cap_a"].id},
+        format="json",
+    )
+    assert response.status_code == 201, response.content
+    assert response.json()["filling_for_name"] == str(c["cap_a"])
+    assert ot_lists(client_for(member))["officers"]["members"][1]["status"] == "overtime"
+    later = ot_lists(client_for(member), A_DAY + datetime.timedelta(days=1))["officers"]
+    assert [m["user"] for m in later["members"]] == [c["cap_a"].id, c["eng_b"].id, c["eng_c"].id]
+
+
+def test_overtime_fills_the_seat_on_the_roster(client_for, officer, department, ot_crew, rigs):
+    from apps.scheduling.models import OvertimeShift
+
+    c = ot_crew
+    Assignment.objects.filter(user=c["cap_a"]).update(apparatus=rigs["E1"])
+    LeaveRequest.objects.create(
+        department=department,
+        user=c["cap_a"],
+        leave_type="vacation",
+        start_date=A_DAY,
+        end_date=A_DAY,
+        status="approved",
+    )
+    OvertimeShift.objects.create(department=department, user=c["eng_b"], date=A_DAY, filling_for=c["cap_a"])
+
+    roster = client_for(officer).get(f"/api/v1/roster/?date={A_DAY}").json()
+    hired = next(p for p in roster["working"] if p["user"] == c["eng_b"].id)
+    assert (hired["position"], hired["apparatus_unit"], hired["overtime"]) == ("captain", "E1", True)
+    e1 = next(r for r in board(client_for(c["eng_b"]))["apparatus"] if r["unit_number"] == "E1")
+    assert [p["user"] for p in e1["crew"]] == [c["eng_b"].id]
+
+
+def test_overtime_permissions_and_validation(client_for, officer, member, ot_crew):
+    c = ot_crew
+    url = "/api/v1/overtime-shifts/"
+    payload = {"user": c["eng_b"].id, "date": str(A_DAY)}
+    assert client_for(member).post(url, payload, format="json").status_code == 403
+    officer_client = client_for(officer)
+    assert officer_client.post(url, {"user": c["cap_a"].id, "date": str(A_DAY)}, format="json").status_code == 400
+    assert officer_client.post(url, {**payload, "filling_for": c["eng_b"].id}, format="json").status_code == 400
+    created = officer_client.post(url, payload, format="json")
+    assert created.status_code == 201
+    assert created.json()["filling_for_name"] is None
+    assert officer_client.post(url, payload, format="json").status_code == 400  # already hired that day

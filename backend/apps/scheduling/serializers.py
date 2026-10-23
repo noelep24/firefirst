@@ -3,8 +3,8 @@ from rest_framework import serializers
 
 from apps.core.tenancy import TenantSerializer
 
-from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade, StaffingRule
-from .roster import platoon_on
+from .models import Assignment, LeaveRequest, OvertimeShift, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from .roster import build_roster, platoon_on
 
 
 class PlatoonSerializer(TenantSerializer):
@@ -149,6 +149,7 @@ class RosterPersonSerializer(serializers.Serializer):
     apparatus = serializers.IntegerField(allow_null=True, help_text="The rig this person rides")
     apparatus_unit = serializers.CharField(allow_null=True)
     covering_for = serializers.IntegerField(required=False, help_text="Member this person is covering on a trade")
+    overtime = serializers.BooleanField(required=False, help_text="Working an overtime shift")
 
 
 class ShortfallSerializer(serializers.Serializer):
@@ -250,3 +251,69 @@ class StationBoardSerializer(serializers.Serializer):
     on_leave = RosterPersonSerializer(many=True)
     traded_off = RosterPersonSerializer(many=True)
     shortfalls = ShortfallSerializer(many=True)
+
+
+class OvertimeShiftSerializer(TenantSerializer):
+    user_name = serializers.CharField(source="user.__str__", read_only=True)
+    filling_for_name = serializers.StringRelatedField(source="filling_for", read_only=True)
+    station_name = serializers.StringRelatedField(source="station", read_only=True)
+
+    class Meta:
+        model = OvertimeShift
+        fields = [
+            "id",
+            "user",
+            "user_name",
+            "date",
+            "hours",
+            "filling_for",
+            "filling_for_name",
+            "station",
+            "station_name",
+            "mandatory",
+            "note",
+            "recorded_by",
+            "created_at",
+        ]
+        read_only_fields = ["recorded_by"]
+
+    def validate(self, attrs):
+        user = attrs.get("user", getattr(self.instance, "user", None))
+        date = attrs.get("date", getattr(self.instance, "date", None))
+        filling_for = attrs.get("filling_for", getattr(self.instance, "filling_for", None))
+        if filling_for is not None and filling_for == user:
+            raise serializers.ValidationError({"filling_for": "A member can't fill their own seat."})
+        clash = OvertimeShift.objects.filter(user=user, date=date).exclude(pk=getattr(self.instance, "pk", None))
+        if clash.exists():
+            raise serializers.ValidationError({"date": f"{user} already has overtime that day."})
+        # Someone already on their own shift that day can't also be hired for it.
+        roster = build_roster(user.department, date)
+        if any(p["user"] == user.id and not p.get("overtime") for p in roster["working"]):
+            raise serializers.ValidationError({"user": f"{user} is already on duty that day."})
+        return attrs
+
+
+class OvertimeMemberSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    name = serializers.CharField()
+    rank = serializers.CharField()
+    position = serializers.CharField()
+    platoon = serializers.CharField()
+    station_number = serializers.CharField(allow_null=True)
+    last_overtime = serializers.DateField(allow_null=True, help_text="Most recent overtime before this date")
+    status = serializers.ChoiceField(
+        choices=["available", "on_duty", "on_leave", "overtime"], help_text="Whether they can be hired that day"
+    )
+
+
+class OvertimeListSerializer(serializers.Serializer):
+    key = serializers.CharField()
+    label = serializers.CharField()
+    members = OvertimeMemberSerializer(many=True)
+    next_up = serializers.IntegerField(allow_null=True, help_text="First available member: who to hire next")
+
+
+class OvertimeBoardSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    platoon = serializers.CharField(allow_null=True)
+    lists = OvertimeListSerializer(many=True)

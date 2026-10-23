@@ -15,11 +15,14 @@ from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
-from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from .models import Assignment, LeaveRequest, OvertimeShift, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from .overtime import overtime_list
 from .roster import build_roster, leave_impact, station_board
 from .serializers import (
     AssignmentSerializer,
     LeaveRequestSerializer,
+    OvertimeBoardSerializer,
+    OvertimeShiftSerializer,
     PlatoonSerializer,
     ReviewSerializer,
     RosterSerializer,
@@ -102,6 +105,33 @@ class RosterView(APIView):
         raw = request.query_params.get("date")
         date = parse_date(raw, "date") if raw else timezone.localdate()
         return Response(build_roster(request.user.department, date))
+
+
+class OvertimeShiftViewSet(TenantViewSet):
+    """Overtime worked. Everyone can see it; officers record it."""
+
+    queryset = OvertimeShift.objects.select_related("user", "filling_for", "station")
+    serializer_class = OvertimeShiftSerializer
+    permission_classes = [IsOfficerOrReadOnly]
+    filterset_fields = ["user", "date", "mandatory"]
+
+    def perform_create(self, serializer):
+        serializer.save(department=self.request.user.department, recorded_by=self.request.user)
+
+
+class OvertimeListView(APIView):
+    """``GET /overtime-list/?date=`` – the rolling mandatory overtime lists, and who is up next that day."""
+
+    permission_classes = [IsDepartmentMember]
+
+    @extend_schema(
+        parameters=[OpenApiParameter("date", OpenApiTypes.DATE, required=False)],
+        responses=OvertimeBoardSerializer,
+    )
+    def get(self, request):
+        raw = request.query_params.get("date")
+        date = parse_date(raw, "date") if raw else timezone.localdate()
+        return Response(overtime_list(request.user.department, date))
 
 
 class StationBoardView(APIView):
