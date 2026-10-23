@@ -1489,6 +1489,75 @@ paths:
                 items:
                   $ref: '#/components/schemas/TrainingHours'
           description: ''
+  /api/v1/imports/:
+    get:
+      operationId: v1_imports_list
+      description: The available importers and the columns each understands.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImportKind'
+          description: ''
+  /api/v1/imports/{kind}/:
+    post:
+      operationId: v1_imports_create
+      description: Upload a CSV or XLSX. Without ``commit`` this only previews; with
+        it, valid rows are saved.
+      parameters:
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportUploadRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportReport'
+          description: ''
+  /api/v1/imports/{kind}/template/:
+    get:
+      operationId: v1_imports_template_retrieve
+      description: A CSV with the expected headers and an example row.
+      parameters:
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
   /api/v1/inspections/:
     get:
       operationId: v1_inspections_list
@@ -4410,16 +4479,6 @@ paths:
           description: No response body
 components:
   schemas:
-    ActionEnum:
-      enum:
-      - create
-      - update
-      - delete
-      type: string
-      description: |-
-        * `create` - Created
-        * `update` - Updated
-        * `delete` - Deleted
     Apparatus:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -4668,7 +4727,7 @@ components:
           type: string
           readOnly: true
         action:
-          $ref: '#/components/schemas/ActionEnum'
+          $ref: '#/components/schemas/AuditEntryActionEnum'
         model:
           type: string
           description: app_label.ModelName
@@ -4688,6 +4747,16 @@ components:
       - model
       - object_id
       - object_repr
+    AuditEntryActionEnum:
+      enum:
+      - create
+      - update
+      - delete
+      type: string
+      description: |-
+        * `create` - Created
+        * `update` - Updated
+        * `delete` - Deleted
     BlankEnum:
       enum:
       - ''
@@ -5028,6 +5097,131 @@ components:
       - ends_at
       - starts_at
       - title
+    ImportColumn:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        required:
+          type: boolean
+        help:
+          type: string
+        aliases:
+          type: array
+          items:
+            type: string
+      required:
+      - aliases
+      - help
+      - key
+      - label
+      - required
+    ImportKind:
+      type: object
+      properties:
+        kind:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportColumn'
+      required:
+      - columns
+      - description
+      - kind
+      - title
+    ImportReport:
+      type: object
+      properties:
+        kind:
+          type: string
+        recognized:
+          type: object
+          additionalProperties:
+            type: string
+          description: File header -> column
+        ignored:
+          type: array
+          items:
+            type: string
+        missing:
+          type: array
+          items:
+            type: string
+        summary:
+          type: object
+          additionalProperties:
+            type: integer
+        committed:
+          type: boolean
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportRow'
+      required:
+      - committed
+      - ignored
+      - kind
+      - missing
+      - recognized
+      - rows
+      - summary
+    ImportRow:
+      type: object
+      properties:
+        line:
+          type: integer
+        action:
+          $ref: '#/components/schemas/ImportRowActionEnum'
+        label:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        notes:
+          type: array
+          items:
+            type: string
+      required:
+      - action
+      - errors
+      - label
+      - line
+      - notes
+    ImportRowActionEnum:
+      enum:
+      - create
+      - update
+      - skip
+      - error
+      type: string
+      description: |-
+        * `create` - create
+        * `update` - update
+        * `skip` - skip
+        * `error` - error
+    ImportUploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        commit:
+          type: boolean
+          default: false
+        skip_errors:
+          type: boolean
+          default: false
+          description: Save the valid rows even if some have errors
+      required:
+      - file
     Inspection:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

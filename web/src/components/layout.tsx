@@ -51,6 +51,7 @@ export function Layout() {
     {
       title: 'Admin',
       items: [
+        { to: '/import', label: 'Import data', adminOnly: true },
         { to: '/audit', label: 'Audit log', adminOnly: true },
         { to: '/settings', label: 'Department settings', adminOnly: true },
       ],

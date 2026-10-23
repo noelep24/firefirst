@@ -124,7 +124,8 @@ ruff check . && ruff format --check .
 - [ ] Push notifications (trade requests, approvals, work orders, maintenance due)
 
 **Replacing ESO**
-- [ ] CSV/Excel importers for ESO exports (personnel, apparatus, inventory, schedules)
+- [x] CSV/Excel importers for ESO exports and spreadsheets (people, apparatus, inventory) with preview; web page and `manage.py import_data`
+- [ ] Importers for schedules and maintenance history
 - [ ] Parallel-run period and data reconciliation checklist
 
 **Module depth**

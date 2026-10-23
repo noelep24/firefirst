@@ -10,6 +10,7 @@ from apps.core import views as core
 from apps.core.dashboard import DashboardView
 from apps.core.session_auth import CsrfView, SessionView
 from apps.events import views as events
+from apps.imports import views as imports
 from apps.inventory import views as inventory
 from apps.scheduling import views as scheduling
 
@@ -48,6 +49,9 @@ api_v1 = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
+    path("imports/", imports.ImportKindsView.as_view(), name="imports"),
+    path("imports/<slug:kind>/", imports.ImportView.as_view(), name="import"),
+    path("imports/<slug:kind>/template/", imports.ImportTemplateView.as_view(), name="import-template"),
     path("", include(router.urls)),
 ]
 

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "apps.scheduling",
     "apps.events",
     "apps.audit",
+    "apps.imports",
 ]
 
 MIDDLEWARE = [

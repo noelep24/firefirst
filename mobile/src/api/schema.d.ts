@@ -386,6 +386,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/imports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The available importers and the columns each understands. */
+        get: operations["v1_imports_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{kind}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Upload a CSV or XLSX. Without ``commit`` this only previews; with it, valid rows are saved. */
+        post: operations["v1_imports_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{kind}/template/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description A CSV with the expected headers and an example row. */
+        get: operations["v1_imports_template_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspections/": {
         parameters: {
             query?: never;
@@ -1149,13 +1200,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * @description * `create` - Created
-         *     * `update` - Updated
-         *     * `delete` - Deleted
-         * @enum {string}
-         */
-        ActionEnum: "create" | "update" | "delete";
         /** @description Restricts every related-field choice to the requesting user's department. */
         Apparatus: {
             readonly id: number;
@@ -1260,13 +1304,20 @@ export interface components {
             readonly created_at: string;
             actor?: number | null;
             readonly actor_name: string;
-            action: components["schemas"]["ActionEnum"];
+            action: components["schemas"]["AuditEntryActionEnum"];
             /** @description app_label.ModelName */
             model: string;
             object_id: string;
             object_repr: string;
             changes?: unknown;
         };
+        /**
+         * @description * `create` - Created
+         *     * `update` - Updated
+         *     * `delete` - Deleted
+         * @enum {string}
+         */
+        AuditEntryActionEnum: "create" | "update" | "delete";
         /** @enum {unknown} */
         BlankEnum: "";
         ChecklistItem: {
@@ -1422,6 +1473,59 @@ export interface components {
             training_hours?: string | null;
             /** @description Members to invite. Mandatory events invite every active member automatically. */
             invitees?: number[];
+        };
+        ImportColumn: {
+            key: string;
+            label: string;
+            required: boolean;
+            help: string;
+            aliases: string[];
+        };
+        ImportKind: {
+            kind: string;
+            title: string;
+            description: string;
+            columns: components["schemas"]["ImportColumn"][];
+        };
+        ImportReport: {
+            kind: string;
+            /** @description File header -> column */
+            recognized: {
+                [key: string]: string;
+            };
+            ignored: string[];
+            missing: string[];
+            summary: {
+                [key: string]: number;
+            };
+            committed: boolean;
+            rows: components["schemas"]["ImportRow"][];
+        };
+        ImportRow: {
+            line: number;
+            action: components["schemas"]["ImportRowActionEnum"];
+            label: string;
+            errors: string[];
+            notes: string[];
+        };
+        /**
+         * @description * `create` - create
+         *     * `update` - update
+         *     * `skip` - skip
+         *     * `error` - error
+         * @enum {string}
+         */
+        ImportRowActionEnum: "create" | "update" | "skip" | "error";
+        ImportUploadRequest: {
+            /** Format: binary */
+            file: string;
+            /** @default false */
+            commit: boolean;
+            /**
+             * @description Save the valid rows even if some have errors
+             * @default false
+             */
+            skip_errors: boolean;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Inspection: {
@@ -3621,6 +3725,71 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrainingHours"][];
+                };
+            };
+        };
+    };
+    v1_imports_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportKind"][];
+                };
+            };
+        };
+    };
+    v1_imports_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["ImportUploadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportReport"];
+                };
+            };
+        };
+    };
+    v1_imports_template_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
                 };
             };
         };

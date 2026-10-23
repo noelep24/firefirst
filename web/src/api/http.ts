@@ -53,7 +53,9 @@ export function withQuery(path: string, query?: Query) {
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const isForm = body instanceof FormData;
+  // For FormData the browser sets the multipart Content-Type (with its boundary) itself.
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (method !== 'GET') headers['X-CSRFToken'] = csrfToken();
 
   let response: Response;
@@ -62,7 +64,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       method,
       headers,
       credentials: 'same-origin',
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError("Can't reach the server. Check your connection.", 0);
@@ -87,6 +89,7 @@ export const http = {
   post: <T>(path: string, body?: unknown) => request<T>('POST', path, body ?? {}),
   patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
   delete: (path: string) => request<void>('DELETE', path),
+  upload: <T>(path: string, form: FormData) => request<T>('POST', path, form),
 };
 
 /** Turn a DRF error body ({detail}, {field: [msg]}, nested lists…) into one readable message. */

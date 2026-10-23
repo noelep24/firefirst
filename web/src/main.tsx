@@ -23,6 +23,7 @@ const Checklists = lazy(() => import('@/pages/Checklists'));
 const People = lazy(() => import('@/pages/People'));
 const Stations = lazy(() => import('@/pages/Stations'));
 const AuditLog = lazy(() => import('@/pages/AuditLog'));
+const Import = lazy(() => import('@/pages/Import'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
 const queryClient = new QueryClient({
@@ -55,6 +56,7 @@ function App() {
           <Route path="people" element={<People />} />
           {isAdmin ? <Route path="stations" element={<Stations />} /> : null}
           {isAdmin ? <Route path="audit" element={<AuditLog />} /> : null}
+          {isAdmin ? <Route path="import" element={<Import />} /> : null}
           {isAdmin ? <Route path="settings" element={<Settings />} /> : null}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
