@@ -545,13 +545,21 @@ function Overtime() {
   const queryClient = useQueryClient();
   const [date, setDate] = useState(isoDate());
   const [hiring, setHiring] = useState<{ user?: number } | null>(null);
+  const [editing, setEditing] = useState<Schemas['OvertimeShift'] | null>(null);
   const board = useQuery({
     queryKey: ['/api/v1/overtime-list/', date],
     queryFn: () => http.get<Schemas['OvertimeBoard']>('/api/v1/overtime-list/', { date }),
   });
+  // The day's hires, so a mistake can be fixed right from the list.
+  const hired = useQuery({
+    queryKey: ['/api/v1/overtime-shifts/', { date }],
+    queryFn: () => getAll<Schemas['OvertimeShift']>('/api/v1/overtime-shifts/', { date }),
+  });
+  const shiftFor = (user: number) => hired.data?.find((o) => o.user === user);
   const saved = () => {
     queryClient.invalidateQueries();
     setHiring(null);
+    setEditing(null);
   };
 
   return (
@@ -576,6 +584,31 @@ function Overtime() {
           {board.data?.platoon ? ` · ${board.data.platoon} Shift on duty` : ''}
         </span>
       </div>
+      <QueryState query={hired}>
+        {(shifts) =>
+          shifts.length ? (
+            <Card className="stack-sm">
+              <h3>Hired for {formatDay(date, { weekday: 'long' })}</h3>
+              {shifts.map((o) => (
+                <div key={o.id} className="row spread">
+                  <span>
+                    <strong>{o.user_name}</strong>
+                    <span className="muted">
+                      {' '}
+                      · {Number(o.hours)} h{o.filling_for_name ? ` · filling for ${o.filling_for_name}` : ''}
+                      {!o.filling_for_name && o.station_name ? ` · ${o.station_name}` : ''}
+                    </span>{' '}
+                    {o.mandatory ? <Badge tone="warning">Mandatory</Badge> : <Badge>Voluntary</Badge>}
+                  </span>
+                  <Button small onClick={() => setEditing(o)}>
+                    Change or remove
+                  </Button>
+                </div>
+              ))}
+            </Card>
+          ) : null
+        }
+      </QueryState>
       <QueryState query={board}>
         {(b) => (
           <div className="grid-2">
@@ -607,6 +640,11 @@ function Overtime() {
                             Hire
                           </Button>
                         ) : null}
+                        {m.status === 'overtime' && shiftFor(m.user) ? (
+                          <Button small onClick={() => setEditing(shiftFor(m.user)!)}>
+                            Change
+                          </Button>
+                        ) : null}
                       </span>
                     </div>
                   );
@@ -634,6 +672,7 @@ function Overtime() {
             header: '',
             cell: (o) => (o.mandatory ? <Badge tone="warning">Mandatory</Badge> : <Badge>Voluntary</Badge>),
           },
+          { header: '', cell: () => <span className="muted small">Edit ›</span> },
         ]}
       />
 
@@ -645,6 +684,16 @@ function Overtime() {
           record={null}
           defaults={{ user: hiring.user, date, hours: 24, mandatory: true }}
           onClose={() => setHiring(null)}
+          onSaved={saved}
+        />
+      ) : null}
+      {editing ? (
+        <RecordModal<Schemas['OvertimeShift']>
+          title="Change overtime"
+          endpoint="/api/v1/overtime-shifts/"
+          fields={overtimeFields}
+          record={editing}
+          onClose={() => setEditing(null)}
           onSaved={saved}
         />
       ) : null}

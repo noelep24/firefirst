@@ -563,3 +563,18 @@ def test_overtime_permissions_and_validation(client_for, officer, member, ot_cre
     assert created.status_code == 201
     assert created.json()["filling_for_name"] is None
     assert officer_client.post(url, payload, format="json").status_code == 400  # already hired that day
+
+
+def test_overtime_can_be_corrected_or_removed(client_for, officer, ot_crew):
+    c = ot_crew
+    url = "/api/v1/overtime-shifts/"
+    client = client_for(officer)
+    shift = client.post(url, {"user": c["eng_b"].id, "date": str(A_DAY)}, format="json").json()
+    # Hired the wrong person: swap them and fix the hours, then take it back entirely.
+    response = client.patch(f"{url}{shift['id']}/", {"user": c["eng_c"].id, "hours": "12"}, format="json")
+    assert response.status_code == 200, response.content
+    assert (response.json()["user"], response.json()["hours"]) == (c["eng_c"].id, "12.00")
+    assert client.patch(f"{url}{shift['id']}/", {"note": "covering"}, format="json").status_code == 200
+    assert client.patch(f"{url}{shift['id']}/", {"user": c["cap_a"].id}, format="json").status_code == 400  # on duty
+    assert client.delete(f"{url}{shift['id']}/").status_code == 204
+    assert ot_lists(client)["officers"]["next_up"] == c["eng_b"].id
