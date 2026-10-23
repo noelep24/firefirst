@@ -1,3 +1,4 @@
+import { Brand } from '@/components/brand';
 import { type FormEvent, useState } from 'react';
 
 import { useAuth } from '@/auth';
@@ -27,9 +28,7 @@ export default function Login({ onSignup }: { onSignup: () => void }) {
       <Card className="login-card">
         <form className="stack" onSubmit={submit}>
           <div className="stack-sm">
-            <div className="brand" style={{ padding: 0, fontSize: '1.8rem' }}>
-              FireFirst
-            </div>
+            <Brand large />
             <p className="muted">Sign in to manage your department.</p>
           </div>
           <div className="field">

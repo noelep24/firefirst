@@ -1,3 +1,6 @@
+import '@fontsource/roboto-slab/600.css';
+import '@fontsource/roboto-slab/700.css';
+import '@fontsource/roboto-slab/800.css';
 import './index.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
