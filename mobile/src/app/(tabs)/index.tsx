@@ -321,6 +321,7 @@ function CrewLine({ person, isMe }: { person: Person; isMe: boolean }) {
       <Label style={styles.name}>{withoutRank(person)}</Label>
       {isMe ? <Badge text="You" tone="success" /> : null}
       {person.covering_for ? <Badge text="Trade" tone="warning" /> : null}
+      {person.overtime ? <Badge text="OT" tone="warning" /> : null}
     </View>
   );
 }

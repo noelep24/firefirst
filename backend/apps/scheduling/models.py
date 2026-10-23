@@ -201,3 +201,37 @@ class StaffingRule(TenantModel):
             )
         )
         return f"{where}: at least {self.minimum} {what or 'on duty'}".strip()
+
+
+class OvertimeShift(TenantModel):
+    """Overtime a member worked. The mandatory overtime list rotates on each member's latest one."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="overtime_shifts")
+    date = models.DateField()
+    hours = models.DecimalField(max_digits=5, decimal_places=2, default=24)
+    filling_for = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="The member whose seat this fills (they ride it for the day)",
+    )
+    station = models.ForeignKey(
+        Station,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Where they work, when not filling a particular seat",
+    )
+    mandatory = models.BooleanField(default=True, help_text="Forced off the list, rather than volunteered")
+    note = models.CharField(max_length=200, blank=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        ordering = ["-date", "-id"]
+        constraints = [models.UniqueConstraint(fields=["user", "date"], name="one_overtime_shift_per_day")]
+
+    def __str__(self):
+        return f"{self.user} overtime {self.date}"

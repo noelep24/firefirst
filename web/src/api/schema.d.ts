@@ -993,6 +993,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/overtime-list/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``GET /overtime-list/?date=`` – the rolling mandatory overtime lists, and who is up next that day. */
+        get: operations["api_v1_overtime_list_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-shifts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        get: operations["api_v1_overtime_shifts_list"];
+        put?: never;
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        post: operations["api_v1_overtime_shifts_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-shifts/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        get: operations["api_v1_overtime_shifts_retrieve"];
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        put: operations["api_v1_overtime_shifts_update"];
+        post?: never;
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        delete: operations["api_v1_overtime_shifts_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Overtime worked. Everyone can see it; officers record it. */
+        patch: operations["api_v1_overtime_shifts_partial_update"];
+        trace?: never;
+    };
     "/api/v1/platoons/": {
         parameters: {
             query?: never;
@@ -2259,6 +2314,86 @@ export interface components {
             /** @description Web app path where it's done */
             link: string;
         };
+        OvertimeBoard: {
+            /** Format: date */
+            date: string;
+            platoon: string | null;
+            lists: components["schemas"]["OvertimeList"][];
+        };
+        OvertimeList: {
+            key: string;
+            label: string;
+            members: components["schemas"]["OvertimeMember"][];
+            /** @description First available member: who to hire next */
+            next_up: number | null;
+        };
+        OvertimeMember: {
+            user: number;
+            name: string;
+            rank: string;
+            position: string;
+            platoon: string;
+            station_number: string | null;
+            /**
+             * Format: date
+             * @description Most recent overtime before this date
+             */
+            last_overtime: string | null;
+            /**
+             * @description Whether they can be hired that day
+             *
+             *     * `available` - available
+             *     * `on_duty` - on_duty
+             *     * `on_leave` - on_leave
+             *     * `overtime` - overtime
+             */
+            status: components["schemas"]["OvertimeMemberStatusEnum"];
+        };
+        /**
+         * @description * `available` - available
+         *     * `on_duty` - on_duty
+         *     * `on_leave` - on_leave
+         *     * `overtime` - overtime
+         * @enum {string}
+         */
+        OvertimeMemberStatusEnum: "available" | "on_duty" | "on_leave" | "overtime";
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        OvertimeShift: {
+            readonly id: number;
+            user: number;
+            readonly user_name: string;
+            /** Format: date */
+            date: string;
+            /** Format: decimal */
+            hours?: string;
+            /** @description The member whose seat this fills (they ride it for the day) */
+            filling_for?: number | null;
+            readonly filling_for_name: string;
+            /** @description Where they work, when not filling a particular seat */
+            station?: number | null;
+            readonly station_name: string;
+            /** @description Forced off the list, rather than volunteered */
+            mandatory?: boolean;
+            note?: string;
+            readonly recorded_by: number | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        OvertimeShiftRequest: {
+            user: number;
+            /** Format: date */
+            date: string;
+            /** Format: decimal */
+            hours?: string;
+            /** @description The member whose seat this fills (they ride it for the day) */
+            filling_for?: number | null;
+            /** @description Where they work, when not filling a particular seat */
+            station?: number | null;
+            /** @description Forced off the list, rather than volunteered */
+            mandatory?: boolean;
+            note?: string;
+        };
         PaginatedApparatusList: {
             /** @example 123 */
             count: number;
@@ -2423,6 +2558,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["MaintenanceSchedule"][];
+        };
+        PaginatedOvertimeShiftList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["OvertimeShift"][];
         };
         PaginatedPlatoonList: {
             /** @example 123 */
@@ -2755,6 +2905,21 @@ export interface components {
             phone?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedOvertimeShiftRequest: {
+            user?: number;
+            /** Format: date */
+            date?: string;
+            /** Format: decimal */
+            hours?: string;
+            /** @description The member whose seat this fills (they ride it for the day) */
+            filling_for?: number | null;
+            /** @description Where they work, when not filling a particular seat */
+            station?: number | null;
+            /** @description Forced off the list, rather than volunteered */
+            mandatory?: boolean;
+            note?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedPlatoonRequest: {
             /** @description Short code used in rotation patterns, e.g. A */
             code?: string;
@@ -2988,6 +3153,8 @@ export interface components {
             apparatus_unit: string | null;
             /** @description Member this person is covering on a trade */
             covering_for?: number;
+            /** @description Working an overtime shift */
+            overtime?: boolean;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         RotationPattern: {
@@ -6226,6 +6393,182 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OnboardingStep"][];
+                };
+            };
+        };
+    };
+    api_v1_overtime_list_retrieve: {
+        parameters: {
+            query?: {
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeBoard"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_shifts_list: {
+        parameters: {
+            query?: {
+                date?: string;
+                mandatory?: boolean;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                user?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOvertimeShiftList"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_shifts_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OvertimeShiftRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OvertimeShiftRequest"];
+                "multipart/form-data": components["schemas"]["OvertimeShiftRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeShift"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_shifts_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime shift. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeShift"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_shifts_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime shift. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OvertimeShiftRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OvertimeShiftRequest"];
+                "multipart/form-data": components["schemas"]["OvertimeShiftRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeShift"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_shifts_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime shift. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_v1_overtime_shifts_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime shift. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedOvertimeShiftRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedOvertimeShiftRequest"];
+                "multipart/form-data": components["schemas"]["PatchedOvertimeShiftRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeShift"];
                 };
             };
         };

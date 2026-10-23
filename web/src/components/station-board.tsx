@@ -182,6 +182,7 @@ function CrewLine({ person, isMe }: { person: Person; isMe: boolean }) {
       <span className="row">
         {isMe ? <Badge tone="success">You</Badge> : null}
         {person.covering_for ? <Badge tone="warning">Trade</Badge> : null}
+        {person.overtime ? <Badge tone="warning">OT</Badge> : null}
       </span>
     </div>
   );

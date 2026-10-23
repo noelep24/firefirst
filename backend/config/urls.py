@@ -40,6 +40,7 @@ router.register("assignments", scheduling.AssignmentViewSet)
 router.register("leave-requests", scheduling.LeaveRequestViewSet)
 router.register("shift-trades", scheduling.ShiftTradeViewSet)
 router.register("staffing-rules", scheduling.StaffingRuleViewSet)
+router.register("overtime-shifts", scheduling.OvertimeShiftViewSet)
 
 router.register("certification-types", certifications.CertificationTypeViewSet)
 router.register("certifications", certifications.CertificationViewSet)
@@ -60,6 +61,7 @@ api_v1 = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("station-board/", scheduling.StationBoardView.as_view(), name="station-board"),
+    path("overtime-list/", scheduling.OvertimeListView.as_view(), name="overtime-list"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),
     path("reports/", reports.ReportListView.as_view(), name="reports"),

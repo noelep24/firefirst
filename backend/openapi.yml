@@ -3660,6 +3660,218 @@ paths:
                 items:
                   $ref: '#/components/schemas/OnboardingStep'
           description: ''
+  /api/v1/overtime-list/:
+    get:
+      operationId: api_v1_overtime_list_retrieve
+      description: '``GET /overtime-list/?date=`` – the rolling mandatory overtime
+        lists, and who is up next that day.'
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeBoard'
+          description: ''
+  /api/v1/overtime-shifts/:
+    get:
+      operationId: api_v1_overtime_shifts_list
+      description: Overtime worked. Everyone can see it; officers record it.
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: mandatory
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOvertimeShiftList'
+          description: ''
+    post:
+      operationId: api_v1_overtime_shifts_create
+      description: Overtime worked. Everyone can see it; officers record it.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeShift'
+          description: ''
+  /api/v1/overtime-shifts/{id}/:
+    get:
+      operationId: api_v1_overtime_shifts_retrieve
+      description: Overtime worked. Everyone can see it; officers record it.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime shift.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeShift'
+          description: ''
+    put:
+      operationId: api_v1_overtime_shifts_update
+      description: Overtime worked. Everyone can see it; officers record it.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime shift.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OvertimeShiftRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeShift'
+          description: ''
+    patch:
+      operationId: api_v1_overtime_shifts_partial_update
+      description: Overtime worked. Everyone can see it; officers record it.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime shift.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeShiftRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeShiftRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeShiftRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeShift'
+          description: ''
+    delete:
+      operationId: api_v1_overtime_shifts_destroy
+      description: Overtime worked. Everyone can see it; officers record it.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime shift.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/platoons/:
     get:
       operationId: api_v1_platoons_list
@@ -7113,6 +7325,181 @@ components:
       - key
       - link
       - title
+    OvertimeBoard:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        platoon:
+          type: string
+          nullable: true
+        lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/OvertimeList'
+      required:
+      - date
+      - lists
+      - platoon
+    OvertimeList:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/OvertimeMember'
+        next_up:
+          type: integer
+          nullable: true
+          description: 'First available member: who to hire next'
+      required:
+      - key
+      - label
+      - members
+      - next_up
+    OvertimeMember:
+      type: object
+      properties:
+        user:
+          type: integer
+        name:
+          type: string
+        rank:
+          type: string
+        position:
+          type: string
+        platoon:
+          type: string
+        station_number:
+          type: string
+          nullable: true
+        last_overtime:
+          type: string
+          format: date
+          nullable: true
+          description: Most recent overtime before this date
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OvertimeMemberStatusEnum'
+          description: |-
+            Whether they can be hired that day
+
+            * `available` - available
+            * `on_duty` - on_duty
+            * `on_leave` - on_leave
+            * `overtime` - overtime
+      required:
+      - last_overtime
+      - name
+      - platoon
+      - position
+      - rank
+      - station_number
+      - status
+      - user
+    OvertimeMemberStatusEnum:
+      enum:
+      - available
+      - on_duty
+      - on_leave
+      - overtime
+      type: string
+      description: |-
+        * `available` - available
+        * `on_duty` - on_duty
+        * `on_leave` - on_leave
+        * `overtime` - overtime
+    OvertimeShift:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+        user_name:
+          type: string
+          readOnly: true
+        date:
+          type: string
+          format: date
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        filling_for:
+          type: integer
+          nullable: true
+          description: The member whose seat this fills (they ride it for the day)
+        filling_for_name:
+          type: string
+          readOnly: true
+        station:
+          type: integer
+          nullable: true
+          description: Where they work, when not filling a particular seat
+        station_name:
+          type: string
+          readOnly: true
+        mandatory:
+          type: boolean
+          description: Forced off the list, rather than volunteered
+        note:
+          type: string
+          maxLength: 200
+        recorded_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - date
+      - filling_for_name
+      - id
+      - recorded_by
+      - station_name
+      - user
+      - user_name
+    OvertimeShiftRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        user:
+          type: integer
+        date:
+          type: string
+          format: date
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        filling_for:
+          type: integer
+          nullable: true
+          description: The member whose seat this fills (they ride it for the day)
+        station:
+          type: integer
+          nullable: true
+          description: Where they work, when not filling a particular seat
+        mandatory:
+          type: boolean
+          description: Forced off the list, rather than volunteered
+        note:
+          type: string
+          maxLength: 200
+      required:
+      - date
+      - user
     PaginatedApparatusList:
       type: object
       required:
@@ -7366,6 +7753,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MaintenanceSchedule'
+    PaginatedOvertimeShiftList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OvertimeShift'
     PaginatedPlatoonList:
       type: object
       required:
@@ -7954,6 +8364,33 @@ components:
         phone:
           type: string
           maxLength: 40
+    PatchedOvertimeShiftRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        user:
+          type: integer
+        date:
+          type: string
+          format: date
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        filling_for:
+          type: integer
+          nullable: true
+          description: The member whose seat this fills (they ride it for the day)
+        station:
+          type: integer
+          nullable: true
+          description: Where they work, when not filling a particular seat
+        mandatory:
+          type: boolean
+          description: Forced off the list, rather than volunteered
+        note:
+          type: string
+          maxLength: 200
     PatchedPlatoonRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -8434,6 +8871,9 @@ components:
         covering_for:
           type: integer
           description: Member this person is covering on a trade
+        overtime:
+          type: boolean
+          description: Working an overtime shift
       required:
       - apparatus
       - apparatus_unit

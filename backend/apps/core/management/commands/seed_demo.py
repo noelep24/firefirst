@@ -16,7 +16,7 @@ from apps.certifications.models import Certification, CertificationType
 from apps.core.models import Department, Station, User
 from apps.events.models import Event
 from apps.inventory.models import Item, StockLevel, StorageLocation
-from apps.scheduling.models import Assignment, Platoon, RotationPattern, StaffingRule
+from apps.scheduling.models import Assignment, OvertimeShift, Platoon, RotationPattern, StaffingRule
 
 PASSWORD = "firefirst-demo"
 
@@ -125,6 +125,22 @@ class Command(BaseCommand):
                     )
 
         self.seed_certifications(dept, today, st1, st2)
+
+        # Some overtime history, so the mandatory overtime lists have an order.
+        for days_ago, username in (
+            (40, "b1-engineer"),
+            (33, "c2-captain"),
+            (26, "b2-paramedic"),
+            (19, "c1-firefighter"),
+            (12, "b1-captain"),
+            (5, "c2-firefighter"),
+        ):
+            OvertimeShift.objects.create(
+                department=dept,
+                user=User.objects.get(username=f"{slug}-{username}"),
+                date=today - datetime.timedelta(days=days_ago),
+                hours=24,
+            )
 
         e1 = Apparatus.objects.create(
             department=dept,

@@ -8,7 +8,7 @@ from apps.apparatus.models import Apparatus, ApparatusMove
 from apps.certifications.models import Certification
 from apps.core.models import Station
 
-from .models import Assignment, LeaveRequest, RotationPattern, ShiftTrade, StaffingRule
+from .models import Assignment, LeaveRequest, OvertimeShift, RotationPattern, ShiftTrade, StaffingRule
 
 
 def platoon_on(department, date):
@@ -62,6 +62,18 @@ def build_roster(department, date, assume_on_leave=frozenset()):
             working.append({**_person(trade.covering_member, a, seats), "covering_for": a.user_id})
         else:
             working.append(_person(a.user, a, seats))
+
+    # Overtime: a hired member rides the seat they fill, or their own position at the given station.
+    for shift in OvertimeShift.objects.filter(department=department, date=date).select_related("user", "station"):
+        seat = assignments.get(shift.filling_for_id) or assignments.get(shift.user_id)
+        if seat is None:
+            continue
+        person = {**_person(shift.user, seat, seats), "overtime": True}
+        if shift.filling_for_id is None and shift.station_id:
+            person.update(
+                station=shift.station_id, station_number=shift.station.number, apparatus=None, apparatus_unit=None
+            )
+        working = [p for p in working if p["user"] != shift.user_id] + [person]
 
     return {
         "date": date,

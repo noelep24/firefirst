@@ -1,15 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
-import { CrudPage } from '@/components/crud';
+import { CrudPage, RecordModal } from '@/components/crud';
+import type { FieldSpec } from '@/components/form';
 import { Badge, Button, Card, DataTable, Empty, PageHeader, QueryState, Tabs } from '@/components/ui';
 import { personLabel, stationLabel } from '@/lib/fields';
 import { addDays, formatDay, isoDate, parseDate } from '@/lib/format';
 import { labelFor, positions } from '@/lib/labels';
 
-type Tab = 'calendar' | 'roster' | 'assignments' | 'staffing' | 'rotation';
+type Tab = 'calendar' | 'roster' | 'overtime' | 'assignments' | 'staffing' | 'rotation';
 
 export default function Schedule() {
   const [tab, setTab] = useState<Tab>('calendar');
@@ -22,6 +23,7 @@ export default function Schedule() {
         options={[
           { value: 'calendar', label: 'Calendar' },
           { value: 'roster', label: 'Daily roster' },
+          { value: 'overtime', label: 'Overtime list' },
           { value: 'assignments', label: 'Assignments' },
           { value: 'staffing', label: 'Staffing rules' },
           { value: 'rotation', label: 'Platoons & rotation' },
@@ -29,6 +31,7 @@ export default function Schedule() {
       />
       {tab === 'calendar' ? <MonthCalendar /> : null}
       {tab === 'roster' ? <Roster /> : null}
+      {tab === 'overtime' ? <Overtime /> : null}
       {tab === 'assignments' ? <Assignments /> : null}
       {tab === 'staffing' ? <StaffingRules /> : null}
       {tab === 'rotation' ? <Rotation /> : null}
@@ -229,6 +232,7 @@ function Roster() {
                         <div key={p.user} className="row spread">
                           <span>
                             {p.name} {p.covering_for ? <Badge tone="warning">Trade</Badge> : null}
+                            {p.overtime ? <Badge tone="warning">OT</Badge> : null}
                           </span>
                           <span className="muted small">
                             {labelFor(positions, p.position)}
@@ -492,6 +496,158 @@ function StaffingRules() {
         defaults={{ minimum: '1' }}
         columns={[{ header: 'Rule', cell: (r) => <strong>{r.description}</strong> }]}
       />
+    </div>
+  );
+}
+
+const OT_STATUS: Record<string, { label: string; tone: 'success' | 'neutral' | 'warning' }> = {
+  available: { label: 'Available', tone: 'success' },
+  on_duty: { label: 'On duty', tone: 'neutral' },
+  on_leave: { label: 'On leave', tone: 'neutral' },
+  overtime: { label: 'On overtime', tone: 'warning' },
+};
+
+const overtimeFields: FieldSpec[] = [
+  {
+    name: 'user',
+    label: 'Member',
+    type: 'relation',
+    required: true,
+    endpoint: '/api/v1/users/',
+    query: { is_active: true },
+    optionLabel: personLabel as (row: never) => string,
+  },
+  { name: 'date', label: 'Date', type: 'date', required: true },
+  { name: 'hours', label: 'Hours', type: 'number', step: '0.25', min: 0, required: true },
+  {
+    name: 'filling_for',
+    label: 'Filling the seat of',
+    type: 'relation',
+    endpoint: '/api/v1/users/',
+    query: { is_active: true },
+    optionLabel: personLabel as (row: never) => string,
+    help: 'They ride that member’s seat on the roster for the day',
+  },
+  {
+    name: 'station',
+    label: 'Station',
+    type: 'relation',
+    endpoint: '/api/v1/stations/',
+    optionLabel: stationLabel as (row: never) => string,
+    help: 'Only when not filling a particular seat',
+  },
+  { name: 'mandatory', label: 'Mandatory (forced off the list)', type: 'checkbox' },
+  { name: 'note', label: 'Note', type: 'text', wide: true },
+];
+
+/** The rolling mandatory overtime lists: whoever worked overtime longest ago is up first. */
+function Overtime() {
+  const queryClient = useQueryClient();
+  const [date, setDate] = useState(isoDate());
+  const [hiring, setHiring] = useState<{ user?: number } | null>(null);
+  const board = useQuery({
+    queryKey: ['/api/v1/overtime-list/', date],
+    queryFn: () => http.get<Schemas['OvertimeBoard']>('/api/v1/overtime-list/', { date }),
+  });
+  const saved = () => {
+    queryClient.invalidateQueries();
+    setHiring(null);
+  };
+
+  return (
+    <div className="stack">
+      <p className="muted">
+        Captains and engineers fill each other's seats; firefighters and medics fill each other's. Whoever worked
+        overtime longest ago (or never) is at the top, and working an overtime shift sends them to the bottom.
+      </p>
+      <div className="toolbar">
+        <Button small onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">
+          ‹
+        </Button>
+        <input type="date" aria-label="Date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
+        <Button small onClick={() => setDate(addDays(date, 1))} aria-label="Next day">
+          ›
+        </Button>
+        <Button small variant="ghost" onClick={() => setDate(isoDate())}>
+          Today
+        </Button>
+        <span className="muted">
+          {formatDay(date, { weekday: 'long' })}
+          {board.data?.platoon ? ` · ${board.data.platoon} Shift on duty` : ''}
+        </span>
+      </div>
+      <QueryState query={board}>
+        {(b) => (
+          <div className="grid-2">
+            {b.lists.map((list) => (
+              <Card key={list.key} className="stack-sm">
+                <h3>{list.label}</h3>
+                {list.members.length === 0 ? <Empty>No one assigned to these positions.</Empty> : null}
+                {list.members.map((m, i) => {
+                  const status = OT_STATUS[m.status];
+                  const next = m.user === list.next_up;
+                  return (
+                    <div key={m.user} className={`ot-row ${next ? 'ot-next' : ''}`}>
+                      <span className="ot-rank">{i + 1}</span>
+                      <span className="stack-sm" style={{ gap: 0 }}>
+                        <strong>{m.name}</strong>
+                        <span className="muted small">
+                          {labelFor(positions, m.position)} · {m.platoon} Shift
+                          {m.station_number ? ` · Station ${m.station_number}` : ''} · last OT{' '}
+                          {m.last_overtime ? formatDay(m.last_overtime) : 'never'}
+                        </span>
+                      </span>
+                      <span className="row">
+                        {next ? <Badge tone="danger">Next up</Badge> : <Badge tone={status.tone}>{status.label}</Badge>}
+                        {m.status === 'available' ? (
+                          <Button
+                            small
+                            variant={next ? 'primary' : 'secondary'}
+                            onClick={() => setHiring({ user: m.user })}>
+                            Hire
+                          </Button>
+                        ) : null}
+                      </span>
+                    </div>
+                  );
+                })}
+              </Card>
+            ))}
+          </div>
+        )}
+      </QueryState>
+
+      <CrudPage<Schemas['OvertimeShift']>
+        header={false}
+        title="Overtime worked"
+        noun="overtime shift"
+        endpoint="/api/v1/overtime-shifts/"
+        search={false}
+        fields={overtimeFields}
+        defaults={{ date, hours: 24, mandatory: true }}
+        columns={[
+          { header: 'Date', cell: (o) => formatDay(o.date) },
+          { header: 'Member', cell: (o) => <strong>{o.user_name}</strong> },
+          { header: 'Hours', cell: (o) => Number(o.hours) },
+          { header: 'Filling for', cell: (o) => o.filling_for_name ?? o.station_name ?? '—' },
+          {
+            header: '',
+            cell: (o) => (o.mandatory ? <Badge tone="warning">Mandatory</Badge> : <Badge>Voluntary</Badge>),
+          },
+        ]}
+      />
+
+      {hiring ? (
+        <RecordModal<Schemas['OvertimeShift']>
+          title="Record overtime"
+          endpoint="/api/v1/overtime-shifts/"
+          fields={overtimeFields}
+          record={null}
+          defaults={{ user: hiring.user, date, hours: 24, mandatory: true }}
+          onClose={() => setHiring(null)}
+          onSaved={saved}
+        />
+      ) : null}
     </div>
   );
 }
