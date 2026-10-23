@@ -44,6 +44,9 @@ export function Screen({ title, subtitle, children, refreshing = false, onRefres
       style={[styles.flex, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.screenContent}
+        // Pushed screens sit under a translucent navigation bar on iOS: start the content below it. Tab screens
+        // have no bar and already keep clear of the status bar through SafeAreaView.
+        contentInsetAdjustmentBehavior={tab ? 'never' : 'automatic'}
         keyboardShouldPersistTaps="handled"
         refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> : undefined}>
         {tab ? <OutboxBanner /> : null}
