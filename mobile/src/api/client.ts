@@ -74,9 +74,10 @@ export async function signIn(server: string, username: string, password: string)
       body: { username, password },
       signal: abort.signal,
     });
-  } catch {
+  } catch (e) {
+    console.warn(`Sign-in request to ${base} failed:`, e);
     throw new ApiError(
-      `Can't reach ${base}. Check the server address below, and that this phone is on the same network as the server.`,
+      `Can't reach ${base} (${reason(e)}). Check the server address below, and that this phone is on the same network as the server.`,
       0,
     );
   } finally {
@@ -205,11 +206,18 @@ export async function unwrap<T>(call: Promise<{ data?: T; error?: unknown; respo
   let result;
   try {
     result = await call;
-  } catch {
-    throw new ApiError(`Can't reach ${session.server}. Check your connection.`, 0);
+  } catch (e) {
+    console.warn(`Request to ${session.server} failed:`, e);
+    throw new ApiError(`Can't reach ${session.server} (${reason(e)}). Check your connection.`, 0);
   }
   if (result.error !== undefined || !result.response.ok) {
     throw new ApiError(errorMessage(result.error), result.response.status);
   }
   return result.data as T;
+}
+
+/** A short reason for a failed request, so problems on a device can be told apart. */
+function reason(error: unknown) {
+  if (error instanceof Error && error.name === 'AbortError') return 'timed out';
+  return error instanceof Error ? error.message : String(error);
 }

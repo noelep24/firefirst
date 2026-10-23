@@ -32,7 +32,7 @@ about 10 minutes the first time and 30 seconds after that.
 
    The first run installs everything, creates a demo department ("Demo Fire
    Rescue", 25 members, 2 stations, rigs and supplies) and then shows a QR
-   code. If your computer asks whether to allow Python or Node to accept
+   code. If your computer asks whether to allow Node to accept
    network connections, click **Allow**.
 
 3. On your phone, scan the QR code:
@@ -64,7 +64,7 @@ demo department.
 | Problem | Fix |
 | --- | --- |
 | The phone says it can't connect to the development server | Phone and computer must be on the same Wi-Fi. Turn off VPNs. Allow Node through the firewall (Windows: Windows Security → Firewall → Allow an app). |
-| The app opens but sign-in says it can't reach the server | Allow Python through the firewall (Mac: System Settings → Network → Firewall; Windows: Windows Security → Firewall → Allow an app). Check that "Server" on the sign-in screen shows the address printed in the terminal; tap it to change it. |
+| The app opens but sign-in says it can't reach the server | Check that "Server" on the sign-in screen shows the `http://…:8081` address printed in the terminal; tap it to change it. The message ends with the reason in brackets, and the terminal prints the full error. Send those if you need help. |
 | The detected address is wrong (several network adapters, VPN) | Find your Wi-Fi IP (Mac: System Settings → Wi-Fi → Details; Windows: `ipconfig`) and run `python3 trial.py --host 192.168.x.x` |
 | Expo Go says the project needs a newer or older SDK | Update Expo Go from the app store. |
 | Port 8000 is taken | `python3 trial.py --port 8001` |

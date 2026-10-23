@@ -6,14 +6,14 @@
 What it does:
   1. Installs the backend into .venv and the mobile app's packages (first run only)
   2. Creates a local database (trial.sqlite3) with a demo department
-  3. Starts the server where your phone can reach it over Wi-Fi
+  3. Starts the server, reachable from your phone over Wi-Fi through the app's dev server
   4. Starts the app and shows a QR code. Scan it with Expo Go on your phone.
 
 Your phone and computer must be on the same Wi-Fi. Press Ctrl+C to stop.
 
 Options:
   --host 192.168.1.20   use this address if the detected one is wrong
-  --port 8000           server port
+  --port 8000           backend port (used only on this computer)
   --reset               start over with a fresh demo database
 """
 
@@ -93,7 +93,10 @@ def main():
         fail(
             "Couldn't find this computer's Wi-Fi address. Connect to Wi-Fi, or pass --host <address>."
         )
-    server = f"http://{host}:{args.port}"
+    # The phone reaches the API through the Expo dev server (port 8081), which forwards it to Django.
+    # Then only one program needs to be reachable over Wi-Fi.
+    server = f"http://{host}:8081"
+    backend = f"http://127.0.0.1:{args.port}"
 
     # 1. Install (first run only).
     if not venv_python().exists():
@@ -149,10 +152,16 @@ def main():
     if not has_demo:
         run([venv_python(), "manage.py", "seed_demo"], cwd=BACKEND, env=env)
 
-    # 3. Server, reachable from the phone.
-    say(f"Starting the server at {server}")
+    # 3. Server, reached by the phone through the Expo dev server.
+    say(f"Starting the server at {backend}")
     django = subprocess.Popen(
-        [venv_python(), "manage.py", "runserver", f"0.0.0.0:{args.port}", "--noreload"],
+        [
+            venv_python(),
+            "manage.py",
+            "runserver",
+            f"127.0.0.1:{args.port}",
+            "--noreload",
+        ],
         cwd=BACKEND,
         env=env,
     )
@@ -169,8 +178,8 @@ def main():
          demo-a1-firefighter   a firefighter on A shift
          demo-a1-captain       an officer (can approve)
          demo-chief            department admin
-  If the app can't connect: allow Python through this computer's
-  firewall, or check the "Server" field on the sign-in screen
+  If the app can't connect: allow Node through this computer's
+  firewall, and check the "Server" field on the sign-in screen
   says {server}
   Press Ctrl+C here to stop.
 ────────────────────────────────────────────────────────────────
@@ -184,6 +193,7 @@ def main():
             env={
                 **os.environ,
                 "EXPO_PUBLIC_API_URL": server,
+                "FIREFIRST_API_PROXY": backend,
                 "REACT_NATIVE_PACKAGER_HOSTNAME": host,
             },
             check=False,
