@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.apparatus import views as apparatus
 from apps.audit.views import AuditEntryViewSet
+from apps.certifications import views as certifications
 from apps.core import views as core
 from apps.core.dashboard import DashboardView
 from apps.core.session_auth import CsrfView, SessionView
@@ -35,6 +36,10 @@ router.register("rotation-patterns", scheduling.RotationPatternViewSet)
 router.register("assignments", scheduling.AssignmentViewSet)
 router.register("leave-requests", scheduling.LeaveRequestViewSet)
 router.register("shift-trades", scheduling.ShiftTradeViewSet)
+router.register("staffing-rules", scheduling.StaffingRuleViewSet)
+
+router.register("certification-types", certifications.CertificationTypeViewSet)
+router.register("certifications", certifications.CertificationViewSet)
 
 router.register("events", events.EventViewSet)
 router.register("audit-log", AuditEntryViewSet)
@@ -49,6 +54,7 @@ api_v1 = [
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
+    path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),
     path("imports/", imports.ImportKindsView.as_view(), name="imports"),
     path("imports/<slug:kind>/", imports.ImportView.as_view(), name="import"),
     path("imports/<slug:kind>/template/", imports.ImportTemplateView.as_view(), name="import-template"),

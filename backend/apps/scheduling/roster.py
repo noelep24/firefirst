@@ -1,6 +1,10 @@
 """Who is working on a given day."""
 
-from .models import Assignment, LeaveRequest, RotationPattern, ShiftTrade
+import datetime
+
+from apps.certifications.models import Certification
+
+from .models import Assignment, LeaveRequest, RotationPattern, ShiftTrade, StaffingRule
 
 
 def platoon_on(department, date):
@@ -8,11 +12,14 @@ def platoon_on(department, date):
     return pattern.platoon_code_on(date) if pattern else None
 
 
-def build_roster(department, date):
-    """Return the on-duty platoon plus who is working, off on leave, and covering trades."""
+def build_roster(department, date, assume_on_leave=frozenset()):
+    """Return the on-duty platoon plus who is working, off on leave, covering trades, and staffing shortfalls.
+
+    ``assume_on_leave`` adds members as if their leave were approved, to preview its effect.
+    """
     pattern = RotationPattern.active_for(department)
     if pattern is None:
-        return {"date": date, "platoon": None, "working": [], "on_leave": [], "traded_off": []}
+        return {"date": date, "platoon": None, "working": [], "on_leave": [], "traded_off": [], "shortfalls": []}
 
     code = pattern.platoon_code_on(date)
     assignments = {
@@ -30,7 +37,7 @@ def build_roster(department, date):
             start_date__lte=date,
             end_date__gte=date,
         ).values_list("user_id", flat=True)
-    )
+    ) | set(assume_on_leave)
     trades = list(
         ShiftTrade.objects.filter(
             department=department, status=ShiftTrade.Status.APPROVED, shift_date=date
@@ -59,7 +66,60 @@ def build_roster(department, date):
         "working": working,
         "on_leave": [_person(assignments[uid].user, assignments[uid]) for uid in sorted(scheduled & on_leave)],
         "traded_off": traded_off,
+        "shortfalls": shortfalls(department, date, working),
     }
+
+
+def shortfalls(department, date, working):
+    """Staffing rules the working crew doesn't meet."""
+    rules = list(StaffingRule.objects.filter(department=department).select_related("station", "certification_type"))
+    if not rules:
+        return []
+    certified = {}
+    if any(r.certification_type_id for r in rules):
+        for cert in Certification.objects.filter(department=department, user_id__in=[p["user"] for p in working]):
+            if cert.is_valid_on(date):
+                certified.setdefault(cert.user_id, set()).add(cert.certification_type_id)
+    result = []
+    for rule in rules:
+        count = sum(
+            1
+            for p in working
+            if (rule.station_id is None or p["station"] == rule.station_id)
+            and (not rule.position or p["position"] == rule.position)
+            and (rule.certification_type_id is None or rule.certification_type_id in certified.get(p["user"], ()))
+        )
+        if count < rule.minimum:
+            result.append(
+                {
+                    "rule": rule.id,
+                    "description": str(rule),
+                    "station": rule.station_id,
+                    "required": rule.minimum,
+                    "scheduled": count,
+                }
+            )
+    return result
+
+
+def leave_impact(leave):
+    """Shortfalls that approving ``leave`` would cause or worsen, by day the member is scheduled."""
+    department = leave.department
+    assignment = Assignment.objects.filter(user=leave.user).select_related("platoon").first()
+    pattern = RotationPattern.active_for(department)
+    if assignment is None or pattern is None:
+        return []
+    days = []
+    day = leave.start_date
+    while day <= leave.end_date:
+        if pattern.platoon_code_on(day) == assignment.platoon.code:
+            before = {s["rule"]: s for s in build_roster(department, day)["shortfalls"]}
+            after = build_roster(department, day, assume_on_leave={leave.user_id})["shortfalls"]
+            caused = [s for s in after if s["rule"] not in before or s["scheduled"] < before[s["rule"]]["scheduled"]]
+            if caused:
+                days.append({"date": day, "shortfalls": caused})
+        day += datetime.timedelta(days=1)
+    return days
 
 
 def _person(user, assignment):

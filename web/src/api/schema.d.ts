@@ -226,6 +226,99 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/certification-types/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        get: operations["v1_certification_types_list"];
+        put?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        post: operations["v1_certification_types_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/certification-types/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        get: operations["v1_certification_types_retrieve"];
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        put: operations["v1_certification_types_update"];
+        post?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        delete: operations["v1_certification_types_destroy"];
+        options?: never;
+        head?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        patch: operations["v1_certification_types_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/certifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Officers manage everyone's certifications; members see their own. */
+        get: operations["v1_certifications_list"];
+        put?: never;
+        /** @description Officers manage everyone's certifications; members see their own. */
+        post: operations["v1_certifications_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/certifications/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Officers manage everyone's certifications; members see their own. */
+        get: operations["v1_certifications_retrieve"];
+        /** @description Officers manage everyone's certifications; members see their own. */
+        put: operations["v1_certifications_update"];
+        post?: never;
+        /** @description Officers manage everyone's certifications; members see their own. */
+        delete: operations["v1_certifications_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Officers manage everyone's certifications; members see their own. */
+        patch: operations["v1_certifications_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/certifications/compliance/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Members with certifications that are expiring, expired, or required but missing. */
+        get: operations["v1_certifications_compliance_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/checklists/": {
         parameters: {
             query?: never;
@@ -743,6 +836,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/leave-requests/{id}/impact/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Staffing shortfalls approving this leave would cause, by day. */
+        get: operations["v1_leave_requests_impact_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maintenance-schedules/": {
         parameters: {
             query?: never;
@@ -1082,6 +1192,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/staffing/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``GET /staffing/?start=&end=`` – days in the range whose crew misses a staffing rule. */
+        get: operations["v1_staffing_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staffing-rules/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        get: operations["v1_staffing_rules_list"];
+        put?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        post: operations["v1_staffing_rules_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staffing-rules/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        get: operations["v1_staffing_rules_retrieve"];
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        put: operations["v1_staffing_rules_update"];
+        post?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        delete: operations["v1_staffing_rules_destroy"];
+        options?: never;
+        head?: never;
+        /** @description ModelViewSet scoped to ``request.user.department``. */
+        patch: operations["v1_staffing_rules_partial_update"];
+        trace?: never;
+    };
     "/api/v1/stations/": {
         parameters: {
             query?: never;
@@ -1320,6 +1485,63 @@ export interface components {
         AuditEntryActionEnum: "create" | "update" | "delete";
         /** @enum {unknown} */
         BlankEnum: "";
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        Certification: {
+            readonly id: number;
+            user: number;
+            readonly user_name: string;
+            certification_type: number;
+            readonly type_name: string;
+            /** Certificate number */
+            number?: string;
+            /** Format: date */
+            issued_on?: string | null;
+            /**
+             * Format: date
+             * @description Leave blank to use the type's renewal period, or if it doesn't expire
+             */
+            expires_on?: string | null;
+            readonly status: string;
+            notes?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        CertificationRequest: {
+            user: number;
+            certification_type: number;
+            /** Certificate number */
+            number?: string;
+            /** Format: date */
+            issued_on?: string | null;
+            /**
+             * Format: date
+             * @description Leave blank to use the type's renewal period, or if it doesn't expire
+             */
+            expires_on?: string | null;
+            notes?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        CertificationType: {
+            readonly id: number;
+            name: string;
+            /** @description Short label, e.g. EMT-B, FF2 */
+            code?: string;
+            /** @description Fills in the expiration from the issue date when none is given */
+            renewal_months?: number | null;
+            /** @description Every active member must hold it */
+            required_for_all?: boolean;
+            notes?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        CertificationTypeRequest: {
+            name: string;
+            /** @description Short label, e.g. EMT-B, FF2 */
+            code?: string;
+            /** @description Fills in the expiration from the issue date when none is given */
+            renewal_months?: number | null;
+            /** @description Every active member must hold it */
+            required_for_all?: boolean;
+            notes?: string;
+        };
         ChecklistItem: {
             id?: number;
             /** @description e.g. Cab, Pump panel, Compartment 1 */
@@ -1379,6 +1601,27 @@ export interface components {
             is_active?: boolean;
             items: components["schemas"]["ChecklistItemRequest"][];
         };
+        Compliance: {
+            user: number;
+            name: string;
+            /** @description Required or held certifications that need attention */
+            problems: components["schemas"]["ComplianceItem"][];
+        };
+        ComplianceItem: {
+            certification_type: number;
+            type_name: string;
+            status: components["schemas"]["ComplianceItemStatusEnum"];
+            /** Format: date */
+            expires_on: string | null;
+        };
+        /**
+         * @description * `valid` - valid
+         *     * `expiring` - expiring
+         *     * `expired` - expired
+         *     * `missing` - missing
+         * @enum {string}
+         */
+        ComplianceItemStatusEnum: "valid" | "expiring" | "expired" | "missing";
         Dashboard: {
             /** Format: date */
             date: string;
@@ -1389,6 +1632,10 @@ export interface components {
             stock_below_par: number;
             stock_expiring_30_days: number;
             upcoming_events: components["schemas"]["DashboardEvent"][];
+            /** @description Expiring within 60 days or expired: department-wide for officers, your own for members */
+            certifications_needing_attention: number;
+            /** @description Days in the next week whose crew misses a staffing rule */
+            staffing_shortfall_days: string[];
             /** @description Officers only */
             pending_leave_requests?: number;
             /** @description Officers only */
@@ -1773,6 +2020,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AuditEntry"][];
         };
+        PaginatedCertificationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Certification"][];
+        };
+        PaginatedCertificationTypeList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CertificationType"][];
+        };
         PaginatedChecklistTemplateList: {
             /** @example 123 */
             count: number;
@@ -1923,6 +2200,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["ShiftTrade"][];
         };
+        PaginatedStaffingRuleList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["StaffingRule"][];
+        };
         PaginatedStationList: {
             /** @example 123 */
             count: number;
@@ -2035,6 +2327,32 @@ export interface components {
             platoon?: number;
             station?: number | null;
             position?: components["schemas"]["PositionEnum"];
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedCertificationRequest: {
+            user?: number;
+            certification_type?: number;
+            /** Certificate number */
+            number?: string;
+            /** Format: date */
+            issued_on?: string | null;
+            /**
+             * Format: date
+             * @description Leave blank to use the type's renewal period, or if it doesn't expire
+             */
+            expires_on?: string | null;
+            notes?: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedCertificationTypeRequest: {
+            name?: string;
+            /** @description Short label, e.g. EMT-B, FF2 */
+            code?: string;
+            /** @description Fills in the expiration from the issue date when none is given */
+            renewal_months?: number | null;
+            /** @description Every active member must hold it */
+            required_for_all?: boolean;
+            notes?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedChecklistTemplateRequest: {
@@ -2175,6 +2493,26 @@ export interface components {
             notes?: string;
         };
         /** @description Restricts every related-field choice to the requesting user's department. */
+        PatchedStaffingRuleRequest: {
+            /** @description Blank applies to the whole department */
+            station?: number | null;
+            /**
+             * @description Blank counts any position
+             *
+             *     * `chief` - Battalion / Shift chief
+             *     * `captain` - Captain
+             *     * `lieutenant` - Lieutenant
+             *     * `engineer` - Engineer / Driver-operator
+             *     * `firefighter` - Firefighter
+             *     * `paramedic` - Paramedic
+             *     * `emt` - EMT
+             */
+            position?: components["schemas"]["PositionEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Only count members holding this certification on the day */
+            certification_type?: number | null;
+            minimum?: number;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedStationRequest: {
             number?: string;
             name?: string;
@@ -2302,6 +2640,7 @@ export interface components {
             working: components["schemas"]["RosterPerson"][];
             on_leave: components["schemas"]["RosterPerson"][];
             traded_off: components["schemas"]["RosterPerson"][];
+            shortfalls: components["schemas"]["Shortfall"][];
         };
         RosterPerson: {
             user: number;
@@ -2434,6 +2773,61 @@ export interface components {
          * @enum {string}
          */
         ShiftTradeStatusEnum: "pending_partner" | "pending_approval" | "approved" | "denied" | "declined" | "cancelled";
+        Shortfall: {
+            rule: number;
+            description: string;
+            station: number | null;
+            required: number;
+            scheduled: number;
+        };
+        StaffingDay: {
+            /** Format: date */
+            date: string;
+            platoon?: string | null;
+            shortfalls: components["schemas"]["Shortfall"][];
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        StaffingRule: {
+            readonly id: number;
+            /** @description Blank applies to the whole department */
+            station?: number | null;
+            /**
+             * @description Blank counts any position
+             *
+             *     * `chief` - Battalion / Shift chief
+             *     * `captain` - Captain
+             *     * `lieutenant` - Lieutenant
+             *     * `engineer` - Engineer / Driver-operator
+             *     * `firefighter` - Firefighter
+             *     * `paramedic` - Paramedic
+             *     * `emt` - EMT
+             */
+            position?: components["schemas"]["PositionEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Only count members holding this certification on the day */
+            certification_type?: number | null;
+            minimum: number;
+            readonly description: string;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        StaffingRuleRequest: {
+            /** @description Blank applies to the whole department */
+            station?: number | null;
+            /**
+             * @description Blank counts any position
+             *
+             *     * `chief` - Battalion / Shift chief
+             *     * `captain` - Captain
+             *     * `lieutenant` - Lieutenant
+             *     * `engineer` - Engineer / Driver-operator
+             *     * `firefighter` - Firefighter
+             *     * `paramedic` - Paramedic
+             *     * `emt` - EMT
+             */
+            position?: components["schemas"]["PositionEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Only count members holding this certification on the day */
+            certification_type?: number | null;
+            minimum: number;
+        };
         /** @description Restricts every related-field choice to the requesting user's department. */
         Station: {
             readonly id: number;
@@ -3231,6 +3625,338 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenRefresh"];
+                };
+            };
+        };
+    };
+    v1_certification_types_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCertificationTypeList"];
+                };
+            };
+        };
+    };
+    v1_certification_types_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificationTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CertificationTypeRequest"];
+                "multipart/form-data": components["schemas"]["CertificationTypeRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificationType"];
+                };
+            };
+        };
+    };
+    v1_certification_types_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificationType"];
+                };
+            };
+        };
+    };
+    v1_certification_types_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificationTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CertificationTypeRequest"];
+                "multipart/form-data": components["schemas"]["CertificationTypeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificationType"];
+                };
+            };
+        };
+    };
+    v1_certification_types_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_certification_types_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification type. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedCertificationTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedCertificationTypeRequest"];
+                "multipart/form-data": components["schemas"]["PatchedCertificationTypeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificationType"];
+                };
+            };
+        };
+    };
+    v1_certifications_list: {
+        parameters: {
+            query?: {
+                certification_type?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                user?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCertificationList"];
+                };
+            };
+        };
+    };
+    v1_certifications_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CertificationRequest"];
+                "multipart/form-data": components["schemas"]["CertificationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Certification"];
+                };
+            };
+        };
+    };
+    v1_certifications_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Certification"];
+                };
+            };
+        };
+    };
+    v1_certifications_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CertificationRequest"];
+                "multipart/form-data": components["schemas"]["CertificationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Certification"];
+                };
+            };
+        };
+    };
+    v1_certifications_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_certifications_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedCertificationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedCertificationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedCertificationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Certification"];
+                };
+            };
+        };
+    };
+    v1_certifications_compliance_list: {
+        parameters: {
+            query?: {
+                certification_type?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                user?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compliance"][];
                 };
             };
         };
@@ -4743,6 +5469,52 @@ export interface operations {
             };
         };
     };
+    v1_leave_requests_impact_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `vacation` - Vacation
+                 *     * `sick` - Sick
+                 *     * `personal` - Personal
+                 *     * `kelly` - Kelly day
+                 *     * `training` - Training / detail
+                 *     * `bereavement` - Bereavement
+                 *     * `injury` - On-duty injury
+                 *     * `other` - Other
+                 */
+                leave_type?: "bereavement" | "injury" | "kelly" | "other" | "personal" | "sick" | "training" | "vacation";
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `pending` - Pending
+                 *     * `approved` - Approved
+                 *     * `denied` - Denied
+                 *     * `cancelled` - Cancelled
+                 */
+                status?: "approved" | "cancelled" | "denied" | "pending";
+                user?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this leave request. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingDay"][];
+                };
+            };
+        };
+    };
     v1_maintenance_schedules_list: {
         parameters: {
             query?: {
@@ -5659,6 +6431,180 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ShiftTrade"];
+                };
+            };
+        };
+    };
+    v1_staffing_list: {
+        parameters: {
+            query: {
+                end: string;
+                start: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingDay"][];
+                };
+            };
+        };
+    };
+    v1_staffing_rules_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedStaffingRuleList"];
+                };
+            };
+        };
+    };
+    v1_staffing_rules_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffingRuleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StaffingRuleRequest"];
+                "multipart/form-data": components["schemas"]["StaffingRuleRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingRule"];
+                };
+            };
+        };
+    };
+    v1_staffing_rules_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this staffing rule. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingRule"];
+                };
+            };
+        };
+    };
+    v1_staffing_rules_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this staffing rule. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffingRuleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StaffingRuleRequest"];
+                "multipart/form-data": components["schemas"]["StaffingRuleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingRule"];
+                };
+            };
+        };
+    };
+    v1_staffing_rules_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this staffing rule. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_staffing_rules_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this staffing rule. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedStaffingRuleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedStaffingRuleRequest"];
+                "multipart/form-data": components["schemas"]["PatchedStaffingRuleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffingRule"];
                 };
             };
         };

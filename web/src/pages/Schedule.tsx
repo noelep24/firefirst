@@ -9,7 +9,7 @@ import { personLabel, stationLabel } from '@/lib/fields';
 import { addDays, formatDay, isoDate, parseDate } from '@/lib/format';
 import { labelFor, positions } from '@/lib/labels';
 
-type Tab = 'calendar' | 'roster' | 'assignments' | 'rotation';
+type Tab = 'calendar' | 'roster' | 'assignments' | 'staffing' | 'rotation';
 
 export default function Schedule() {
   const [tab, setTab] = useState<Tab>('calendar');
@@ -23,12 +23,14 @@ export default function Schedule() {
           { value: 'calendar', label: 'Calendar' },
           { value: 'roster', label: 'Daily roster' },
           { value: 'assignments', label: 'Assignments' },
+          { value: 'staffing', label: 'Staffing rules' },
           { value: 'rotation', label: 'Platoons & rotation' },
         ]}
       />
       {tab === 'calendar' ? <MonthCalendar /> : null}
       {tab === 'roster' ? <Roster /> : null}
       {tab === 'assignments' ? <Assignments /> : null}
+      {tab === 'staffing' ? <StaffingRules /> : null}
       {tab === 'rotation' ? <Rotation /> : null}
     </div>
   );
@@ -75,6 +77,11 @@ function MonthCalendar() {
     queryKey: ['/api/v1/leave-requests/', 'approved', start, end],
     queryFn: () => getAll<Schemas['LeaveRequest']>('/api/v1/leave-requests/', { status: 'approved', start, end }),
   });
+  const staffing = useQuery({
+    queryKey: ['/api/v1/staffing/', start, end],
+    queryFn: () => http.get<Schemas['StaffingDay'][]>('/api/v1/staffing/', { start, end }),
+  });
+  const shortOn = new Map((staffing.data ?? []).map((d) => [d.date, d.shortfalls]));
 
   const platoonOn = new Map((shifts.data ?? []).map((d) => [d.date, d.platoon]));
   const colorOf = (code: string | null | undefined) => platoons.data?.find((p) => p.code === code)?.color ?? 'gray';
@@ -131,6 +138,16 @@ function MonthCalendar() {
                 ) : null}
               </div>
               {off ? <span className="muted small">{off} on leave</span> : null}
+              {shortOn.get(day) ? (
+                <span
+                  className="tone-danger small"
+                  title={shortOn
+                    .get(day)!
+                    .map((s) => s.description)
+                    .join('\n')}>
+                  ▲ Short staffed
+                </span>
+              ) : null}
               {dayEvents.map((e) => (
                 <button
                   key={e.id}
@@ -193,6 +210,16 @@ function Roster() {
               <h2>
                 {formatDay(date, { weekday: 'long' })}: {r.platoon} Shift · {r.working.length} on duty
               </h2>
+              {r.shortfalls.length ? (
+                <div className="alert" role="alert">
+                  <strong>Short staffed:</strong>
+                  {r.shortfalls.map((s) => (
+                    <div key={s.rule}>
+                      {s.description} (have {s.scheduled})
+                    </div>
+                  ))}
+                </div>
+              ) : null}
               <div className="grid-2">
                 {[...stations.entries()].map(([station, people]) => (
                   <Card key={station}>
@@ -415,5 +442,44 @@ function PlatoonCounts() {
         )}
       </QueryState>
     </section>
+  );
+}
+
+function StaffingRules() {
+  return (
+    <div className="stack-sm">
+      <p className="muted small">
+        Minimums for every shift. Leave or trades that would break one are flagged on the roster, the calendar and the
+        approvals page. A rule can count everyone, a position, or members holding a certification.
+      </p>
+      <CrudPage<Schemas['StaffingRule']>
+        header={false}
+        title="Staffing rules"
+        noun="rule"
+        endpoint="/api/v1/staffing-rules/"
+        search={false}
+        fields={[
+          {
+            name: 'station',
+            label: 'Station',
+            type: 'relation',
+            endpoint: '/api/v1/stations/',
+            optionLabel: stationLabel as (row: never) => string,
+            help: 'Blank for department-wide',
+          },
+          { name: 'minimum', label: 'At least', type: 'number', step: '1', min: 1, required: true },
+          { name: 'position', label: 'Position', type: 'select', options: positions, help: 'Blank counts anyone' },
+          {
+            name: 'certification_type',
+            label: 'Holding certification',
+            type: 'relation',
+            endpoint: '/api/v1/certification-types/',
+            optionLabel: ((t: Schemas['CertificationType']) => t.name) as (row: never) => string,
+          },
+        ]}
+        defaults={{ minimum: '1' }}
+        columns={[{ header: 'Rule', cell: (r) => <strong>{r.description}</strong> }]}
+      />
+    </div>
   );
 }

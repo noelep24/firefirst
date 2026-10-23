@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from apps.core.tenancy import TenantSerializer
 
-from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade
+from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade, StaffingRule
 from .roster import platoon_on
 
 
@@ -137,6 +137,33 @@ class RosterPersonSerializer(serializers.Serializer):
     covering_for = serializers.IntegerField(required=False, help_text="Member this person is covering on a trade")
 
 
+class ShortfallSerializer(serializers.Serializer):
+    rule = serializers.IntegerField()
+    description = serializers.CharField()
+    station = serializers.IntegerField(allow_null=True)
+    required = serializers.IntegerField()
+    scheduled = serializers.IntegerField()
+
+
+class StaffingDaySerializer(serializers.Serializer):
+    date = serializers.DateField()
+    platoon = serializers.CharField(allow_null=True, required=False)
+    shortfalls = ShortfallSerializer(many=True)
+
+
+class StaffingRuleSerializer(TenantSerializer):
+    description = serializers.CharField(source="__str__", read_only=True)
+
+    class Meta:
+        model = StaffingRule
+        fields = ["id", "station", "position", "certification_type", "minimum", "description"]
+
+    def validate_minimum(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Minimum must be at least 1.")
+        return value
+
+
 class RosterSerializer(serializers.Serializer):
     date = serializers.DateField()
     platoon = serializers.CharField(allow_null=True)
@@ -145,6 +172,7 @@ class RosterSerializer(serializers.Serializer):
     working = RosterPersonSerializer(many=True)
     on_leave = RosterPersonSerializer(many=True)
     traded_off = RosterPersonSerializer(many=True)
+    shortfalls = ShortfallSerializer(many=True)
 
 
 class ShiftDaySerializer(serializers.Serializer):

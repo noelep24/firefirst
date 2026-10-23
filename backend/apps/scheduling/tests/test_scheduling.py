@@ -189,3 +189,88 @@ def test_officers_cannot_review_trades_they_are_part_of(client_for, department, 
     )
     assert client_for(captain).post(f"/api/v1/shift-trades/{trade.id}/approve/").status_code == 403
     assert client_for(captain).post(f"/api/v1/shift-trades/{trade.id}/deny/").status_code == 403
+
+
+# ---------------------------------------------------------------- Staffing
+
+
+@pytest.fixture
+def medic_cert(department):
+    from apps.certifications.models import CertificationType
+
+    return CertificationType.objects.create(department=department, name="Paramedic")
+
+
+def test_roster_reports_shortfalls(client_for, officer, department, station, crew, medic_cert):
+    from apps.certifications.models import Certification
+    from apps.scheduling.models import StaffingRule
+
+    StaffingRule.objects.create(department=department, station=station, minimum=2)
+    StaffingRule.objects.create(department=department, station=station, certification_type=medic_cert, minimum=1)
+    roster = client_for(officer).get(f"/api/v1/roster/?date={A_DAY}").json()
+    assert [(s["required"], s["scheduled"]) for s in roster["shortfalls"]] == [(1, 0)]  # 2 on duty, no medic
+
+    Certification.objects.create(department=department, user=crew["a2"], certification_type=medic_cert)
+    assert client_for(officer).get(f"/api/v1/roster/?date={A_DAY}").json()["shortfalls"] == []
+
+
+def test_expired_certification_does_not_count(client_for, officer, department, station, crew, medic_cert):
+    from apps.certifications.models import Certification
+    from apps.scheduling.models import StaffingRule
+
+    StaffingRule.objects.create(department=department, certification_type=medic_cert, minimum=1)
+    Certification.objects.create(
+        department=department,
+        user=crew["a1"],
+        certification_type=medic_cert,
+        expires_on=A_DAY - datetime.timedelta(days=1),
+    )
+    assert len(client_for(officer).get(f"/api/v1/roster/?date={A_DAY}").json()["shortfalls"]) == 1
+
+
+def test_covering_member_counts_with_their_own_certs(client_for, officer, department, station, crew, medic_cert):
+    from apps.certifications.models import Certification
+    from apps.scheduling.models import StaffingRule
+
+    StaffingRule.objects.create(department=department, station=station, certification_type=medic_cert, minimum=1)
+    Certification.objects.create(department=department, user=crew["b1"], certification_type=medic_cert)
+    ShiftTrade.objects.create(
+        department=department, requester=crew["a1"], covering_member=crew["b1"], shift_date=A_DAY, status="approved"
+    )
+    assert client_for(officer).get(f"/api/v1/roster/?date={A_DAY}").json()["shortfalls"] == []
+
+
+def test_leave_impact_and_outlook(client_for, officer, department, station, crew):
+    from apps.scheduling.models import StaffingRule
+
+    StaffingRule.objects.create(department=department, station=station, minimum=2)
+    leave = LeaveRequest.objects.create(
+        department=department, user=crew["a1"], leave_type="vacation", start_date=A_DAY, end_date=B_DAY
+    )
+    impact = client_for(officer).get(f"/api/v1/leave-requests/{leave.id}/impact/").json()
+    # Only the A-shift day matters; B_DAY isn't one of their shifts.
+    assert [d["date"] for d in impact] == [str(A_DAY)]
+    assert impact[0]["shortfalls"][0]["scheduled"] == 1
+
+    # B shift only has one member at Station 1, so that day is already short; look at the A day alone.
+    assert client_for(officer).get(f"/api/v1/staffing/?start={A_DAY}&end={A_DAY}").json() == []
+    leave.status = "approved"
+    leave.save()
+    outlook = client_for(officer).get(f"/api/v1/staffing/?start={A_DAY}&end={A_DAY}").json()
+    assert [d["date"] for d in outlook] == [str(A_DAY)]
+
+
+def test_members_cannot_see_leave_impact(client_for, member, department, crew):
+    leave = LeaveRequest.objects.create(
+        department=department, user=member, leave_type="vacation", start_date=A_DAY, end_date=A_DAY
+    )
+    assert client_for(member).get(f"/api/v1/leave-requests/{leave.id}/impact/").status_code == 403
+
+
+def test_staffing_rule_validation_and_description(client_for, officer, station, medic_cert):
+    client = client_for(officer)
+    assert client.post("/api/v1/staffing-rules/", {"station": station.id, "minimum": 0}).status_code == 400
+    created = client.post(
+        "/api/v1/staffing-rules/", {"station": station.id, "certification_type": medic_cert.id, "minimum": 1}
+    ).json()
+    assert created["description"] == "Station 1 – Headquarters: at least 1 Paramedic"

@@ -89,5 +89,11 @@ class DashboardSerializer(serializers.Serializer):
     stock_below_par = serializers.IntegerField()
     stock_expiring_30_days = serializers.IntegerField()
     upcoming_events = DashboardEventSerializer(many=True)
+    certifications_needing_attention = serializers.IntegerField(
+        help_text="Expiring within 60 days or expired: department-wide for officers, your own for members"
+    )
+    staffing_shortfall_days = serializers.ListField(
+        child=serializers.DateField(), help_text="Days in the next week whose crew misses a staffing rule"
+    )
     pending_leave_requests = serializers.IntegerField(required=False, help_text="Officers only")
     pending_shift_trades = serializers.IntegerField(required=False, help_text="Officers only")

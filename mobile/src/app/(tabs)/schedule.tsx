@@ -61,6 +61,18 @@ function Roster() {
               <Label type="heading">
                 {r.platoon} Shift · {r.working.length} on duty
               </Label>
+              {r.shortfalls.length ? (
+                <Card>
+                  <Label type="smallBold" color="danger">
+                    Short staffed
+                  </Label>
+                  {r.shortfalls.map((s) => (
+                    <Label key={s.rule} type="small">
+                      {s.description} (have {s.scheduled})
+                    </Label>
+                  ))}
+                </Card>
+              ) : null}
               {[...byStation.entries()].map(([station, people]) => (
                 <Card key={station}>
                   <Label type="smallBold" color="textSecondary">

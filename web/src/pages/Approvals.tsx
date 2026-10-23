@@ -101,6 +101,10 @@ function Pending() {
                 { header: 'Dates', cell: (l) => range(l) },
                 { header: 'Reason', cell: (l) => l.reason },
                 {
+                  header: 'Staffing',
+                  cell: (l) => <LeaveImpact id={l.id} />,
+                },
+                {
                   header: 'Others off',
                   cell: (l) => {
                     const n = othersOff(l);
@@ -242,5 +246,24 @@ function TradeHistory() {
         />
       )}
     </QueryState>
+  );
+}
+
+/** Whether approving this leave would leave a shift below a staffing rule. */
+function LeaveImpact({ id }: { id: number }) {
+  const impact = useQuery({
+    queryKey: ['/api/v1/leave-requests/', id, 'impact'],
+    queryFn: () => http.get<Schemas['StaffingDay'][]>(`/api/v1/leave-requests/${id}/impact/`),
+  });
+  if (impact.isPending) return <span className="muted small">Checking…</span>;
+  if (!impact.data?.length) return <Badge tone="success">OK</Badge>;
+  return (
+    <div className="stack-sm" style={{ gap: 2 }}>
+      {impact.data.map((day) => (
+        <div key={day.date} className="tone-danger small">
+          {formatDay(day.date)}: {day.shortfalls.map((s) => `${s.description} (would have ${s.scheduled})`).join('; ')}
+        </div>
+      ))}
+    </div>
   );
 }

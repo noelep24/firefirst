@@ -12,10 +12,11 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.apparatus.models import Apparatus, ChecklistItem, ChecklistTemplate, MaintenanceSchedule
+from apps.certifications.models import Certification, CertificationType
 from apps.core.models import Department, Station, User
 from apps.events.models import Event
 from apps.inventory.models import Item, StockLevel, StorageLocation
-from apps.scheduling.models import Assignment, Platoon, RotationPattern
+from apps.scheduling.models import Assignment, Platoon, RotationPattern, StaffingRule
 
 PASSWORD = "firefirst-demo"
 
@@ -92,6 +93,8 @@ class Command(BaseCommand):
                     Assignment.objects.create(
                         department=dept, user=u, platoon=platoons[code], station=station, position=position
                     )
+
+        self.seed_certifications(dept, today, st1, st2)
 
         e1 = Apparatus.objects.create(
             department=dept,
@@ -212,3 +215,30 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created '{dept}' with {crew + 1} members. Log in as {slug}-chief / {PASSWORD}")
         )
+
+    def seed_certifications(self, dept, today, st1, st2):
+        emt = CertificationType.objects.create(
+            department=dept, name="EMT", code="EMT-B", renewal_months=24, required_for_all=True
+        )
+        medic = CertificationType.objects.create(department=dept, name="Paramedic", code="NRP", renewal_months=24)
+        driver = CertificationType.objects.create(
+            department=dept, name="Driver/Operator", code="D/O", renewal_months=36
+        )
+        cpr = CertificationType.objects.create(
+            department=dept, name="CPR / BLS", renewal_months=24, required_for_all=True
+        )
+        for n, assignment in enumerate(Assignment.objects.filter(department=dept).select_related("user")):
+            user, position = assignment.user, assignment.position
+            # Stagger issue dates so a few cards are due soon, as in a real roster.
+            issued = today - datetime.timedelta(days=700 - n * 25)
+            Certification.objects.create(department=dept, user=user, certification_type=emt, issued_on=issued)
+            if n % 7 != 3:  # a couple of members are behind on CPR
+                Certification.objects.create(department=dept, user=user, certification_type=cpr, issued_on=issued)
+            if position == Assignment.Position.PARAMEDIC:
+                Certification.objects.create(department=dept, user=user, certification_type=medic, issued_on=issued)
+            if position in (Assignment.Position.ENGINEER, Assignment.Position.CAPTAIN):
+                Certification.objects.create(department=dept, user=user, certification_type=driver, issued_on=issued)
+        StaffingRule.objects.create(department=dept, station=st1, minimum=4)
+        StaffingRule.objects.create(department=dept, station=st1, certification_type=medic, minimum=1)
+        StaffingRule.objects.create(department=dept, station=st2, minimum=3)
+        StaffingRule.objects.create(department=dept, certification_type=driver, minimum=2)

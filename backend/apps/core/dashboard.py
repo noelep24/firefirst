@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.apparatus.models import Apparatus, MaintenanceSchedule, WorkOrder
+from apps.certifications.models import EXPIRING_SOON_DAYS, Certification
 from apps.events.models import Event
 from apps.inventory.models import StockLevel
 from apps.scheduling.models import LeaveRequest, ShiftTrade
-from apps.scheduling.roster import platoon_on
+from apps.scheduling.roster import build_roster, platoon_on
 
 from .permissions import IsDepartmentMember
 from .serializers import DashboardSerializer
@@ -49,6 +50,17 @@ class DashboardView(APIView):
                 .values("id", "title", "category", "starts_at", "is_mandatory")[:10]
             ),
         }
+        certs = Certification.objects.filter(
+            department=department,
+            user__is_active=True,
+            expires_on__lt=today + timedelta(days=EXPIRING_SOON_DAYS),
+        )
+        if not request.user.is_officer:
+            certs = certs.filter(user=request.user)
+        data["certifications_needing_attention"] = certs.count()
+        data["staffing_shortfall_days"] = [
+            day for day in (today + timedelta(days=n) for n in range(7)) if build_roster(department, day)["shortfalls"]
+        ]
         if request.user.is_officer:
             data["pending_leave_requests"] = LeaveRequest.objects.filter(
                 department=department, status=LeaveRequest.Status.PENDING

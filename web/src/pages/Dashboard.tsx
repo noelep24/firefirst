@@ -40,6 +40,17 @@ export default function Dashboard() {
                 label="Waiting for your approval"
                 value={(d.pending_leave_requests ?? 0) + (d.pending_shift_trades ?? 0)}
               />
+              <StatLink
+                to="/schedule"
+                label="Short-staffed days (next 7)"
+                value={d.staffing_shortfall_days.length}
+                danger
+              />
+              <StatLink
+                to="/people"
+                label="Certifications expiring or expired"
+                value={d.certifications_needing_attention}
+              />
             </div>
             {d.apparatus_out_of_service.length ? (
               <Card>

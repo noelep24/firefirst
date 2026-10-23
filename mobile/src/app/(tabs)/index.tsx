@@ -78,6 +78,27 @@ export default function TodayScreen() {
                 ) : null}
               </Row>
 
+              {d.certifications_needing_attention ? (
+                <Card onPress={() => router.push('/certifications')}>
+                  <Label type="smallBold" color="warning">
+                    {isOfficer ? 'Department certifications' : 'Your certifications'}
+                  </Label>
+                  <Label>
+                    {d.certifications_needing_attention} expiring soon or expired.{' '}
+                    {isOfficer ? 'Review on the web app.' : 'Tap to see which.'}
+                  </Label>
+                </Card>
+              ) : null}
+
+              {isOfficer && d.staffing_shortfall_days.length ? (
+                <Card onPress={() => router.navigate('/schedule')}>
+                  <Label type="smallBold" color="danger">
+                    Short staffed
+                  </Label>
+                  <Label>{d.staffing_shortfall_days.map((day) => formatDay(day)).join(', ')}</Label>
+                </Card>
+              ) : null}
+
               <Section title="Next 7 days">
                 {d.upcoming_events.length === 0 ? <Empty text="Nothing scheduled." /> : null}
                 {d.upcoming_events.map((event) => (

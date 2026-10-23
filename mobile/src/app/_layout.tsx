@@ -50,6 +50,7 @@ function Navigation() {
           <Stack.Screen name="trade/new" options={{ title: 'Trade a shift', presentation: 'modal' }} />
           <Stack.Screen name="event/[id]" options={{ title: 'Event' }} />
           <Stack.Screen name="outbox" options={{ title: 'Waiting to sync' }} />
+          <Stack.Screen name="certifications" options={{ title: 'My certifications' }} />
         </Stack.Protected>
         <Stack.Protected guard={auth.status === 'signedOut'}>
           <Stack.Screen name="login" options={{ headerShown: false }} />

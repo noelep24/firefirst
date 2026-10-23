@@ -14,8 +14,8 @@ from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
-from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade
-from .roster import build_roster
+from .models import Assignment, LeaveRequest, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from .roster import build_roster, leave_impact
 from .serializers import (
     AssignmentSerializer,
     LeaveRequestSerializer,
@@ -25,6 +25,8 @@ from .serializers import (
     RotationPatternSerializer,
     ShiftDaySerializer,
     ShiftTradeSerializer,
+    StaffingDaySerializer,
+    StaffingRuleSerializer,
 )
 
 MAX_CALENDAR_DAYS = 400
@@ -47,6 +49,42 @@ class AssignmentViewSet(TenantViewSet):
     serializer_class = AssignmentSerializer
     permission_classes = [IsOfficerOrReadOnly]
     filterset_fields = ["platoon", "station", "position", "user"]
+
+
+class StaffingRuleViewSet(TenantViewSet):
+    queryset = StaffingRule.objects.select_related("station", "certification_type")
+    serializer_class = StaffingRuleSerializer
+    permission_classes = [IsOfficerOrReadOnly]
+
+
+MAX_OUTLOOK_DAYS = 62
+
+
+class StaffingOutlookView(APIView):
+    """``GET /staffing/?start=&end=`` – days in the range whose crew misses a staffing rule."""
+
+    permission_classes = [IsDepartmentMember]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("start", OpenApiTypes.DATE, required=True),
+            OpenApiParameter("end", OpenApiTypes.DATE, required=True),
+        ],
+        responses=StaffingDaySerializer(many=True),
+    )
+    def get(self, request):
+        start = parse_date(request.query_params.get("start"), "start")
+        end = parse_date(request.query_params.get("end"), "end")
+        if end < start or (end - start).days > MAX_OUTLOOK_DAYS:
+            raise ValidationError({"end": f"End must be after start and within {MAX_OUTLOOK_DAYS} days."})
+        days = []
+        day = start
+        while day <= end:
+            roster = build_roster(request.user.department, day)
+            if roster["shortfalls"]:
+                days.append({"date": day, "platoon": roster["platoon"], "shortfalls": roster["shortfalls"]})
+            day += datetime.timedelta(days=1)
+        return Response(days)
 
 
 class RosterView(APIView):
@@ -154,6 +192,15 @@ class LeaveRequestViewSet(TenantViewSet):
     @action(detail=True, methods=["post"], permission_classes=[IsOfficer], serializer_class=ReviewSerializer)
     def deny(self, request, pk=None):
         return self._review(request, LeaveRequest.Status.DENIED)
+
+    @extend_schema(responses=StaffingDaySerializer(many=True))
+    @action(detail=True, methods=["get"], permission_classes=[IsOfficer], pagination_class=None)
+    def impact(self, request, pk=None):
+        """Staffing shortfalls approving this leave would cause, by day."""
+        leave = self.get_object()
+        if (leave.end_date - leave.start_date).days > MAX_OUTLOOK_DAYS:
+            return Response([])
+        return Response(leave_impact(leave))
 
     @extend_schema(request=None)
     @action(detail=True, methods=["post"])

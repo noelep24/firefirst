@@ -866,6 +866,406 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
+  /api/v1/certification-types/:
+    get:
+      operationId: v1_certification_types_list
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCertificationTypeList'
+          description: ''
+    post:
+      operationId: v1_certification_types_create
+      description: ModelViewSet scoped to ``request.user.department``.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificationType'
+          description: ''
+  /api/v1/certification-types/{id}/:
+    get:
+      operationId: v1_certification_types_retrieve
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification type.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificationType'
+          description: ''
+    put:
+      operationId: v1_certification_types_update
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification type.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CertificationTypeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificationType'
+          description: ''
+    patch:
+      operationId: v1_certification_types_partial_update
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification type.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationTypeRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificationType'
+          description: ''
+    delete:
+      operationId: v1_certification_types_destroy
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification type.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/certifications/:
+    get:
+      operationId: v1_certifications_list
+      description: Officers manage everyone's certifications; members see their own.
+      parameters:
+      - in: query
+        name: certification_type
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCertificationList'
+          description: ''
+    post:
+      operationId: v1_certifications_create
+      description: Officers manage everyone's certifications; members see their own.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+          description: ''
+  /api/v1/certifications/{id}/:
+    get:
+      operationId: v1_certifications_retrieve
+      description: Officers manage everyone's certifications; members see their own.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+          description: ''
+    put:
+      operationId: v1_certifications_update
+      description: Officers manage everyone's certifications; members see their own.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CertificationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+          description: ''
+    patch:
+      operationId: v1_certifications_partial_update
+      description: Officers manage everyone's certifications; members see their own.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCertificationRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+          description: ''
+    delete:
+      operationId: v1_certifications_destroy
+      description: Officers manage everyone's certifications; members see their own.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certification.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/certifications/compliance/:
+    get:
+      operationId: v1_certifications_compliance_list
+      description: Members with certifications that are expiring, expired, or required
+        but missing.
+      parameters:
+      - in: query
+        name: certification_type
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Compliance'
+          description: ''
   /api/v1/checklists/:
     get:
       operationId: v1_checklists_list
@@ -2806,6 +3206,83 @@ paths:
               schema:
                 $ref: '#/components/schemas/LeaveRequest'
           description: ''
+  /api/v1/leave-requests/{id}/impact/:
+    get:
+      operationId: v1_leave_requests_impact_list
+      description: Staffing shortfalls approving this leave would cause, by day.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this leave request.
+        required: true
+      - in: query
+        name: leave_type
+        schema:
+          type: string
+          enum:
+          - bereavement
+          - injury
+          - kelly
+          - other
+          - personal
+          - sick
+          - training
+          - vacation
+        description: |-
+          * `vacation` - Vacation
+          * `sick` - Sick
+          * `personal` - Personal
+          * `kelly` - Kelly day
+          * `training` - Training / detail
+          * `bereavement` - Bereavement
+          * `injury` - On-duty injury
+          * `other` - Other
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - approved
+          - cancelled
+          - denied
+          - pending
+        description: |-
+          * `pending` - Pending
+          * `approved` - Approved
+          * `denied` - Denied
+          * `cancelled` - Cancelled
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffingDay'
+          description: ''
   /api/v1/maintenance-schedules/:
     get:
       operationId: v1_maintenance_schedules_list
@@ -3886,6 +4363,214 @@ paths:
               schema:
                 $ref: '#/components/schemas/ShiftTrade'
           description: ''
+  /api/v1/staffing/:
+    get:
+      operationId: v1_staffing_list
+      description: '``GET /staffing/?start=&end=`` – days in the range whose crew
+        misses a staffing rule.'
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+          format: date
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffingDay'
+          description: ''
+  /api/v1/staffing-rules/:
+    get:
+      operationId: v1_staffing_rules_list
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStaffingRuleList'
+          description: ''
+    post:
+      operationId: v1_staffing_rules_create
+      description: ModelViewSet scoped to ``request.user.department``.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRule'
+          description: ''
+  /api/v1/staffing-rules/{id}/:
+    get:
+      operationId: v1_staffing_rules_retrieve
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staffing rule.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRule'
+          description: ''
+    put:
+      operationId: v1_staffing_rules_update
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staffing rule.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffingRuleRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRule'
+          description: ''
+    patch:
+      operationId: v1_staffing_rules_partial_update
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staffing rule.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffingRuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffingRuleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffingRuleRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRule'
+          description: ''
+    delete:
+      operationId: v1_staffing_rules_destroy
+      description: ModelViewSet scoped to ``request.user.department``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this staffing rule.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/stations/:
     get:
       operationId: v1_stations_list
@@ -4760,6 +5445,131 @@ components:
     BlankEnum:
       enum:
       - ''
+    Certification:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+        user_name:
+          type: string
+          readOnly: true
+        certification_type:
+          type: integer
+        type_name:
+          type: string
+          readOnly: true
+        number:
+          type: string
+          title: Certificate number
+          maxLength: 60
+        issued_on:
+          type: string
+          format: date
+          nullable: true
+        expires_on:
+          type: string
+          format: date
+          nullable: true
+          description: Leave blank to use the type's renewal period, or if it doesn't
+            expire
+        status:
+          type: string
+          readOnly: true
+        notes:
+          type: string
+          maxLength: 255
+      required:
+      - certification_type
+      - id
+      - status
+      - type_name
+      - user
+      - user_name
+    CertificationRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        user:
+          type: integer
+        certification_type:
+          type: integer
+        number:
+          type: string
+          title: Certificate number
+          maxLength: 60
+        issued_on:
+          type: string
+          format: date
+          nullable: true
+        expires_on:
+          type: string
+          format: date
+          nullable: true
+          description: Leave blank to use the type's renewal period, or if it doesn't
+            expire
+        notes:
+          type: string
+          maxLength: 255
+      required:
+      - certification_type
+      - user
+    CertificationType:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        code:
+          type: string
+          description: Short label, e.g. EMT-B, FF2
+          maxLength: 20
+        renewal_months:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: Fills in the expiration from the issue date when none is given
+        required_for_all:
+          type: boolean
+          description: Every active member must hold it
+        notes:
+          type: string
+      required:
+      - id
+      - name
+    CertificationTypeRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        code:
+          type: string
+          description: Short label, e.g. EMT-B, FF2
+          maxLength: 20
+        renewal_months:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: Fills in the expiration from the issue date when none is given
+        required_for_all:
+          type: boolean
+          description: Every active member must hold it
+        notes:
+          type: string
+      required:
+      - name
     ChecklistItem:
       type: object
       properties:
@@ -4870,6 +5680,52 @@ components:
       required:
       - items
       - name
+    Compliance:
+      type: object
+      properties:
+        user:
+          type: integer
+        name:
+          type: string
+        problems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceItem'
+          description: Required or held certifications that need attention
+      required:
+      - name
+      - problems
+      - user
+    ComplianceItem:
+      type: object
+      properties:
+        certification_type:
+          type: integer
+        type_name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ComplianceItemStatusEnum'
+        expires_on:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - certification_type
+      - expires_on
+      - status
+      - type_name
+    ComplianceItemStatusEnum:
+      enum:
+      - valid
+      - expiring
+      - expired
+      - missing
+      type: string
+      description: |-
+        * `valid` - valid
+        * `expiring` - expiring
+        * `expired` - expired
+        * `missing` - missing
     Dashboard:
       type: object
       properties:
@@ -4895,6 +5751,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DashboardEvent'
+        certifications_needing_attention:
+          type: integer
+          description: 'Expiring within 60 days or expired: department-wide for officers,
+            your own for members'
+        staffing_shortfall_days:
+          type: array
+          items:
+            type: string
+            format: date
+          description: Days in the next week whose crew misses a staffing rule
         pending_leave_requests:
           type: integer
           description: Officers only
@@ -4903,10 +5769,12 @@ components:
           description: Officers only
       required:
       - apparatus_out_of_service
+      - certifications_needing_attention
       - date
       - maintenance_due
       - open_work_orders
       - platoon_on_duty
+      - staffing_shortfall_days
       - stock_below_par
       - stock_expiring_30_days
       - upcoming_events
@@ -5787,6 +6655,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditEntry'
+    PaginatedCertificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Certification'
+    PaginatedCertificationTypeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificationType'
     PaginatedChecklistTemplateList:
       type: object
       required:
@@ -6017,6 +6931,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ShiftTrade'
+    PaginatedStaffingRuleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffingRule'
     PaginatedStationList:
       type: object
       required:
@@ -6210,6 +7147,54 @@ components:
           nullable: true
         position:
           $ref: '#/components/schemas/PositionEnum'
+    PatchedCertificationRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        user:
+          type: integer
+        certification_type:
+          type: integer
+        number:
+          type: string
+          title: Certificate number
+          maxLength: 60
+        issued_on:
+          type: string
+          format: date
+          nullable: true
+        expires_on:
+          type: string
+          format: date
+          nullable: true
+          description: Leave blank to use the type's renewal period, or if it doesn't
+            expire
+        notes:
+          type: string
+          maxLength: 255
+    PatchedCertificationTypeRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        code:
+          type: string
+          description: Short label, e.g. EMT-B, FF2
+          maxLength: 20
+        renewal_months:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: Fills in the expiration from the issue date when none is given
+        required_for_all:
+          type: boolean
+          description: Every active member must hold it
+        notes:
+          type: string
     PatchedChecklistTemplateRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -6490,6 +7475,36 @@ components:
           description: For tests such as pump or ladder tests
         notes:
           type: string
+    PatchedStaffingRuleRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        station:
+          type: integer
+          nullable: true
+          description: Blank applies to the whole department
+        position:
+          description: |-
+            Blank counts any position
+
+            * `chief` - Battalion / Shift chief
+            * `captain` - Captain
+            * `lieutenant` - Lieutenant
+            * `engineer` - Engineer / Driver-operator
+            * `firefighter` - Firefighter
+            * `paramedic` - Paramedic
+            * `emt` - EMT
+          oneOf:
+          - $ref: '#/components/schemas/PositionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        certification_type:
+          type: integer
+          nullable: true
+          description: Only count members holding this certification on the day
+        minimum:
+          type: integer
+          maximum: 32767
+          minimum: 0
     PatchedStationRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -6751,10 +7766,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RosterPerson'
+        shortfalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shortfall'
       required:
       - date
       - on_leave
       - platoon
+      - shortfalls
       - traded_off
       - working
     RosterPerson:
@@ -7053,6 +8073,114 @@ components:
         * `denied` - Denied
         * `declined` - Declined by covering member
         * `cancelled` - Cancelled
+    Shortfall:
+      type: object
+      properties:
+        rule:
+          type: integer
+        description:
+          type: string
+        station:
+          type: integer
+          nullable: true
+        required:
+          type: integer
+        scheduled:
+          type: integer
+      required:
+      - description
+      - required
+      - rule
+      - scheduled
+      - station
+    StaffingDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        platoon:
+          type: string
+          nullable: true
+        shortfalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shortfall'
+      required:
+      - date
+      - shortfalls
+    StaffingRule:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        station:
+          type: integer
+          nullable: true
+          description: Blank applies to the whole department
+        position:
+          description: |-
+            Blank counts any position
+
+            * `chief` - Battalion / Shift chief
+            * `captain` - Captain
+            * `lieutenant` - Lieutenant
+            * `engineer` - Engineer / Driver-operator
+            * `firefighter` - Firefighter
+            * `paramedic` - Paramedic
+            * `emt` - EMT
+          oneOf:
+          - $ref: '#/components/schemas/PositionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        certification_type:
+          type: integer
+          nullable: true
+          description: Only count members holding this certification on the day
+        minimum:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        description:
+          type: string
+          readOnly: true
+      required:
+      - description
+      - id
+      - minimum
+    StaffingRuleRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        station:
+          type: integer
+          nullable: true
+          description: Blank applies to the whole department
+        position:
+          description: |-
+            Blank counts any position
+
+            * `chief` - Battalion / Shift chief
+            * `captain` - Captain
+            * `lieutenant` - Lieutenant
+            * `engineer` - Engineer / Driver-operator
+            * `firefighter` - Firefighter
+            * `paramedic` - Paramedic
+            * `emt` - EMT
+          oneOf:
+          - $ref: '#/components/schemas/PositionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        certification_type:
+          type: integer
+          nullable: true
+          description: Only count members holding this certification on the day
+        minimum:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - minimum
     Station:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

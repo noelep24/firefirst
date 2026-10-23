@@ -152,3 +152,44 @@ class ShiftTrade(TenantModel):
 
     def __str__(self):
         return f"{self.covering_member} covering {self.requester} on {self.shift_date}"
+
+
+class StaffingRule(TenantModel):
+    """A minimum for each shift, e.g. "Station 1: 4 on duty", "Station 1: 1 paramedic", "Department: 1 chief"."""
+
+    station = models.ForeignKey(
+        Station,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="staffing_rules",
+        help_text="Blank applies to the whole department",
+    )
+    position = models.CharField(
+        max_length=20, choices=Assignment.Position.choices, blank=True, help_text="Blank counts any position"
+    )
+    certification_type = models.ForeignKey(
+        "certifications.CertificationType",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="+",
+        help_text="Only count members holding this certification on the day",
+    )
+    minimum = models.PositiveSmallIntegerField()
+
+    class Meta:
+        ordering = ["station__number", "position"]
+
+    def __str__(self):
+        where = str(self.station) if self.station else "Department"
+        what = " ".join(
+            filter(
+                None,
+                [
+                    self.get_position_display() if self.position else "",
+                    str(self.certification_type) if self.certification_type else "",
+                ],
+            )
+        )
+        return f"{where}: at least {self.minimum} {what or 'on duty'}".strip()
