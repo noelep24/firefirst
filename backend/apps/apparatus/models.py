@@ -110,8 +110,8 @@ class Inspection(TenantModel):
     """A completed rig check."""
 
     apparatus = models.ForeignKey(Apparatus, on_delete=models.CASCADE, related_name="inspections")
-    template = models.ForeignKey(ChecklistTemplate, on_delete=models.PROTECT, related_name="inspections")
-    performed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="inspections")
+    template = models.ForeignKey(ChecklistTemplate, on_delete=models.RESTRICT, related_name="inspections")
+    performed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT, related_name="inspections")
     performed_at = models.DateTimeField(default=timezone.now)
     mileage = models.PositiveIntegerField(null=True, blank=True)
     engine_hours = models.DecimalField(max_digits=9, decimal_places=1, null=True, blank=True)
@@ -135,7 +135,7 @@ class InspectionResult(models.Model):
         NOT_APPLICABLE = "na", "N/A"
 
     inspection = models.ForeignKey(Inspection, on_delete=models.CASCADE, related_name="results")
-    checklist_item = models.ForeignKey(ChecklistItem, on_delete=models.PROTECT, related_name="+")
+    checklist_item = models.ForeignKey(ChecklistItem, on_delete=models.RESTRICT, related_name="+")
     status = models.CharField(max_length=12, choices=Status.choices)
     note = models.CharField(max_length=500, blank=True)
 

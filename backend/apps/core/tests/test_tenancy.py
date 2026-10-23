@@ -93,3 +93,37 @@ def test_deleting_a_user_deactivates_them(client_for, admin_user, member):
     assert client_for(admin_user).delete(f"/api/v1/users/{member.id}/").status_code == 204
     member.refresh_from_db()
     assert member.is_active is False
+
+
+def test_deleting_a_department_removes_all_its_data(db):
+    """Offboarding a customer: everything goes, even rows other rows depend on (RESTRICT, not PROTECT)."""
+    from django.core.management import call_command
+
+    from apps.apparatus.models import ChecklistTemplate, Inspection
+    from apps.core.models import Department
+    from apps.scheduling.models import Platoon
+
+    call_command("seed_demo", slug="gone", stdout=open("/dev/null", "w"))
+    dept = Department.objects.get(slug="gone")
+    template = ChecklistTemplate.objects.get(department=dept)
+    Inspection.objects.create(
+        department=dept,
+        apparatus=Apparatus.objects.filter(department=dept, apparatus_type="engine").first(),
+        template=template,
+        performed_by=User.objects.filter(department=dept).first(),
+    )
+    dept.delete()
+    assert not User.objects.filter(username__startswith="gone-").exists()
+    assert not Platoon.objects.exists()
+    assert not Inspection.objects.exists()
+
+
+def test_platoon_with_members_cannot_be_deleted_on_its_own(department, make_user):
+    from django.db.models import RestrictedError
+
+    from apps.scheduling.models import Assignment, Platoon
+
+    platoon = Platoon.objects.create(department=department, code="A")
+    Assignment.objects.create(department=department, user=make_user("ff9"), platoon=platoon)
+    with pytest.raises(RestrictedError):
+        platoon.delete()

@@ -33,5 +33,8 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: ruff check . && ruff format --check .
       - run: python manage.py makemigrations --check --dry-run
-      - run: python manage.py spectacular --fail-on-warn --file /tmp/schema.yml
+      - name: OpenAPI schema is up to date (the mobile app's client is generated from it)
+        run: |
+          python manage.py spectacular --fail-on-warn --file /tmp/schema.yml
+          diff -u openapi.yml /tmp/schema.yml
       - run: pytest

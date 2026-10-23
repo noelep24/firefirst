@@ -3,7 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import F
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -37,6 +38,11 @@ class StorageLocationViewSet(TenantViewSet):
     filterset_fields = ["station", "apparatus"]
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[OpenApiParameter("below_par", OpenApiTypes.BOOL, description="Only stock below its par level")]
+    )
+)
 class StockLevelViewSet(TenantViewSet):
     queryset = StockLevel.objects.select_related("item", "location__station", "location__apparatus")
     serializer_class = StockLevelSerializer
@@ -56,7 +62,11 @@ class StockLevelViewSet(TenantViewSet):
         if quantity:
             stock.adjust(quantity, StockTransaction.Reason.COUNT, self.request.user, "Initial count")
 
-    @action(detail=False, methods=["get"])
+    @extend_schema(
+        parameters=[OpenApiParameter("days", OpenApiTypes.INT, description="Window in days (default 30)")],
+        responses=StockLevelSerializer(many=True),
+    )
+    @action(detail=False, methods=["get"], pagination_class=None)
     def expiring(self, request):
         """Stock expiring within ``?days=`` (default 30), including already expired."""
         days = int(request.query_params.get("days", 30))

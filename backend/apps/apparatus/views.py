@@ -1,4 +1,6 @@
 from django.db.models import Count, Q
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -25,7 +27,8 @@ class ApparatusViewSet(TenantViewSet):
     filterset_fields = ["station", "status", "apparatus_type"]
     search_fields = ["unit_number", "vin", "make", "model"]
 
-    @action(detail=True, methods=["get"])
+    @extend_schema(responses=ChecklistTemplateSerializer(many=True))
+    @action(detail=True, methods=["get"], pagination_class=None)
     def checklists(self, request, pk=None):
         """Active checklists that can be used for this apparatus."""
         apparatus = self.get_object()
@@ -60,6 +63,9 @@ class InspectionViewSet(TenantViewSet):
         serializer.save(department=self.request.user.department, performed_by=self.request.user)
 
 
+@extend_schema_view(
+    list=extend_schema(parameters=[OpenApiParameter("open", OpenApiTypes.BOOL, description="Only open work orders")])
+)
 class WorkOrderViewSet(TenantViewSet):
     """Any member can report a problem; only officers can delete."""
 
@@ -96,7 +102,11 @@ class MaintenanceScheduleViewSet(TenantViewSet):
     permission_classes = [IsOfficerOrReadOnly]
     filterset_fields = ["apparatus"]
 
-    @action(detail=False, methods=["get"])
+    @extend_schema(
+        parameters=[OpenApiParameter("days", OpenApiTypes.INT, description="Lead time in days (default 14)")],
+        responses=MaintenanceScheduleSerializer(many=True),
+    )
+    @action(detail=False, methods=["get"], pagination_class=None)
     def due(self, request):
         """Schedules that are due now, or within ``?days=`` (default 14)."""
         days = int(request.query_params.get("days", 14))

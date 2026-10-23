@@ -1,5 +1,6 @@
 from django.db.models import Sum
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -13,6 +14,14 @@ from .models import Attendance, Event
 from .serializers import AttendanceMarkSerializer, EventSerializer, RsvpSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter("start", OpenApiTypes.DATE, description="Overlapping on or after this date"),
+            OpenApiParameter("end", OpenApiTypes.DATE, description="Overlapping on or before this date"),
+        ]
+    )
+)
 class EventViewSet(TenantViewSet):
     """``?start=&end=`` (YYYY-MM-DD) returns events overlapping that range."""
 
@@ -73,7 +82,7 @@ class EventViewSet(TenantViewSet):
             many=True,
         )
     )
-    @action(detail=False, methods=["get"], url_path="training-hours")
+    @action(detail=False, methods=["get"], url_path="training-hours", pagination_class=None)
     def training_hours(self, request):
         """Training hours per member from attended events, optionally within ``?start=&end=``."""
         attendance = Attendance.objects.filter(

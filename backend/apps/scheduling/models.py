@@ -73,7 +73,7 @@ class Assignment(TenantModel):
         EMT = "emt", "EMT"
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="assignment")
-    platoon = models.ForeignKey(Platoon, on_delete=models.PROTECT, related_name="assignments")
+    platoon = models.ForeignKey(Platoon, on_delete=models.RESTRICT, related_name="assignments")
     station = models.ForeignKey(Station, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
     position = models.CharField(max_length=20, choices=Position.choices, default=Position.FIREFIGHTER)
 

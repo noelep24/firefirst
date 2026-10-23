@@ -3,7 +3,7 @@ import datetime
 from django.db.models import Q
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -96,6 +96,14 @@ class ShiftCalendarView(APIView):
         return Response(days)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter("start", OpenApiTypes.DATE, description="Overlapping on or after this date"),
+            OpenApiParameter("end", OpenApiTypes.DATE, description="Overlapping on or before this date"),
+        ]
+    )
+)
 class LeaveRequestViewSet(TenantViewSet):
     """Members see and file their own leave; officers see everyone's and approve or deny."""
 

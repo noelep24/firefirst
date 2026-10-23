@@ -1,0 +1,27 @@
+name: mobile
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - name: API types match the backend's OpenAPI schema
+        run: |
+          npm run api:types
+          git diff --exit-code src/api/schema.d.ts
+      - run: npm run typecheck
+      - run: npm run lint

@@ -4,9 +4,12 @@ Station administration for fire departments: inventory, apparatus maintenance,
 shift scheduling and the events calendar, all in one place. It is built to
 replace ESO's station-side modules.
 
-This repository currently holds the **backend API** (Django + Postgres). The
-web app and the native mobile apps are built on top of it (see the
-[roadmap](#roadmap)).
+This repository holds:
+
+- **`backend/`**: the API (Django + Postgres), shared by every client
+- **`mobile/`**: the crew app for iOS and Android (Expo / React Native). See [mobile/README.md](mobile/README.md)
+
+The officer web app is next on the [roadmap](#roadmap).
 
 ## What's in v0.1
 
@@ -117,8 +120,8 @@ ruff check . && ruff format --check .
 
 **Next: clients**
 - [ ] Web app for officers and admins (React + TypeScript, typed client generated from the OpenAPI schema)
-- [ ] Mobile app (React Native / Expo for iOS and Android, sharing the generated client with the web app): rig checks, stock usage, roster, leave and trades, calendar
-- [ ] Barcode scanning for inventory, plus offline rig checks that sync when back in coverage
+- [x] Mobile app (Expo for iOS and Android): rig checks, work orders, stock usage with barcode scanning, roster, leave and trades, calendar
+- [ ] Mobile: offline rig checks and stock changes that sync when back in coverage, photos, date picker, store builds (EAS)
 - [ ] Push notifications (trade requests, approvals, work orders, maintenance due)
 
 **Replacing ESO**
