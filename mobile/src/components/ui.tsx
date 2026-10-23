@@ -12,7 +12,6 @@ import {
   Text,
   TextInput,
   type TextInputProps,
-  type TextProps,
   View,
   type ViewProps,
 } from 'react-native';
@@ -21,6 +20,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaxContentWidth, Spacing, type ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { OutboxBanner } from '@/offline/outbox-banner';
+
+import { Label } from './label';
+
+export { Label };
 
 type ScreenProps = {
   title?: string;
@@ -57,16 +60,6 @@ export function Screen({ title, subtitle, children, refreshing = false, onRefres
       ) : null}
     </SafeAreaView>
   );
-}
-
-type LabelProps = TextProps & {
-  type?: 'title' | 'heading' | 'body' | 'small' | 'smallBold' | 'big';
-  color?: ThemeColor;
-};
-
-export function Label({ type = 'body', color = 'text', style, ...rest }: LabelProps) {
-  const theme = useTheme();
-  return <Text style={[{ color: theme[color] }, textStyles[type], style]} {...rest} />;
 }
 
 export function Card({ style, onPress, children, ...rest }: ViewProps & { onPress?: () => void }) {
@@ -273,15 +266,6 @@ export function QueryState<T>({
   if (query.error) return <ErrorBox error={query.error} onRetry={() => query.refetch()} />;
   return <>{children(query.data as T)}</>;
 }
-
-const textStyles = StyleSheet.create({
-  title: { fontSize: 32, lineHeight: 38, fontWeight: '700' },
-  heading: { fontSize: 20, lineHeight: 26, fontWeight: '700' },
-  body: { fontSize: 16, lineHeight: 22 },
-  small: { fontSize: 14, lineHeight: 19 },
-  smallBold: { fontSize: 14, lineHeight: 19, fontWeight: '700' },
-  big: { fontSize: 30, lineHeight: 34, fontWeight: '700' },
-});
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
