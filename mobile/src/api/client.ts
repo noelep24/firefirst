@@ -7,7 +7,15 @@ import type { components, paths } from './schema';
 
 export type Schemas = components['schemas'];
 
-const KEYS = { server: 'ff.server', access: 'ff.access', refresh: 'ff.refresh' } as const;
+const KEYS = {
+  server: 'ff.server',
+  access: 'ff.access',
+  refresh: 'ff.refresh',
+  defaultServer: 'ff.defaultServer',
+} as const;
+
+/** How long sign-in waits for the server. Firewalls often drop requests silently rather than refuse them. */
+const SIGN_IN_TIMEOUT_MS = 15_000;
 
 /** Where the API lives when nothing else is configured. Android emulators reach the host at 10.0.2.2. */
 export const DEFAULT_SERVER =
@@ -28,11 +36,22 @@ export function currentServer() {
 
 /** Load the saved server and tokens. Returns true when there is a session to resume. */
 export async function restoreSession(): Promise<boolean> {
-  const [server, access, refresh] = await Promise.all([
+  const [server, access, refresh, savedDefault] = await Promise.all([
     storage.get(KEYS.server),
     storage.get(KEYS.access),
     storage.get(KEYS.refresh),
+    storage.get(KEYS.defaultServer),
   ]);
+  if (savedDefault !== DEFAULT_SERVER) {
+    await storage.set(KEYS.defaultServer, DEFAULT_SERVER);
+    if (server !== null && server !== DEFAULT_SERVER) {
+      // This build (or trial run) points at a different server than the one saved, e.g. the
+      // computer running the trial got a new Wi-Fi address. Start over on the new one.
+      await Promise.all([storage.set(KEYS.server, null), saveTokens(null, null)]);
+      session.server = DEFAULT_SERVER;
+      return false;
+    }
+  }
   session.server = server ?? DEFAULT_SERVER;
   session.access = access;
   session.refresh = refresh;
@@ -47,9 +66,23 @@ async function saveTokens(access: string | null, refresh: string | null) {
 
 export async function signIn(server: string, username: string, password: string) {
   const base = normalizeServer(server);
-  const { data, error, response } = await createClient<paths>({ baseUrl: base }).POST('/api/v1/auth/token/', {
-    body: { username, password },
-  });
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), SIGN_IN_TIMEOUT_MS);
+  let result;
+  try {
+    result = await createClient<paths>({ baseUrl: base }).POST('/api/v1/auth/token/', {
+      body: { username, password },
+      signal: abort.signal,
+    });
+  } catch {
+    throw new ApiError(
+      `Can't reach ${base}. Check the server address below, and that this phone is on the same network as the server.`,
+      0,
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+  const { data, error, response } = result;
   if (!data) {
     throw response.status === 401
       ? new ApiError('Wrong username or password.', 401)

@@ -64,7 +64,7 @@ demo department.
 | Problem | Fix |
 | --- | --- |
 | The phone says it can't connect to the development server | Phone and computer must be on the same Wi-Fi. Turn off VPNs. Allow Node through the firewall (Windows: Windows Security → Firewall → Allow an app). |
-| The app opens but sign-in says it can't reach the server | Allow Python through the firewall. Check that "Server" on the sign-in screen shows the address printed in the terminal. |
+| The app opens but sign-in says it can't reach the server | Allow Python through the firewall (Mac: System Settings → Network → Firewall; Windows: Windows Security → Firewall → Allow an app). Check that "Server" on the sign-in screen shows the address printed in the terminal; tap it to change it. |
 | The detected address is wrong (several network adapters, VPN) | Find your Wi-Fi IP (Mac: System Settings → Wi-Fi → Details; Windows: `ipconfig`) and run `python3 trial.py --host 192.168.x.x` |
 | Expo Go says the project needs a newer or older SDK | Update Expo Go from the app store. |
 | Port 8000 is taken | `python3 trial.py --port 8001` |
