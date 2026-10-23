@@ -28,3 +28,8 @@ class IsDepartmentAdminOrReadOnly(IsDepartmentMember):
 class IsOfficer(IsDepartmentMember):
     def has_permission(self, request, view):
         return super().has_permission(request, view) and request.user.is_officer
+
+
+class IsDepartmentAdmin(IsDepartmentMember):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and request.user.is_department_admin

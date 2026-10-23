@@ -6,9 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
-from apps.scheduling.views import parse_date
 
 from .models import Attendance, Event
 from .serializers import AttendanceMarkSerializer, EventSerializer, RsvpSerializer

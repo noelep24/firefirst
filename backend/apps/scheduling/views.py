@@ -10,6 +10,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
@@ -27,13 +28,6 @@ from .serializers import (
 )
 
 MAX_CALENDAR_DAYS = 400
-
-
-def parse_date(value, name):
-    try:
-        return datetime.date.fromisoformat(value)
-    except (TypeError, ValueError):
-        raise ValidationError({name: "Use YYYY-MM-DD."}) from None
 
 
 class PlatoonViewSet(TenantViewSet):

@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.apparatus import views as apparatus
+from apps.audit.views import AuditEntryViewSet
 from apps.core import views as core
 from apps.core.dashboard import DashboardView
 from apps.events import views as events
@@ -34,6 +35,7 @@ router.register("leave-requests", scheduling.LeaveRequestViewSet)
 router.register("shift-trades", scheduling.ShiftTradeViewSet)
 
 router.register("events", events.EventViewSet)
+router.register("audit-log", AuditEntryViewSet)
 
 api_v1 = [
     path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

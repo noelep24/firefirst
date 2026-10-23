@@ -119,6 +119,40 @@ export interface paths {
         patch: operations["v1_assignments_partial_update"];
         trace?: never;
     };
+    "/api/v1/audit-log/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Who changed what. Department admins only. */
+        get: operations["v1_audit_log_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-log/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Who changed what. Department admins only. */
+        get: operations["v1_audit_log_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/token/": {
         parameters: {
             query?: never;
@@ -1082,6 +1116,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description * `create` - Created
+         *     * `update` - Updated
+         *     * `delete` - Deleted
+         * @enum {string}
+         */
+        ActionEnum: "create" | "update" | "delete";
         /** @description Restricts every related-field choice to the requesting user's department. */
         Apparatus: {
             readonly id: number;
@@ -1179,6 +1220,19 @@ export interface components {
          * @enum {string}
          */
         AttendanceStatusEnum: "invited" | "going" | "declined" | "attended" | "absent";
+        AuditEntry: {
+            readonly id: number;
+            /** Format: date-time */
+            readonly created_at: string;
+            actor?: number | null;
+            readonly actor_name: string;
+            action: components["schemas"]["ActionEnum"];
+            /** @description app_label.ModelName */
+            model: string;
+            object_id: string;
+            object_repr: string;
+            changes?: unknown;
+        };
         /** @enum {unknown} */
         BlankEnum: "";
         ChecklistItem: {
@@ -1565,6 +1619,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Assignment"][];
+        };
+        PaginatedAuditEntryList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["AuditEntry"][];
         };
         PaginatedChecklistTemplateList: {
             /** @example 123 */
@@ -2839,6 +2908,69 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Assignment"];
+                };
+            };
+        };
+    };
+    v1_audit_log_list: {
+        parameters: {
+            query?: {
+                /**
+                 * @description * `create` - Created
+                 *     * `update` - Updated
+                 *     * `delete` - Deleted
+                 */
+                action?: "create" | "delete" | "update";
+                actor?: number;
+                /** @description On or before this date */
+                end?: string;
+                model?: string;
+                object_id?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /** @description On or after this date */
+                start?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAuditEntryList"];
+                };
+            };
+        };
+    };
+    v1_audit_log_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this audit entry. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntry"];
                 };
             };
         };

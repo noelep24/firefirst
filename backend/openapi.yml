@@ -664,6 +664,106 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/audit-log/:
+    get:
+      operationId: v1_audit_log_list
+      description: Who changed what. Department admins only.
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - update
+        description: |-
+          * `create` - Created
+          * `update` - Updated
+          * `delete` - Deleted
+      - in: query
+        name: actor
+        schema:
+          type: integer
+      - in: query
+        name: end
+        schema:
+          type: string
+          format: date
+        description: On or before this date
+      - in: query
+        name: model
+        schema:
+          type: string
+      - in: query
+        name: object_id
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: start
+        schema:
+          type: string
+          format: date
+        description: On or after this date
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditEntryList'
+          description: ''
+  /api/v1/audit-log/{id}/:
+    get:
+      operationId: v1_audit_log_retrieve
+      description: Who changed what. Department admins only.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this audit entry.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEntry'
+          description: ''
   /api/v1/auth/token/:
     post:
       operationId: v1_auth_token_create
@@ -4262,6 +4362,16 @@ paths:
           description: No response body
 components:
   schemas:
+    ActionEnum:
+      enum:
+      - create
+      - update
+      - delete
+      type: string
+      description: |-
+        * `create` - Created
+        * `update` - Updated
+        * `delete` - Deleted
     Apparatus:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -4489,6 +4599,43 @@ components:
         * `declined` - Declined
         * `attended` - Attended
         * `absent` - Absent
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor:
+          type: integer
+          nullable: true
+        actor_name:
+          type: string
+          readOnly: true
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        model:
+          type: string
+          description: app_label.ModelName
+          maxLength: 60
+        object_id:
+          type: string
+          maxLength: 40
+        object_repr:
+          type: string
+          maxLength: 200
+        changes: {}
+      required:
+      - action
+      - actor_name
+      - created_at
+      - id
+      - model
+      - object_id
+      - object_repr
     BlankEnum:
       enum:
       - ''
@@ -5371,6 +5518,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Assignment'
+    PaginatedAuditEntryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
     PaginatedChecklistTemplateList:
       type: object
       required:
