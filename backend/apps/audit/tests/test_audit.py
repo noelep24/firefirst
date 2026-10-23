@@ -105,3 +105,13 @@ def test_deleting_a_department_does_not_break_on_logging(department, engine):
     department.delete()
     assert not Department.objects.filter(pk=department.pk).exists()
     assert not AuditEntry.objects.filter(department_id=department.pk).exists()
+
+
+def test_a_new_department_reusing_a_deleted_id_is_audited(db):
+    """SQLite can hand a deleted department's id to a new one; its changes must still be logged."""
+    old = Department.objects.create(name="Old", slug="old")
+    old_id = old.pk
+    old.delete()
+    reused = Department.objects.create(id=old_id, name="New", slug="new")
+    Apparatus.objects.create(department=reused, unit_number="N1", apparatus_type="engine")
+    assert AuditEntry.objects.filter(department=reused, object_repr="N1").exists()

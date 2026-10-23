@@ -120,8 +120,15 @@ def _department_deleting(sender, instance, **kwargs):
     _departments_being_deleted.add(instance.pk)
 
 
+def _department_deleted(sender, instance, **kwargs):
+    # The department row goes last, after everything that depends on it, so the cascade is over.
+    # Forget the id: some databases (SQLite) reuse ids, and a new department must be logged.
+    _departments_being_deleted.discard(instance.pk)
+
+
 def connect():
     pre_delete.connect(_department_deleting, sender=Department, dispatch_uid="audit_department_deleting")
+    post_delete.connect(_department_deleted, sender=Department, dispatch_uid="audit_department_deleted")
     pre_save.connect(_before_save, dispatch_uid="audit_pre_save")
     post_save.connect(_after_save, dispatch_uid="audit_post_save")
     post_delete.connect(_after_delete, dispatch_uid="audit_post_delete")

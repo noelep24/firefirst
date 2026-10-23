@@ -55,10 +55,13 @@ npm install
 npx expo start
 ```
 
-Then press `i` for the iOS simulator or `a` for the Android emulator, or open
-`w` for a browser. The barcode scanner and some native features need a
-[development build](https://docs.expo.dev/develop/development-builds/introduction/)
-(`npx expo run:ios` / `npx expo run:android`) rather than Expo Go.
+Then scan the QR code with Expo Go on a phone, press `i` for the iOS
+simulator or `a` for the Android emulator, or `w` for a browser. Everything,
+barcode scanner included, runs in Expo Go.
+
+**Quickest way onto a phone:** `python3 trial.py` from the repository root
+does all of this (backend, demo data, server address) in one step. See
+[TRIAL.md](../TRIAL.md).
 
 **Server address.** It defaults to `http://localhost:8000`, or
 `http://10.0.2.2:8000` on the Android emulator. To use a phone on your network,

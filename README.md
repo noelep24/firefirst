@@ -70,6 +70,16 @@ you can generate typed clients for the mobile apps from it.
 | Officer | Everything a member can, plus manage apparatus, checklists, inventory catalog, schedules and events; approve leave and trades; record attendance |
 | Admin | Everything an officer can, plus manage stations, users and department settings |
 
+## Try it on your phone
+
+One command on your computer, then scan a QR code with Expo Go:
+
+```bash
+python3 trial.py
+```
+
+Step-by-step instructions: [TRIAL.md](TRIAL.md).
+
 ## Running locally
 
 Requirements: Python 3.12+, and Postgres 16 (or Docker).
