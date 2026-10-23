@@ -39,7 +39,10 @@ function count(value: number, text: string, tone: Tone = 'warning') {
   return value ? { text: `${value} ${text}`, tone } : null;
 }
 
-/** Every area of the officer app, grouped as the sidebar shows them. The home page tiles come from the same list. */
+/**
+ * Every area of the officer app, grouped as the menu shows them. The home page shows the first three groups as
+ * tiles; the Admin group sits behind one Admin tile.
+ */
 export const SECTION_GROUPS: { title: string; sections: Section[] }[] = [
   {
     title: 'Overview',
@@ -119,6 +122,11 @@ export const SECTION_GROUPS: { title: string; sections: Section[] }[] = [
         icon: Users,
         alert: (d) => count(d.certifications_needing_attention, 'certifications due'),
       },
+    ],
+  },
+  {
+    title: 'Admin',
+    sections: [
       {
         to: '/stations',
         label: 'Stations',
@@ -126,11 +134,6 @@ export const SECTION_GROUPS: { title: string; sections: Section[] }[] = [
         icon: Building2,
         adminOnly: true,
       },
-    ],
-  },
-  {
-    title: 'Admin',
-    sections: [
       {
         to: '/import',
         label: 'Import data',
