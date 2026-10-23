@@ -61,6 +61,16 @@ def lan_address():
             return "127.0.0.1"
 
 
+def packages_are_stale(app):
+    """True when an app's packages were never installed, or an update (git pull) changed which it needs."""
+    installed = (
+        app / "node_modules" / ".package-lock.json"
+    )  # npm rewrites this on every install
+    if not installed.exists():
+        return True
+    return (app / "package-lock.json").stat().st_mtime > installed.stat().st_mtime
+
+
 def web_build_is_stale():
     """True when the officer web app has never been built, or its source changed since (e.g. after git pull)."""
     index = WEB / "dist" / "index.html"
@@ -124,14 +134,12 @@ def main():
             str(BACKEND / "requirements.txt"),
         ]
     )
-    if not (MOBILE / "node_modules").exists():
-        say(
-            "Installing the mobile app's packages (first run only, takes a few minutes)…"
-        )
-        run([npm, "ci", "--no-audit", "--no-fund"], cwd=MOBILE)
-    if not (WEB / "node_modules").exists():
-        say("Installing the web app's packages (first run only)…")
-        run([npm, "ci", "--no-audit", "--no-fund"], cwd=WEB)
+    for app, name in ((MOBILE, "mobile app"), (WEB, "web app")):
+        if packages_are_stale(app):
+            say(
+                f"Installing the {name}'s packages (takes a few minutes the first time)…"
+            )
+            run([npm, "ci", "--no-audit", "--no-fund"], cwd=app)
     if web_build_is_stale():
         say("Building the officer web app…")
         run([npm, "run", "build"], cwd=WEB)
