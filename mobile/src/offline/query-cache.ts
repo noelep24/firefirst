@@ -5,6 +5,7 @@ import { focusManager, onlineManager, QueryClient } from '@tanstack/react-query'
 import { AppState, Platform } from 'react-native';
 
 import { ApiError } from '@/api/client';
+import { SCHEMA_VERSION } from '@/api/schema-version';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -26,7 +27,8 @@ export const queryClient = new QueryClient({
 
 /** Saves the query cache on the phone so screens open with the last-known data when there's no signal. */
 export const persister = createAsyncStoragePersister({ storage: AsyncStorage, key: 'ff.query-cache.v1' });
-export const persistOptions = { persister, maxAge: DAY, buster: 'v1' };
+// Saved data is only reused by an app built against the same API: when the API changes, it's dropped and refetched.
+export const persistOptions = { persister, maxAge: DAY, buster: SCHEMA_VERSION };
 
 export async function clearCache() {
   queryClient.clear();
