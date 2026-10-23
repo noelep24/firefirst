@@ -19,3 +19,11 @@ export function Brand({ large }: { large?: boolean }) {
     </span>
   );
 }
+
+/** The department's own patch or logo, set in Department settings; the Maltese cross until one is uploaded. */
+export function DepartmentEmblem({ logo, name, size }: { logo?: string | null; name?: string; size: number }) {
+  if (logo) {
+    return <img src={logo} alt={name ? `${name} logo` : ''} width={size} height={size} className="department-emblem" />;
+  }
+  return <MalteseCross size={size} />;
+}

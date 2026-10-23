@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CalendarPlus } from 'lucide-react';
 import { useState } from 'react';
 
 import { http, type Schemas } from '@/api/http';
@@ -11,7 +12,8 @@ export function CalendarFeedButton() {
   return (
     <>
       <Button small variant="ghost" onClick={() => setOpen(true)}>
-        Add shifts to your calendar
+        <CalendarPlus size={16} aria-hidden="true" />
+        Calendar feed
       </Button>
       {open ? <CalendarFeedModal onClose={() => setOpen(false)} /> : null}
     </>

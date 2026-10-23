@@ -11,6 +11,8 @@ class Department(models.Model):
     neris_id = models.CharField(
         "NERIS ID", max_length=10, blank=True, help_text="The department's NERIS ID, e.g. FD12345678"
     )
+    # A small image kept in the database as a data URL, so it needs no file storage and moves with the department.
+    logo = models.TextField(blank=True, help_text="The department's patch or logo, as a data: URL")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

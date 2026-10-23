@@ -15,6 +15,7 @@ import { Loading } from '@/components/ui';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 
+const Home = lazy(() => import('@/pages/Home'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ApparatusList = lazy(() => import('@/pages/ApparatusList'));
 const ApparatusDetail = lazy(() => import('@/pages/ApparatusDetail'));
@@ -54,7 +55,8 @@ function App() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Home />} />
+          <Route path="today" element={<Dashboard />} />
           <Route path="incidents" element={<Incidents />} />
           <Route path="incidents/:id" element={<IncidentDetail />} />
           <Route path="apparatus" element={<ApparatusList />} />

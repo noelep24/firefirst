@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ImageUp, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { http, type Schemas } from '@/api/http';
 import { useAuth } from '@/auth';
+import { DepartmentEmblem } from '@/components/brand';
 import { Button, Card, ErrorBox, PageHeader, QueryState } from '@/components/ui';
+import { shrinkImage } from '@/lib/image';
 
 const timezones = [
   'America/New_York',
@@ -35,10 +38,13 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
   const [name, setName] = useState(department.name);
   const [timezone, setTimezone] = useState(department.timezone ?? 'America/Chicago');
   const [nerisId, setNerisId] = useState(department.neris_id ?? '');
+  const [logo, setLogo] = useState(department.logo ?? '');
+  const [logoError, setLogoError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   const save = useMutation({
-    mutationFn: () => http.patch<Schemas['Department']>('/api/v1/department/', { name, timezone, neris_id: nerisId }),
+    mutationFn: () =>
+      http.patch<Schemas['Department']>('/api/v1/department/', { name, timezone, neris_id: nerisId, logo }),
     onSuccess: async () => {
       setSaved(true);
       queryClient.invalidateQueries();
@@ -48,10 +54,9 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
 
   const zones = timezones.includes(timezone) ? timezones : [timezone, ...timezones];
   return (
-    <Card>
+    <Card className="card-narrow">
       <form
         className="stack"
-        style={{ maxWidth: 520 }}
         onSubmit={(e) => {
           e.preventDefault();
           setSaved(false);
@@ -60,6 +65,47 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
         <div className="field">
           <label htmlFor="dept-name">Department name</label>
           <input id="dept-name" value={name} onChange={(e) => setName(e.target.value)} required />
+        </div>
+        <div className="field">
+          <span className="field-label">Patch or logo</span>
+          <div className="logo-picker">
+            <DepartmentEmblem logo={logo} name={name} size={96} />
+            <div className="stack-sm">
+              <div className="row">
+                <label className="btn btn-secondary btn-sm">
+                  <ImageUp size={16} aria-hidden="true" />
+                  {logo ? 'Replace' : 'Upload'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="visually-hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = '';
+                      if (!file) return;
+                      setLogoError(null);
+                      setSaved(false);
+                      try {
+                        setLogo(await shrinkImage(file));
+                      } catch {
+                        setLogoError("That file couldn't be opened as an image.");
+                      }
+                    }}
+                  />
+                </label>
+                {logo ? (
+                  <Button small variant="ghost" onClick={() => setLogo('')}>
+                    <Trash2 size={16} aria-hidden="true" />
+                    Remove
+                  </Button>
+                ) : null}
+              </div>
+              <span className="field-help">
+                Shown on the home page and in the menu. A square image with a transparent background looks best.
+              </span>
+              {logoError ? <span className="field-error">{logoError}</span> : null}
+            </div>
+          </div>
         </div>
         <div className="field">
           <label htmlFor="dept-tz">Time zone</label>
