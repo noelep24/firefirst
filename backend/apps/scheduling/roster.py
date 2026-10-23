@@ -4,7 +4,7 @@ import datetime
 
 from django.db import models
 
-from apps.apparatus.models import Apparatus
+from apps.apparatus.models import Apparatus, ApparatusMove
 from apps.certifications.models import Certification
 from apps.core.models import Station
 
@@ -33,6 +33,7 @@ def build_roster(department, date, assume_on_leave=frozenset()):
         )
     }
     scheduled = {uid for uid, a in assignments.items() if a.platoon.code == code}
+    seats = Seats(department, date)
 
     on_leave = set(
         LeaveRequest.objects.filter(
@@ -56,11 +57,11 @@ def build_roster(department, date, assume_on_leave=frozenset()):
         trade = next((t for t in trades if t.requester_id == uid), None)
         a = assignments[uid]
         if trade:
-            traded_off.append(_person(a.user, a))
+            traded_off.append(_person(a.user, a, seats))
             # The covering member rides the requester's seat.
-            working.append({**_person(trade.covering_member, a), "covering_for": a.user_id})
+            working.append({**_person(trade.covering_member, a, seats), "covering_for": a.user_id})
         else:
-            working.append(_person(a.user, a))
+            working.append(_person(a.user, a, seats))
 
     return {
         "date": date,
@@ -68,7 +69,7 @@ def build_roster(department, date, assume_on_leave=frozenset()):
         "shift_start": pattern.shift_start,
         "shift_hours": pattern.shift_hours,
         "working": working,
-        "on_leave": [_person(assignments[uid].user, assignments[uid]) for uid in sorted(scheduled & on_leave)],
+        "on_leave": [_person(assignments[uid].user, assignments[uid], seats) for uid in sorted(scheduled & on_leave)],
         "traded_off": traded_off,
         "shortfalls": shortfalls(department, date, working),
     }
@@ -87,14 +88,18 @@ def station_board(user, date, station=None):
         preferred = (working and working["station"]) or (assignment and assignment.station_id) or user.home_station_id
         station = next((s for s in stations if s.id == preferred), stations[0] if stations else None)
 
-    rigs = list(Apparatus.objects.filter(department=department, station=station)) if station else []
-    rig_ids = {rig.id for rig in rigs}
     here = station.id if station else None
+    moves = ApparatusMove.active_on(department, date)
+    fleet = list(Apparatus.objects.filter(department=department).select_related("station"))
+    # Rigs here today: based here and not away, or visiting on a temporary move.
+    rigs = [r for r in fleet if here and (moves[r.id].station_id if r.id in moves else r.station_id) == here]
+    away = [r for r in fleet if r.station_id == here and r.id in moves and moves[r.id].station_id != here]
+    rig_ids = {rig.id for rig in rigs}
 
     return {
         "date": date,
         "platoon": roster["platoon"],
-        "me": _board_member(user, assignment, working, roster),
+        "me": _board_member(user, assignment, working, roster, Seats(department, date, moves)),
         "stations": [_board_station(s) for s in stations],
         "station": _board_station(station) if station else None,
         "apparatus": [
@@ -104,8 +109,18 @@ def station_board(user, date, station=None):
                 "apparatus_type": rig.apparatus_type,
                 "status": rig.status,
                 "crew": [p for p in roster["working"] if p["apparatus"] == rig.id],
+                "visiting": _visit(moves[rig.id]) if rig.id in moves else None,
             }
             for rig in rigs
+        ],
+        "away": [
+            {
+                "id": rig.id,
+                "unit_number": rig.unit_number,
+                "station_number": moves[rig.id].station.number,
+                "until": moves[rig.id].ends_on,
+            }
+            for rig in away
         ],
         "unassigned": [p for p in roster["working"] if p["station"] == here and p["apparatus"] not in rig_ids],
         "on_leave": [p for p in roster["on_leave"] if p["station"] == here],
@@ -114,13 +129,23 @@ def station_board(user, date, station=None):
     }
 
 
+def _visit(move):
+    home = move.apparatus.station
+    return {
+        "home_station_number": home.number if home else None,
+        "until": move.ends_on,
+        "covering_for_unit": move.covering_for.unit_number if move.covering_for else None,
+        "reason": move.reason,
+    }
+
+
 def _board_station(station):
     return {"id": station.id, "number": station.number, "name": station.name}
 
 
-def _board_member(user, assignment, working, roster):
+def _board_member(user, assignment, working, roster, seats):
     # Covering a trade puts the member in the requester's seat for the day.
-    seat = working or (_person(user, assignment) if assignment else None)
+    seat = working or (_person(user, assignment, seats) if assignment else None)
     if working and working.get("covering_for"):
         status = "covering"
         covered = Assignment.objects.select_related("user").get(user_id=working["covering_for"]).user
@@ -202,16 +227,43 @@ def leave_impact(leave):
     return days
 
 
-def _person(user, assignment):
+class Seats:
+    """Where an assignment actually rides on a date, after rig moves.
+
+    A rig covering for another (a reserve engine while the frontline one is in the shop) carries the
+    covered rig's crew, at the covering rig's station. A rig on a temporary move takes its crew along
+    if the move says so; otherwise they stay at their station without a rig.
+    """
+
+    def __init__(self, department, date, moves=None):
+        self.moves = ApparatusMove.active_on(department, date) if moves is None else moves
+        self.covering = {m.covering_for_id: m for m in self.moves.values() if m.covering_for_id}
+
+    def of(self, assignment):
+        station, rig = assignment.station, assignment.apparatus
+        if rig is not None and rig.id in self.covering:
+            move = self.covering[rig.id]
+            station, rig = move.station, move.apparatus
+        elif rig is not None and rig.id in self.moves:
+            move = self.moves[rig.id]
+            if move.crew_moves:
+                station = move.station
+            else:
+                rig = None
+        return station, rig
+
+
+def _person(user, assignment, seats=None):
+    station, rig = seats.of(assignment) if seats else (assignment.station, assignment.apparatus)
     return {
         "user": user.id,
         "name": str(user),
-        "station": assignment.station_id,
-        "station_number": assignment.station.number if assignment.station else None,
+        "station": station.id if station else None,
+        "station_number": station.number if station else None,
         "position": assignment.position,
         "rank": user.rank,
-        "apparatus": assignment.apparatus_id,
-        "apparatus_unit": assignment.apparatus.unit_number if assignment.apparatus else None,
+        "apparatus": rig.id if rig else None,
+        "apparatus_unit": rig.unit_number if rig else None,
     }
 
 

@@ -1,10 +1,14 @@
 from django.db import transaction
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from apps.core.tenancy import TenantSerializer
+from apps.core.models import Station
+from apps.core.tenancy import TenantScopedFieldsMixin, TenantSerializer
 
 from .models import (
     Apparatus,
+    ApparatusMove,
     ChecklistItem,
     ChecklistTemplate,
     Inspection,
@@ -15,9 +19,72 @@ from .models import (
 )
 
 
+class ApparatusMoveSerializer(serializers.ModelSerializer):
+    station_name = serializers.StringRelatedField(source="station", read_only=True)
+    covering_for_unit = serializers.CharField(source="covering_for.unit_number", read_only=True, default=None)
+
+    class Meta:
+        model = ApparatusMove
+        fields = [
+            "id",
+            "station",
+            "station_name",
+            "starts_on",
+            "ends_on",
+            "covering_for",
+            "covering_for_unit",
+            "crew_moves",
+            "reason",
+        ]
+
+
+class MoveRequestSerializer(TenantScopedFieldsMixin, serializers.Serializer):
+    station = serializers.PrimaryKeyRelatedField(queryset=Station.objects.all())
+    temporary = serializers.BooleanField(help_text="Temporary moves leave the home station alone and end on their own")
+    until = serializers.DateField(
+        required=False, allow_null=True, help_text="Last day away (temporary only); blank until returned"
+    )
+    crew_moves = serializers.BooleanField(default=False, help_text="The rig's own crew goes with it")
+    covering_for = serializers.PrimaryKeyRelatedField(
+        queryset=Apparatus.objects.all(),
+        required=False,
+        allow_null=True,
+        help_text="Temporary only: a rig whose crew rides this one meanwhile",
+    )
+    reason = serializers.CharField(max_length=200, required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        apparatus = self.context["apparatus"]
+        today = timezone.localdate()
+        temporary = attrs["temporary"]
+        if not temporary and (attrs.get("until") or attrs.get("covering_for")):
+            raise serializers.ValidationError("Only a temporary move can have an end date or cover for a rig.")
+        if attrs.get("until") and attrs["until"] < today:
+            raise serializers.ValidationError({"until": "The end date has passed."})
+        if attrs.get("covering_for") == apparatus:
+            raise serializers.ValidationError({"covering_for": "A rig can't cover for itself."})
+        if temporary and attrs["station"] == apparatus.station:
+            raise serializers.ValidationError(
+                {"station": f"That's {apparatus}'s home station. Return it instead of moving it there."}
+            )
+        if not temporary and attrs["station"] == apparatus.station:
+            raise serializers.ValidationError({"station": f"{apparatus} is already based there."})
+        return attrs
+
+
 class ApparatusSerializer(TenantSerializer):
     station_name = serializers.StringRelatedField(source="station", read_only=True)
     open_work_orders = serializers.IntegerField(read_only=True)
+    current_move = serializers.SerializerMethodField(help_text="Where the rig is temporarily, if it's away today")
+
+    @extend_schema_field(ApparatusMoveSerializer(allow_null=True))
+    def get_current_move(self, apparatus):
+        today = timezone.localdate()
+        if hasattr(apparatus, "pending_moves"):  # prefetched by the viewset
+            move = next((m for m in apparatus.pending_moves if m.is_active_on(today)), None)
+        else:
+            move = ApparatusMove.active_on(apparatus.department, today).get(apparatus.id)
+        return ApparatusMoveSerializer(move).data if move else None
 
     class Meta:
         model = Apparatus
@@ -37,6 +104,7 @@ class ApparatusSerializer(TenantSerializer):
             "engine_hours",
             "notes",
             "open_work_orders",
+            "current_move",
         ]
 
 

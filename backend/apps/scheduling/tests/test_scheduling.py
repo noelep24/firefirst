@@ -359,3 +359,112 @@ def test_assignment_apparatus_must_be_in_department(client_for, officer, other_d
         f"/api/v1/assignments/{assignment.id}/", {"apparatus": foreign.id}, format="json"
     )
     assert response.status_code == 400
+
+
+@pytest.fixture
+def st2(department):
+    from apps.core.models import Station
+
+    return Station.objects.create(department=department, number="2", name="Northside")
+
+
+def visit(department, rig, station, **extra):
+    from apps.apparatus.models import ApparatusMove
+
+    return ApparatusMove.objects.create(department=department, apparatus=rig, station=station, starts_on=A_DAY, **extra)
+
+
+def test_reserve_covering_carries_the_covered_rigs_crew(client_for, department, station, st2, crew, rigs):
+    from apps.apparatus.models import Apparatus
+
+    a1 = crew["a1"]
+    Assignment.objects.filter(user=a1).update(apparatus=rigs["E1"])
+    reserve = Apparatus.objects.create(
+        department=department, unit_number="E9", apparatus_type="engine", station=st2, status="reserve"
+    )
+    visit(department, reserve, station, ends_on=A_DAY, covering_for=rigs["E1"], reason="E1 in the shop")
+
+    data = board(client_for(a1))
+    units = {rig["unit_number"]: rig for rig in data["apparatus"]}
+    assert [p["user"] for p in units["E9"]["crew"]] == [a1.id]
+    assert units["E9"]["visiting"] == {
+        "home_station_number": "2",
+        "until": str(A_DAY),
+        "covering_for_unit": "E1",
+        "reason": "E1 in the shop",
+    }
+    assert units["E1"]["crew"] == []
+    assert data["me"]["apparatus_unit"] == "E9"
+    # Station 2 sees its reserve as away; the day after, everything is back.
+    away = board(client_for(a1), station=st2.id)["away"]
+    assert [(r["unit_number"], r["station_number"]) for r in away] == [("E9", "1")]
+    next_shift = board(client_for(a1), date=A_DAY + datetime.timedelta(days=3))
+    assert "E9" not in {rig["unit_number"] for rig in next_shift["apparatus"]}
+
+
+def test_temporary_move_with_and_without_crew(client_for, department, station, st2, crew, rigs):
+    a1, a2 = crew["a1"], crew["a2"]
+    Assignment.objects.filter(user__in=[a1, a2]).update(apparatus=rigs["L1"])
+    move = visit(department, rigs["L1"], st2, crew_moves=True)
+
+    at_2 = board(client_for(a1), station=st2.id)
+    assert [sorted(p["user"] for p in rig["crew"]) for rig in at_2["apparatus"]] == [sorted([a1.id, a2.id])]
+    assert board(client_for(a1))["me"]["station"]["number"] == "2"
+
+    move.crew_moves = False
+    move.save()
+    at_1 = board(client_for(a1))
+    assert sorted(p["user"] for p in at_1["unassigned"]) == sorted([a1.id, a2.id])
+    assert [r["unit_number"] for r in at_1["away"]] == ["L1"]
+
+
+def test_move_api(client_for, officer, member, department, station, st2, crew, rigs):
+    a1 = crew["a1"]
+    Assignment.objects.filter(user=a1).update(apparatus=rigs["L1"])
+    url = f"/api/v1/apparatus/{rigs['L1'].id}/"
+    assert client_for(member).post(url + "move/", {"station": st2.id, "temporary": True}).status_code == 403
+
+    # Temporary, with an end date: home station unchanged, current_move set.
+    until = datetime.date.today() + datetime.timedelta(days=2)
+    response = client_for(officer).post(
+        url + "move/", {"station": st2.id, "temporary": True, "until": until, "reason": "Coverage"}, format="json"
+    )
+    assert response.status_code == 200, response.content
+    body = response.json()
+    assert body["station"] == station.id
+    assert (body["current_move"]["station"], body["current_move"]["ends_on"]) == (st2.id, str(until))
+    assert client_for(member).get(url).json()["current_move"]["reason"] == "Coverage"
+
+    # Return ends it; returning again is an error.
+    assert client_for(officer).post(url + "return/").json()["current_move"] is None
+    assert client_for(officer).post(url + "return/").status_code == 400
+
+    # Permanent, crew stays: the rig is rebased and its riders lose it.
+    response = client_for(officer).post(url + "move/", {"station": st2.id, "temporary": False}, format="json")
+    assert response.json()["station"] == st2.id
+    assignment = Assignment.objects.get(user=a1)
+    assert (assignment.station_id, assignment.apparatus_id) == (station.id, None)
+
+    # Permanent, crew moves: riders' station changes with the rig.
+    Assignment.objects.filter(user=a1).update(apparatus=rigs["L1"])
+    client_for(officer).post(url + "move/", {"station": station.id, "temporary": False, "crew_moves": True})
+    assignment.refresh_from_db()
+    assert (assignment.station_id, assignment.apparatus_id) == (station.id, rigs["L1"].id)
+
+
+def test_move_validation(client_for, officer, other_department, station, st2, rigs):
+    from apps.core.models import Station
+
+    url = f"/api/v1/apparatus/{rigs['L1'].id}/move/"
+    client = client_for(officer)
+    elsewhere = Station.objects.create(department=other_department, number="9")
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    for payload in (
+        {"station": elsewhere.id, "temporary": True},
+        {"station": station.id, "temporary": False},  # already based there
+        {"station": station.id, "temporary": True},  # its home station
+        {"station": st2.id, "temporary": False, "until": str(datetime.date.today())},
+        {"station": st2.id, "temporary": True, "until": str(yesterday)},
+        {"station": st2.id, "temporary": True, "covering_for": rigs["L1"].id},
+    ):
+        assert client.post(url, payload, format="json").status_code == 400, payload

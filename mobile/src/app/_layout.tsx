@@ -42,6 +42,7 @@ function Navigation() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="rig/[id]/index" options={{ title: 'Apparatus' }} />
           <Stack.Screen name="rig/[id]/check" options={{ title: 'Rig check' }} />
+          <Stack.Screen name="rig/[id]/move" options={{ title: 'Move rig', presentation: 'modal' }} />
           <Stack.Screen name="work-order/new" options={{ title: 'Report a problem', presentation: 'modal' }} />
           <Stack.Screen name="work-order/[id]" options={{ title: 'Work order' }} />
           <Stack.Screen name="stock/[id]" options={{ title: 'Stock' }} />

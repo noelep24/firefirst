@@ -456,6 +456,64 @@ paths:
                 items:
                   $ref: '#/components/schemas/ChecklistTemplate'
           description: ''
+  /api/v1/apparatus/{id}/move/:
+    post:
+      operationId: api_v1_apparatus_move_create
+      description: Move the rig to another station, permanently or for a while (officers).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this apparatus.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MoveRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MoveRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apparatus'
+          description: ''
+  /api/v1/apparatus/{id}/return/:
+    post:
+      operationId: api_v1_apparatus_return_create
+      description: 'End a temporary move: the rig is back at its home station (officers).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this apparatus.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Apparatus'
+          description: ''
   /api/v1/assignments/:
     get:
       operationId: api_v1_assignments_list
@@ -5408,12 +5466,58 @@ components:
         open_work_orders:
           type: integer
           readOnly: true
+        current_move:
+          allOf:
+          - $ref: '#/components/schemas/ApparatusMove'
+          nullable: true
+          readOnly: true
+          description: Where the rig is temporarily, if it's away today
       required:
       - apparatus_type
+      - current_move
       - id
       - open_work_orders
       - station_name
       - unit_number
+    ApparatusMove:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        station:
+          type: integer
+        station_name:
+          type: string
+          readOnly: true
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+          nullable: true
+          description: Last day away; blank until it's returned
+        covering_for:
+          type: integer
+          nullable: true
+          description: A rig out of service whose crew rides this one meanwhile
+        covering_for_unit:
+          type: string
+          readOnly: true
+        crew_moves:
+          type: boolean
+          description: The rig's own crew goes with it (otherwise they stay at their
+            station)
+        reason:
+          type: string
+          maxLength: 200
+      required:
+      - covering_for_unit
+      - id
+      - starts_on
+      - station
+      - station_name
     ApparatusRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -5666,12 +5770,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RosterPerson'
+        visiting:
+          allOf:
+          - $ref: '#/components/schemas/BoardVisit'
+          nullable: true
+          description: Set when the rig is here on a temporary move
       required:
       - apparatus_type
       - crew
       - id
       - status
       - unit_number
+      - visiting
+    BoardAway:
+      type: object
+      properties:
+        id:
+          type: integer
+        unit_number:
+          type: string
+        station_number:
+          type: string
+        until:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - id
+      - station_number
+      - unit_number
+      - until
     BoardMember:
       type: object
       description: The signed-in member's standing assignment and whether they work
@@ -5728,6 +5856,27 @@ components:
       - id
       - name
       - number
+    BoardVisit:
+      type: object
+      properties:
+        home_station_number:
+          type: string
+          nullable: true
+        until:
+          type: string
+          format: date
+          nullable: true
+          description: Last day here; null until it's returned
+        covering_for_unit:
+          type: string
+          nullable: true
+        reason:
+          type: string
+      required:
+      - covering_for_unit
+      - home_station_number
+      - reason
+      - until
     CalendarLink:
       type: object
       properties:
@@ -6918,6 +7067,35 @@ components:
       - rank
       - role
       - username
+    MoveRequestRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        station:
+          type: integer
+        temporary:
+          type: boolean
+          description: Temporary moves leave the home station alone and end on their
+            own
+        until:
+          type: string
+          format: date
+          nullable: true
+          description: Last day away (temporary only); blank until returned
+        crew_moves:
+          type: boolean
+          default: false
+          description: The rig's own crew goes with it
+        covering_for:
+          type: integer
+          nullable: true
+          description: 'Temporary only: a rig whose crew rides this one meanwhile'
+        reason:
+          type: string
+          maxLength: 200
+      required:
+      - station
+      - temporary
     OnboardingStep:
       type: object
       properties:
@@ -8733,6 +8911,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BoardApparatus'
+        away:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoardAway'
+          description: Rigs based here that are at another station today
         unassigned:
           type: array
           items:
@@ -8752,6 +8935,7 @@ components:
             $ref: '#/components/schemas/Shortfall'
       required:
       - apparatus
+      - away
       - date
       - me
       - on_leave

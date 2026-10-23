@@ -1,18 +1,30 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
+from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from apps.core.permissions import IsDepartmentMember, IsOfficerOrReadOnly
+from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
-from .models import Apparatus, ChecklistTemplate, Inspection, MaintenanceSchedule, ServiceRecord, WorkOrder
+from .models import (
+    Apparatus,
+    ApparatusMove,
+    ChecklistTemplate,
+    Inspection,
+    MaintenanceSchedule,
+    ServiceRecord,
+    WorkOrder,
+)
+from .moves import move_apparatus, return_apparatus
 from .serializers import (
     ApparatusSerializer,
     ChecklistTemplateSerializer,
     InspectionSerializer,
     MaintenanceScheduleSerializer,
+    MoveRequestSerializer,
     ServiceRecordSerializer,
     WorkOrderSerializer,
 )
@@ -26,6 +38,39 @@ class ApparatusViewSet(TenantViewSet):
     permission_classes = [IsOfficerOrReadOnly]
     filterset_fields = ["station", "status", "apparatus_type"]
     search_fields = ["unit_number", "vin", "make", "model"]
+
+    def get_queryset(self):
+        pending = ApparatusMove.objects.filter(returned_at__isnull=True).filter(
+            Q(ends_on__isnull=True) | Q(ends_on__gte=timezone.localdate())
+        )
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related(
+                Prefetch("moves", queryset=pending.select_related("station", "covering_for"), to_attr="pending_moves")
+            )
+        )
+
+    @extend_schema(request=MoveRequestSerializer, responses=ApparatusSerializer)
+    @action(detail=True, methods=["post"], permission_classes=[IsOfficer])
+    def move(self, request, pk=None):
+        """Move the rig to another station, permanently or for a while (officers)."""
+        apparatus = self.get_object()
+        serializer = MoveRequestSerializer(data=request.data, context={"request": request, "apparatus": apparatus})
+        serializer.is_valid(raise_exception=True)
+        move_apparatus(apparatus, user=request.user, **serializer.validated_data)
+        return Response(ApparatusSerializer(self.get_object(), context={"request": request}).data)
+
+    @extend_schema(request=None, responses=ApparatusSerializer)
+    @action(detail=True, methods=["post"], url_path="return", permission_classes=[IsOfficer])
+    def return_home(self, request, pk=None):
+        """End a temporary move: the rig is back at its home station (officers)."""
+        apparatus = self.get_object()
+        try:
+            return_apparatus(apparatus)
+        except LookupError as exc:
+            raise ValidationError(str(exc)) from exc
+        return Response(ApparatusSerializer(self.get_object(), context={"request": request}).data)
 
     @extend_schema(responses=ChecklistTemplateSerializer(many=True))
     @action(detail=True, methods=["get"], pagination_class=None)
