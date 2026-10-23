@@ -34,10 +34,11 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
   const { refreshMe } = useAuth();
   const [name, setName] = useState(department.name);
   const [timezone, setTimezone] = useState(department.timezone ?? 'America/Chicago');
+  const [nerisId, setNerisId] = useState(department.neris_id ?? '');
   const [saved, setSaved] = useState(false);
 
   const save = useMutation({
-    mutationFn: () => http.patch<Schemas['Department']>('/api/v1/department/', { name, timezone }),
+    mutationFn: () => http.patch<Schemas['Department']>('/api/v1/department/', { name, timezone, neris_id: nerisId }),
     onSuccess: async () => {
       setSaved(true);
       queryClient.invalidateQueries();
@@ -69,6 +70,19 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
               </option>
             ))}
           </select>
+        </div>
+        <div className="field">
+          <label htmlFor="dept-neris">NERIS ID</label>
+          <input
+            id="dept-neris"
+            value={nerisId}
+            onChange={(e) => setNerisId(e.target.value)}
+            placeholder="FD12345678"
+            maxLength={10}
+          />
+          <span className="field-help">
+            Your department's NERIS ID. It goes on every incident report exported to NERIS.
+          </span>
         </div>
         <div className="field">
           <span className="field-label">Account ID</span>

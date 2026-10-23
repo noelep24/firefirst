@@ -147,7 +147,7 @@ export function Badge({
   );
 }
 
-export function Field({ label, error, ...props }: TextInputProps & { label: string; error?: string }) {
+export function Field({ label, error, style, ...props }: TextInputProps & { label: string; error?: string }) {
   const theme = useTheme();
   return (
     <View style={styles.field}>
@@ -163,6 +163,7 @@ export function Field({ label, error, ...props }: TextInputProps & { label: stri
             backgroundColor: theme.backgroundElement,
             borderColor: error ? theme.danger : theme.border,
           },
+          style,
         ]}
         {...props}
       />

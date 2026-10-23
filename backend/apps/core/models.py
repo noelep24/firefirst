@@ -8,6 +8,9 @@ class Department(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     timezone = models.CharField(max_length=64, default="America/Chicago")
+    neris_id = models.CharField(
+        "NERIS ID", max_length=10, blank=True, help_text="The department's NERIS ID, e.g. FD12345678"
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

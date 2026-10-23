@@ -2024,6 +2024,448 @@ paths:
               schema:
                 type: string
           description: ''
+  /api/v1/incident-units/:
+    get:
+      operationId: api_v1_incident_units_list
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      parameters:
+      - in: query
+        name: incident
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentUnit'
+          description: ''
+    post:
+      operationId: api_v1_incident_units_create
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentUnit'
+          description: ''
+  /api/v1/incident-units/{id}/:
+    get:
+      operationId: api_v1_incident_units_retrieve
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident unit.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentUnit'
+          description: ''
+    put:
+      operationId: api_v1_incident_units_update
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident unit.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentUnitRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentUnit'
+          description: ''
+    patch:
+      operationId: api_v1_incident_units_partial_update
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident unit.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentUnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentUnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentUnitRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentUnit'
+          description: ''
+    delete:
+      operationId: api_v1_incident_units_destroy
+      description: Units on an incident. A rig added without a crew gets the crew
+        riding it that day.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident unit.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/incidents/:
+    get:
+      operationId: api_v1_incidents_list
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: station
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - complete
+          - draft
+        description: |-
+          * `draft` - Draft
+          * `complete` - Complete
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIncidentList'
+          description: ''
+    post:
+      operationId: api_v1_incidents_create
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /api/v1/incidents/{id}/:
+    get:
+      operationId: api_v1_incidents_retrieve
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    put:
+      operationId: api_v1_incidents_update
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IncidentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    patch:
+      operationId: api_v1_incidents_partial_update
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIncidentRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+    delete:
+      operationId: api_v1_incidents_destroy
+      description: Incident reports. Any member can start and fill one in; officers
+        delete and reopen.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/incidents/{id}/complete/:
+    post:
+      operationId: api_v1_incidents_complete_create
+      description: Mark the report complete once nothing NERIS needs is missing.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
+  /api/v1/incidents/{id}/neris/:
+    get:
+      operationId: api_v1_incidents_neris_retrieve
+      description: The report in NERIS incident format, for review or upload.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/incidents/{id}/reopen/:
+    post:
+      operationId: api_v1_incidents_reopen_create
+      description: Send a completed report back to draft for changes (officers).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this incident.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+          description: ''
   /api/v1/inspections/:
     get:
       operationId: api_v1_inspections_list
@@ -3641,6 +4083,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalendarLink'
+          description: ''
+  /api/v1/neris/value-sets/:
+    get:
+      operationId: api_v1_neris_value_sets_retrieve
+      description: '``GET /neris/value-sets/`` – the NERIS choice lists the incident
+        report uses.'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NerisValueSets'
           description: ''
   /api/v1/onboarding/:
     get:
@@ -6481,6 +6940,10 @@ components:
         timezone:
           type: string
           maxLength: 64
+        neris_id:
+          type: string
+          description: The department's NERIS ID, e.g. FD12345678
+          maxLength: 10
       required:
       - id
       - name
@@ -6496,6 +6959,10 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+        neris_id:
+          type: string
+          description: The department's NERIS ID, e.g. FD12345678
+          maxLength: 10
       required:
       - name
     Event:
@@ -6783,6 +7250,292 @@ components:
           description: Save the valid rows even if some have errors
       required:
       - file
+    Incident:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          description: Department incident number, e.g. 2026-00123
+          maxLength: 40
+        status:
+          allOf:
+          - $ref: '#/components/schemas/IncidentStatusEnum'
+          readOnly: true
+        alarm_at:
+          type: string
+          format: date-time
+          description: When the call came in
+        station:
+          type: integer
+          nullable: true
+        station_name:
+          type: string
+          readOnly: true
+        address:
+          type: string
+          description: Street address, e.g. 120 N Oak Ave
+          maxLength: 255
+        address_detail:
+          type: string
+          description: Apartment, floor, landmark…
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 120
+        state:
+          type: string
+          maxLength: 2
+        postal_code:
+          type: string
+          maxLength: 10
+        incident_types:
+          description: Up to 3 NERIS incident types, primary first
+        type_labels:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        actions_taken:
+          description: NERIS action/tactic codes
+        no_action_reason:
+          type: string
+          description: NERIS no-action code, if none taken
+          maxLength: 40
+        people_present:
+          type: boolean
+          nullable: true
+        displaced:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: People displaced
+        rescues_or_casualties:
+          type: boolean
+          nullable: true
+          description: Any rescues, injuries or deaths (civilian or firefighter)
+        fire:
+          description: NERIS fire module answers
+        alarms:
+          description: Smoke alarm, fire alarm and sprinkler presence
+        patients:
+          description: 'One entry per patient: ESO report number + NERIS outcome'
+        narrative:
+          type: string
+        units:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentUnit'
+          readOnly: true
+        missing:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: What NERIS still needs; empty when the report is ready
+        created_by_name:
+          type: string
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - alarm_at
+      - completed_at
+      - created_by_name
+      - id
+      - missing
+      - station_name
+      - status
+      - type_labels
+      - units
+    IncidentRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        number:
+          type: string
+          minLength: 1
+          description: Department incident number, e.g. 2026-00123
+          maxLength: 40
+        alarm_at:
+          type: string
+          format: date-time
+          description: When the call came in
+        station:
+          type: integer
+          nullable: true
+        address:
+          type: string
+          description: Street address, e.g. 120 N Oak Ave
+          maxLength: 255
+        address_detail:
+          type: string
+          description: Apartment, floor, landmark…
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 120
+        state:
+          type: string
+          maxLength: 2
+        postal_code:
+          type: string
+          maxLength: 10
+        incident_types:
+          description: Up to 3 NERIS incident types, primary first
+        actions_taken:
+          description: NERIS action/tactic codes
+        no_action_reason:
+          type: string
+          description: NERIS no-action code, if none taken
+          maxLength: 40
+        people_present:
+          type: boolean
+          nullable: true
+        displaced:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: People displaced
+        rescues_or_casualties:
+          type: boolean
+          nullable: true
+          description: Any rescues, injuries or deaths (civilian or firefighter)
+        fire:
+          description: NERIS fire module answers
+        alarms:
+          description: Smoke alarm, fire alarm and sprinkler presence
+        patients:
+          description: 'One entry per patient: ESO report number + NERIS outcome'
+        narrative:
+          type: string
+      required:
+      - alarm_at
+    IncidentStatusEnum:
+      enum:
+      - draft
+      - complete
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `complete` - Complete
+    IncidentUnit:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        incident:
+          type: integer
+        apparatus:
+          type: integer
+          nullable: true
+        unit:
+          type: string
+          description: Unit designation, e.g. E1 or a mutual-aid unit
+          maxLength: 30
+        response_mode:
+          type: string
+          description: NERIS response mode code
+          maxLength: 20
+        crew:
+          type: array
+          items:
+            type: integer
+        crew_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        staffing:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: People on the unit
+        dispatched_at:
+          type: string
+          format: date-time
+          nullable: true
+        enroute_at:
+          type: string
+          format: date-time
+          nullable: true
+        on_scene_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        cleared_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - crew_names
+      - id
+      - incident
+    IncidentUnitRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        incident:
+          type: integer
+        apparatus:
+          type: integer
+          nullable: true
+        unit:
+          type: string
+          minLength: 1
+          description: Unit designation, e.g. E1 or a mutual-aid unit
+          maxLength: 30
+        response_mode:
+          type: string
+          description: NERIS response mode code
+          maxLength: 20
+        crew:
+          type: array
+          items:
+            type: integer
+        staffing:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: People on the unit
+        dispatched_at:
+          type: string
+          format: date-time
+          nullable: true
+        enroute_at:
+          type: string
+          format: date-time
+          nullable: true
+        on_scene_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        cleared_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - incident
     Inspection:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -7308,6 +8061,106 @@ components:
       required:
       - station
       - temporary
+    NerisValue:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+      required:
+      - label
+      - value
+    NerisValueSets:
+      type: object
+      description: Every NERIS choice list the incident report uses.
+      properties:
+        incident_type:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        action:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        no_action:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        response_mode:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        patient_care:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        patient_status:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        medical_disposition:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        investigation_need:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        investigation_type:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        arrival_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        building_damage:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        room:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        structure_cause:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        outside_cause:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        water_supply:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        suppression_appliance:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+        presence:
+          type: array
+          items:
+            $ref: '#/components/schemas/NerisValue'
+      required:
+      - action
+      - arrival_conditions
+      - building_damage
+      - incident_type
+      - investigation_need
+      - investigation_type
+      - medical_disposition
+      - no_action
+      - outside_cause
+      - patient_care
+      - patient_status
+      - presence
+      - response_mode
+      - room
+      - structure_cause
+      - suppression_appliance
+      - water_supply
     OnboardingStep:
       type: object
       properties:
@@ -7661,6 +8514,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Event'
+    PaginatedIncidentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Incident'
     PaginatedInspectionList:
       type: object
       required:
@@ -8179,6 +9055,10 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+        neris_id:
+          type: string
+          description: The department's NERIS ID, e.g. FD12345678
+          maxLength: 10
     PatchedEventRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -8251,6 +9131,116 @@ components:
           maximum: 104
           minimum: 2
           writeOnly: true
+          nullable: true
+    PatchedIncidentRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        number:
+          type: string
+          minLength: 1
+          description: Department incident number, e.g. 2026-00123
+          maxLength: 40
+        alarm_at:
+          type: string
+          format: date-time
+          description: When the call came in
+        station:
+          type: integer
+          nullable: true
+        address:
+          type: string
+          description: Street address, e.g. 120 N Oak Ave
+          maxLength: 255
+        address_detail:
+          type: string
+          description: Apartment, floor, landmark…
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 120
+        state:
+          type: string
+          maxLength: 2
+        postal_code:
+          type: string
+          maxLength: 10
+        incident_types:
+          description: Up to 3 NERIS incident types, primary first
+        actions_taken:
+          description: NERIS action/tactic codes
+        no_action_reason:
+          type: string
+          description: NERIS no-action code, if none taken
+          maxLength: 40
+        people_present:
+          type: boolean
+          nullable: true
+        displaced:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          description: People displaced
+        rescues_or_casualties:
+          type: boolean
+          nullable: true
+          description: Any rescues, injuries or deaths (civilian or firefighter)
+        fire:
+          description: NERIS fire module answers
+        alarms:
+          description: Smoke alarm, fire alarm and sprinkler presence
+        patients:
+          description: 'One entry per patient: ESO report number + NERIS outcome'
+        narrative:
+          type: string
+    PatchedIncidentUnitRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        incident:
+          type: integer
+        apparatus:
+          type: integer
+          nullable: true
+        unit:
+          type: string
+          minLength: 1
+          description: Unit designation, e.g. E1 or a mutual-aid unit
+          maxLength: 30
+        response_mode:
+          type: string
+          description: NERIS response mode code
+          maxLength: 20
+        crew:
+          type: array
+          items:
+            type: integer
+        staffing:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+          description: People on the unit
+        dispatched_at:
+          type: string
+          format: date-time
+          nullable: true
+        enroute_at:
+          type: string
+          format: date-time
+          nullable: true
+        on_scene_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        cleared_at:
+          type: string
+          format: date-time
           nullable: true
     PatchedItemRequest:
       type: object
