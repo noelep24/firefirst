@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 
 import { useAuth } from '@/auth/auth-context';
-import { Label } from '@/components/ui';
+import { Label } from '@/components/label';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 

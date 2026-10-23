@@ -143,18 +143,18 @@ async function accessToken(): Promise<string | null> {
   return refreshing;
 }
 
+// The hooks return nothing: openapi-fetch only accepts the global Request/Response classes back, and on
+// iOS and Android responses come from expo/fetch, which uses its own Response class.
 const auth: Middleware = {
   async onRequest({ request }) {
     const token = await accessToken();
     if (token) request.headers.set('Authorization', `Bearer ${token}`);
-    return request;
   },
   async onResponse({ response }) {
     if (response.status === 401 && session.refresh) {
       await saveTokens(null, null);
       onSessionExpired();
     }
-    return response;
   },
 };
 
