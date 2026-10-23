@@ -250,6 +250,61 @@ a {
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
 }
+.icon-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.icon-button:hover {
+  background: var(--surface-2);
+}
+.bell-count {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 18px;
+}
+.notifications-popover {
+  width: 340px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.notification {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.notification:hover {
+  background: var(--surface-2);
+}
+.notification.unread .notification-title {
+  font-weight: 700;
+}
+.notification.unread {
+  background: var(--accent-soft);
+}
 .user-popover .btn {
   justify-content: flex-start;
 }
@@ -936,6 +991,22 @@ dialog.modal::backdrop {
   font-weight: 800;
   color: var(--text-2);
   text-align: center;
+}
+
+/* ---------- Overtime vacancies ---------- */
+
+.vacancy {
+  padding: 12px 0;
+  border-top: 1px solid var(--surface-2);
+}
+.vacancy-offers {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* ---------- Incident report ---------- */

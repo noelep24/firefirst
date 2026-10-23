@@ -10,18 +10,33 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.core.models import Station
+from apps.core.models import Station, User
 from apps.core.params import parse_date
-from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
+from apps.core.permissions import IsDepartmentAdmin, IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
-from .models import Assignment, LeaveRequest, OvertimeShift, Platoon, RotationPattern, ShiftTrade, StaffingRule
+from . import offers
+from .models import (
+    Assignment,
+    LeaveRequest,
+    OvertimeOffer,
+    OvertimeSettings,
+    OvertimeShift,
+    Platoon,
+    RotationPattern,
+    ShiftTrade,
+    StaffingRule,
+    Vacancy,
+)
 from .overtime import overtime_list
 from .roster import build_roster, leave_impact, station_board
 from .serializers import (
     AssignmentSerializer,
+    HireSerializer,
     LeaveRequestSerializer,
     OvertimeBoardSerializer,
+    OvertimeOfferSerializer,
+    OvertimeSettingsSerializer,
     OvertimeShiftSerializer,
     PlatoonSerializer,
     ReviewSerializer,
@@ -32,6 +47,7 @@ from .serializers import (
     StaffingDaySerializer,
     StaffingRuleSerializer,
     StationBoardSerializer,
+    VacancySerializer,
 )
 
 MAX_CALENDAR_DAYS = 400
@@ -119,6 +135,143 @@ class OvertimeShiftViewSet(TenantViewSet):
         serializer.save(department=self.request.user.department, recorded_by=self.request.user)
 
 
+class OvertimeSettingsView(APIView):
+    """``/overtime-settings/`` – how the department fills overtime. Everyone can read it; admins change it."""
+
+    def get_permissions(self):
+        return [IsDepartmentAdmin()] if self.request.method == "PATCH" else [IsDepartmentMember()]
+
+    @extend_schema(responses=OvertimeSettingsSerializer)
+    def get(self, request):
+        return Response(OvertimeSettingsSerializer(OvertimeSettings.for_department(request.user.department)).data)
+
+    @extend_schema(request=OvertimeSettingsSerializer, responses=OvertimeSettingsSerializer)
+    def patch(self, request):
+        serializer = OvertimeSettingsSerializer(
+            OvertimeSettings.for_department(request.user.department), data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class VacancyViewSet(TenantViewSet):
+    """Seats to fill with overtime. Posting one offers it to volunteers, then hires off the list."""
+
+    queryset = Vacancy.objects.select_related("filling_for", "station", "overtime_shift__user").prefetch_related(
+        "offers__user"
+    )
+    serializer_class = VacancySerializer
+    permission_classes = [IsOfficerOrReadOnly]
+    filterset_fields = ["date", "status"]
+    http_method_names = ["get", "post", "head", "options"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.query_params.get("open") == "true":
+            queryset = queryset.filter(status__in=[Vacancy.Status.OFFERED, Vacancy.Status.UNFILLED])
+        return queryset
+
+    @extend_schema(parameters=[OpenApiParameter("open", OpenApiTypes.BOOL, description="Only vacancies still open")])
+    def list(self, request, *args, **kwargs):
+        offers.process_due(request.user.department)
+        return super().list(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        vacancy = serializer.save(department=self.request.user.department, created_by=self.request.user)
+        offers.open_vacancy(vacancy)
+
+    def _open(self):
+        vacancy = self.get_object()
+        if vacancy.status not in (Vacancy.Status.OFFERED, Vacancy.Status.UNFILLED):
+            raise ValidationError("This vacancy is already closed.")
+        return vacancy
+
+    def _respond(self, vacancy):
+        fresh = self.get_queryset().get(pk=vacancy.pk)
+        return Response(VacancySerializer(fresh, context=self.get_serializer_context()).data)
+
+    @extend_schema(request=HireSerializer, responses=VacancySerializer)
+    @action(detail=True, methods=["post"])
+    def hire(self, request, pk=None):
+        """Hire a particular member now (a volunteer, or anyone available), skipping the wait."""
+        vacancy = self._open()
+        body = HireSerializer(data=request.data)
+        body.is_valid(raise_exception=True)
+        if body.validated_data["user"] not in {m["user"] for m in offers.available(vacancy)}:
+            raise ValidationError({"user": "They aren't available to work that day."})
+        user = User.objects.get(pk=body.validated_data["user"])
+        volunteered = vacancy.offers.filter(user=user, status=OvertimeOffer.Status.ACCEPTED).exists()
+        offers.hire(vacancy, user, mandatory=not volunteered, by=request.user)
+        return self._respond(vacancy)
+
+    @extend_schema(request=None, responses=VacancySerializer)
+    @action(detail=True, methods=["post"], url_path="fill-now")
+    def fill_now(self, request, pk=None):
+        """Stop waiting for answers: hire the top volunteer, or off the list."""
+        vacancy = self._open()
+        if vacancy.status == Vacancy.Status.UNFILLED:
+            vacancy.status = Vacancy.Status.OFFERED
+            vacancy.save(update_fields=["status", "updated_at"])
+        offers.resolve(vacancy)
+        return self._respond(vacancy)
+
+    @extend_schema(request=None, responses=VacancySerializer)
+    @action(detail=True, methods=["post"])
+    def cancel(self, request, pk=None):
+        offers.cancel(self._open())
+        return self._respond(self.get_object())
+
+
+class OvertimeOfferViewSet(TenantViewSet):
+    """Overtime offers. Members see and answer their own; officers see everyone's."""
+
+    queryset = OvertimeOffer.objects.select_related("vacancy__filling_for", "vacancy__station", "user")
+    serializer_class = OvertimeOfferSerializer
+    filterset_fields = ["status", "vacancy"]
+    http_method_names = ["get", "post", "head", "options"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by("-id")
+        if self.request.query_params.get("open") == "true":
+            queryset = queryset.filter(vacancy__status=Vacancy.Status.OFFERED)
+        return queryset if self.request.user.is_officer else queryset.filter(user=self.request.user)
+
+    @extend_schema(
+        parameters=[OpenApiParameter("open", OpenApiTypes.BOOL, description="Only offers still taking answers")]
+    )
+    def list(self, request, *args, **kwargs):
+        offers.process_due(request.user.department)
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        raise PermissionDenied("Offers are sent when a vacancy is posted.")
+
+    def _answer(self, accept):
+        offer = self.get_object()
+        if offer.user_id != self.request.user.id:
+            raise PermissionDenied("Only the member offered can answer.")
+        offers.process_due(self.request.user.department)
+        offer.refresh_from_db()
+        # Members can change their answer until volunteering closes.
+        closed = (OvertimeOffer.Status.EXPIRED, OvertimeOffer.Status.WITHDRAWN)
+        if offer.status in closed or offer.vacancy.status != Vacancy.Status.OFFERED:
+            raise ValidationError("This offer has closed.")
+        offers.respond(offer, accept)
+        offer.refresh_from_db()
+        return Response(self.get_serializer(offer).data)
+
+    @extend_schema(request=None, responses=OvertimeOfferSerializer)
+    @action(detail=True, methods=["post"])
+    def accept(self, request, pk=None):
+        return self._answer(True)
+
+    @extend_schema(request=None, responses=OvertimeOfferSerializer)
+    @action(detail=True, methods=["post"])
+    def decline(self, request, pk=None):
+        return self._answer(False)
+
+
 class OvertimeListView(APIView):
     """``GET /overtime-list/?date=`` – the rolling mandatory overtime lists, and who is up next that day."""
 
@@ -131,6 +284,7 @@ class OvertimeListView(APIView):
     def get(self, request):
         raw = request.query_params.get("date")
         date = parse_date(raw, "date") if raw else timezone.localdate()
+        offers.process_due(request.user.department)
         return Response(overtime_list(request.user.department, date))
 
 
@@ -244,6 +398,8 @@ class LeaveRequestViewSet(TenantViewSet):
         leave.reviewed_at = timezone.now()
         leave.review_note = review.validated_data.get("note", "")
         leave.save()
+        if new_status == LeaveRequest.Status.APPROVED:
+            offers.vacancies_for_leave(leave, by=request.user)
         return Response(LeaveRequestSerializer(leave, context=self.get_serializer_context()).data)
 
     @extend_schema(request=ReviewSerializer, responses=LeaveRequestSerializer)
@@ -275,6 +431,7 @@ class LeaveRequestViewSet(TenantViewSet):
             raise ValidationError("This request is already closed.")
         leave.status = LeaveRequest.Status.CANCELLED
         leave.save(update_fields=["status", "updated_at"])
+        offers.cancel_for_leave(leave)
         return Response(self.get_serializer(leave).data)
 
 

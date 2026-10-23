@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { api, unwrap, type Schemas } from '@/api/client';
 import { useMe } from '@/auth/auth-context';
+import { OvertimeOffers } from '@/components/overtime-offers';
 import { Badge, Button, Card, Empty, Label, QueryState, Row, Screen, Section, Stat } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { formatDateTime, formatDay, humanize } from '@/lib/format';
@@ -38,6 +39,7 @@ export default function TodayScreen() {
         drafts.refetch();
         dashboard.refetch();
       }}>
+      <OvertimeOffers />
       <QueryState query={board}>
         {(boardData) => <StationBoard board={boardData} myId={me.id} onPickStation={setStation} />}
       </QueryState>

@@ -1,19 +1,21 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { getAll, http, type Schemas } from '@/api/http';
 import { CrudPage, RecordModal } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
-import { Badge, Button, Card, DataTable, Empty, PageHeader, QueryState, Tabs } from '@/components/ui';
+import { Badge, Button, Card, DataTable, Empty, ErrorBox, PageHeader, QueryState, Tabs } from '@/components/ui';
 import { personLabel, stationLabel } from '@/lib/fields';
-import { addDays, formatDay, isoDate, parseDate } from '@/lib/format';
+import { addDays, formatDateTime, formatDay, isoDate, parseDate } from '@/lib/format';
 import { labelFor, positions } from '@/lib/labels';
 
 type Tab = 'calendar' | 'roster' | 'overtime' | 'assignments' | 'staffing' | 'rotation';
 
 export default function Schedule() {
-  const [tab, setTab] = useState<Tab>('calendar');
+  const [params] = useSearchParams();
+  // Notifications about overtime link straight to its tab.
+  const [tab, setTab] = useState<Tab>(params.get('tab') === 'overtime' ? 'overtime' : 'calendar');
   return (
     <div>
       <PageHeader title="Schedule" subtitle="Shift rotation, daily roster and who rides where." />
@@ -584,6 +586,7 @@ function Overtime() {
           {board.data?.platoon ? ` · ${board.data.platoon} Shift on duty` : ''}
         </span>
       </div>
+      <Vacancies date={date} />
       <QueryState query={hired}>
         {(shifts) =>
           shifts.length ? (
@@ -696,6 +699,183 @@ function Overtime() {
           onClose={() => setEditing(null)}
           onSaved={saved}
         />
+      ) : null}
+    </div>
+  );
+}
+
+type Vacancy = Schemas['Vacancy'];
+
+const vacancyFields: FieldSpec[] = [
+  { name: 'date', label: 'Date', type: 'date', required: true },
+  {
+    name: 'filling_for',
+    label: 'Whose seat is empty',
+    type: 'relation',
+    endpoint: '/api/v1/users/',
+    query: { is_active: true },
+    optionLabel: personLabel as (row: never) => string,
+    help: 'Sets the list, position and station for you',
+  },
+  {
+    name: 'overtime_list',
+    label: 'Overtime list',
+    type: 'select',
+    options: [
+      { value: 'officers', label: 'Captains & engineers' },
+      { value: 'firefighters', label: 'Firefighters & medics' },
+    ],
+    help: 'Only when no one’s seat is named',
+  },
+  {
+    name: 'station',
+    label: 'Station',
+    type: 'relation',
+    endpoint: '/api/v1/stations/',
+    optionLabel: stationLabel as (row: never) => string,
+  },
+  { name: 'hours', label: 'Hours', type: 'number', step: '0.25', min: 0, required: true },
+  { name: 'note', label: 'Note', type: 'text', wide: true },
+];
+
+const OFFER_STATUS: Record<string, { label: string; tone: 'success' | 'neutral' | 'warning' | 'danger' }> = {
+  pending: { label: 'Waiting', tone: 'neutral' },
+  accepted: { label: 'Volunteered', tone: 'success' },
+  declined: { label: 'Turned down', tone: 'neutral' },
+  expired: { label: 'No answer', tone: 'neutral' },
+  withdrawn: { label: 'Not needed', tone: 'neutral' },
+};
+
+/** Seats being filled automatically: open ones on any day, plus everything on the day shown. */
+function Vacancies({ date }: { date: string }) {
+  const [posting, setPosting] = useState(false);
+  const queryClient = useQueryClient();
+  const open = useQuery({
+    queryKey: ['/api/v1/vacancies/', { open: true }],
+    queryFn: () => getAll<Vacancy>('/api/v1/vacancies/', { open: true }),
+    refetchInterval: 60_000,
+  });
+  const onDay = useQuery({
+    queryKey: ['/api/v1/vacancies/', { date }],
+    queryFn: () => getAll<Vacancy>('/api/v1/vacancies/', { date }),
+  });
+  const rows = [...(open.data ?? [])];
+  for (const v of onDay.data ?? []) if (!rows.some((r) => r.id === v.id) && v.status !== 'cancelled') rows.push(v);
+  rows.sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+
+  return (
+    <Card className="stack-sm">
+      <div className="row spread">
+        <div>
+          <h3>Vacancies</h3>
+          <p className="muted small">Offered to volunteers, then filled from the list automatically.</p>
+        </div>
+        <Button small variant="primary" onClick={() => setPosting(true)}>
+          Post a vacancy
+        </Button>
+      </div>
+      {open.error ? <ErrorBox error={open.error} /> : null}
+      {rows.length === 0 && open.data ? <p className="muted">No open vacancies.</p> : null}
+      {rows.map((v) => (
+        <VacancyRow key={v.id} vacancy={v} />
+      ))}
+      {posting ? (
+        <RecordModal<Vacancy>
+          title="Post a vacancy"
+          endpoint="/api/v1/vacancies/"
+          fields={vacancyFields}
+          record={null}
+          defaults={{ date, hours: 24 }}
+          onClose={() => setPosting(false)}
+          onSaved={() => {
+            setPosting(false);
+            queryClient.invalidateQueries();
+          }}
+        />
+      ) : null}
+    </Card>
+  );
+}
+
+function VacancyRow({ vacancy: v }: { vacancy: Vacancy }) {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState(false);
+  const act = useMutation({
+    mutationFn: ({ path, body }: { path: string; body?: object }) =>
+      http.post<Vacancy>(`/api/v1/vacancies/${v.id}/${path}/`, body ?? {}),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+  const answered = v.offers.filter((o) => o.status !== 'pending').length;
+  const volunteers = v.offers.filter((o) => o.status === 'accepted');
+  const live = v.status === 'offered' || v.status === 'unfilled';
+
+  let summary: string;
+  if (v.status === 'offered') {
+    summary = `${answered} of ${v.offers.length} answered · ${volunteers.length} volunteered`;
+    if (v.respond_by) summary += ` · closes ${formatDateTime(v.respond_by)}`;
+  } else if (v.status === 'filled') {
+    summary = `Filled by ${v.hired_name}${v.hired_mandatory ? ' (mandatory)' : ' (volunteered)'}`;
+  } else if (v.status === 'unfilled') {
+    summary = 'No one available on the list';
+  } else {
+    summary = 'Cancelled';
+  }
+  const tone = v.status === 'unfilled' ? 'danger' : v.status === 'offered' ? 'warning' : 'success';
+
+  return (
+    <div className="vacancy">
+      <div className="row spread">
+        <div className="stack-sm" style={{ gap: 2 }}>
+          <strong>
+            {formatDay(v.date)} · {v.description}
+          </strong>
+          <span className="row small">
+            <Badge tone={v.status === 'cancelled' ? 'neutral' : tone}>{summary}</Badge>
+          </span>
+        </div>
+        <div className="row">
+          {v.offers.length ? (
+            <Button small variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+              {expanded ? 'Hide answers' : 'Answers'}
+            </Button>
+          ) : null}
+          {live ? (
+            <>
+              <Button small loading={act.isPending} onClick={() => act.mutate({ path: 'fill-now' })}>
+                {v.status === 'unfilled' ? 'Try again' : 'Fill now'}
+              </Button>
+              <Button
+                small
+                variant="ghost"
+                onClick={() =>
+                  window.confirm('Cancel this vacancy? Anyone offered it is told.') && act.mutate({ path: 'cancel' })
+                }>
+                Cancel
+              </Button>
+            </>
+          ) : null}
+        </div>
+      </div>
+      {act.error ? <ErrorBox error={act.error} /> : null}
+      {expanded ? (
+        <div className="vacancy-offers">
+          {v.offers.map((o) => {
+            const status = OFFER_STATUS[o.status];
+            return (
+              <div key={o.id} className="row spread">
+                <span>{o.user_name}</span>
+                <span className="row">
+                  <Badge tone={status.tone}>{status.label}</Badge>
+                  {v.status === 'offered' && o.status === 'accepted' ? (
+                    <Button small onClick={() => act.mutate({ path: 'hire', body: { user: o.user } })}>
+                      Hire now
+                    </Button>
+                  ) : null}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       ) : null}
     </div>
   );

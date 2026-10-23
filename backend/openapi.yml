@@ -4101,6 +4101,82 @@ paths:
               schema:
                 $ref: '#/components/schemas/NerisValueSets'
           description: ''
+  /api/v1/notifications/:
+    get:
+      operationId: api_v1_notifications_list
+      description: Your own notifications, newest first.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/v1/notifications/{id}/read/:
+    post:
+      operationId: api_v1_notifications_read_create
+      description: Your own notifications, newest first.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/notifications/read-all/:
+    post:
+      operationId: api_v1_notifications_read_all_create
+      description: Your own notifications, newest first.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/onboarding/:
     get:
       operationId: api_v1_onboarding_list
@@ -4141,6 +4217,205 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OvertimeBoard'
+          description: ''
+  /api/v1/overtime-offers/:
+    get:
+      operationId: api_v1_overtime_offers_list
+      description: Overtime offers. Members see and answer their own; officers see
+        everyone's.
+      parameters:
+      - in: query
+        name: open
+        schema:
+          type: boolean
+        description: Only offers still taking answers
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - accepted
+          - declined
+          - expired
+          - pending
+          - withdrawn
+        description: |-
+          * `pending` - Waiting for an answer
+          * `accepted` - Volunteered
+          * `declined` - Turned down
+          * `expired` - No answer
+          * `withdrawn` - No longer needed
+      - in: query
+        name: vacancy
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOvertimeOfferList'
+          description: ''
+    post:
+      operationId: api_v1_overtime_offers_create
+      description: Overtime offers. Members see and answer their own; officers see
+        everyone's.
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeOffer'
+          description: ''
+  /api/v1/overtime-offers/{id}/:
+    get:
+      operationId: api_v1_overtime_offers_retrieve
+      description: Overtime offers. Members see and answer their own; officers see
+        everyone's.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime offer.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeOffer'
+          description: ''
+  /api/v1/overtime-offers/{id}/accept/:
+    post:
+      operationId: api_v1_overtime_offers_accept_create
+      description: Overtime offers. Members see and answer their own; officers see
+        everyone's.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime offer.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeOffer'
+          description: ''
+  /api/v1/overtime-offers/{id}/decline/:
+    post:
+      operationId: api_v1_overtime_offers_decline_create
+      description: Overtime offers. Members see and answer their own; officers see
+        everyone's.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this overtime offer.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeOffer'
+          description: ''
+  /api/v1/overtime-settings/:
+    get:
+      operationId: api_v1_overtime_settings_retrieve
+      description: '``/overtime-settings/`` – how the department fills overtime. Everyone
+        can read it; admins change it.'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeSettings'
+          description: ''
+    patch:
+      operationId: api_v1_overtime_settings_partial_update
+      description: '``/overtime-settings/`` – how the department fills overtime. Everyone
+        can read it; admins change it.'
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeSettingsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeSettingsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOvertimeSettingsRequest'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OvertimeSettings'
           description: ''
   /api/v1/overtime-shifts/:
     get:
@@ -4499,6 +4774,43 @@ paths:
           type: integer
         description: A unique integer value identifying this platoon.
         required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/push-devices/:
+    post:
+      operationId: api_v1_push_devices_create
+      description: '``POST /push-devices/`` – register this phone for push notifications
+        (the signed-in member''s).'
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushDeviceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PushDeviceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PushDeviceRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+    delete:
+      operationId: api_v1_push_devices_destroy
+      description: '``POST /push-devices/`` – register this phone for push notifications
+        (the signed-in member''s).'
       tags:
       - api
       security:
@@ -5843,6 +6155,207 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/vacancies/:
+    get:
+      operationId: api_v1_vacancies_list
+      description: Seats to fill with overtime. Posting one offers it to volunteers,
+        then hires off the list.
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: open
+        schema:
+          type: boolean
+        description: Only vacancies still open
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - cancelled
+          - filled
+          - offered
+          - unfilled
+        description: |-
+          * `offered` - Offered to volunteers
+          * `filled` - Filled
+          * `unfilled` - No one available
+          * `cancelled` - Cancelled
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVacancyList'
+          description: ''
+    post:
+      operationId: api_v1_vacancies_create
+      description: Seats to fill with overtime. Posting one offers it to volunteers,
+        then hires off the list.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VacancyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VacancyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VacancyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancy'
+          description: ''
+  /api/v1/vacancies/{id}/:
+    get:
+      operationId: api_v1_vacancies_retrieve
+      description: Seats to fill with overtime. Posting one offers it to volunteers,
+        then hires off the list.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vacancy.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancy'
+          description: ''
+  /api/v1/vacancies/{id}/cancel/:
+    post:
+      operationId: api_v1_vacancies_cancel_create
+      description: Seats to fill with overtime. Posting one offers it to volunteers,
+        then hires off the list.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vacancy.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancy'
+          description: ''
+  /api/v1/vacancies/{id}/fill-now/:
+    post:
+      operationId: api_v1_vacancies_fill_now_create
+      description: 'Stop waiting for answers: hire the top volunteer, or off the list.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vacancy.
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancy'
+          description: ''
+  /api/v1/vacancies/{id}/hire/:
+    post:
+      operationId: api_v1_vacancies_hire_create
+      description: Hire a particular member now (a volunteer, or anyone available),
+        skipping the wait.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vacancy.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HireRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HireRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HireRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancy'
+          description: ''
   /api/v1/work-orders/:
     get:
       operationId: api_v1_work_orders_list
@@ -7131,6 +7644,13 @@ components:
       - ends_at
       - starts_at
       - title
+    HireRequest:
+      type: object
+      properties:
+        user:
+          type: integer
+      required:
+      - user
     ImportColumn:
       type: object
       properties:
@@ -8167,6 +8687,38 @@ components:
       - structure_cause
       - suppression_appliance
       - water_supply
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        link:
+          type: string
+          readOnly: true
+          description: Where in the app this leads, e.g. /schedule
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - id
+      - link
+      - read_at
+      - title
     OnboardingStep:
       type: object
       properties:
@@ -8221,6 +8773,14 @@ components:
       - label
       - members
       - next_up
+    OvertimeListEnum:
+      enum:
+      - officers
+      - firefighters
+      type: string
+      description: |-
+        * `officers` - Captains & engineers
+        * `firefighters` - Firefighters & medics
     OvertimeMember:
       type: object
       properties:
@@ -8273,6 +8833,98 @@ components:
         * `on_duty` - on_duty
         * `on_leave` - on_leave
         * `overtime` - overtime
+    OvertimeOffer:
+      type: object
+      description: 'An offer as the member sees it: what the vacancy is and when to
+        answer by.'
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vacancy:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OvertimeOfferStatusEnum'
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        respond_by:
+          type: string
+          format: date-time
+          readOnly: true
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        vacancy_status:
+          type: string
+          readOnly: true
+      required:
+      - date
+      - description
+      - hours
+      - id
+      - respond_by
+      - responded_at
+      - status
+      - user
+      - user_name
+      - vacancy
+      - vacancy_status
+    OvertimeOfferStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - declined
+      - expired
+      - withdrawn
+      type: string
+      description: |-
+        * `pending` - Waiting for an answer
+        * `accepted` - Volunteered
+        * `declined` - Turned down
+        * `expired` - No answer
+        * `withdrawn` - No longer needed
+    OvertimeSettings:
+      type: object
+      properties:
+        response_hours:
+          type: integer
+          maximum: 72
+          minimum: 1
+        voluntary_first:
+          type: boolean
+          description: Offer overtime to volunteers before forcing anyone off the
+            list
+        refusal_moves_to_bottom:
+          type: boolean
+          description: Turning down an offer counts like working it, sending the member
+            to the bottom
+        vacancy_from_leave:
+          type: boolean
+          description: Open a vacancy automatically when leave is approved for someone
+            on duty
+      required:
+      - response_hours
     OvertimeShift:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -8635,6 +9287,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MaintenanceSchedule'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    PaginatedOvertimeOfferList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OvertimeOffer'
     PaginatedOvertimeShiftList:
       type: object
       required:
@@ -8888,6 +9586,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    PaginatedVacancyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vacancy'
     PaginatedWorkOrderList:
       type: object
       required:
@@ -9363,6 +10084,25 @@ components:
         phone:
           type: string
           maxLength: 40
+    PatchedOvertimeSettingsRequest:
+      type: object
+      properties:
+        response_hours:
+          type: integer
+          maximum: 72
+          minimum: 1
+        voluntary_first:
+          type: boolean
+          description: Offer overtime to volunteers before forcing anyone off the
+            list
+        refusal_moves_to_bottom:
+          type: boolean
+          description: Turning down an offer counts like working it, sending the member
+            to the bottom
+        vacancy_from_leave:
+          type: boolean
+          description: Open a vacancy automatically when leave is approved for someone
+            on duty
     PatchedOvertimeShiftRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.
@@ -9703,6 +10443,18 @@ components:
         * `normal` - Normal
         * `high` - High
         * `critical` - Critical
+    PushDeviceRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+          maxLength: 200
+        platform:
+          type: string
+          maxLength: 20
+      required:
+      - token
     ReasonEnum:
       enum:
       - restock
@@ -10756,6 +11508,161 @@ components:
           minLength: 8
       required:
       - username
+    Vacancy:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+        overtime_list:
+          oneOf:
+          - $ref: '#/components/schemas/OvertimeListEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        position:
+          oneOf:
+          - $ref: '#/components/schemas/PositionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        station:
+          type: integer
+          nullable: true
+        station_name:
+          type: string
+          readOnly: true
+        filling_for:
+          type: integer
+          nullable: true
+          description: The member whose seat is empty
+        filling_for_name:
+          type: string
+          readOnly: true
+        leave_request:
+          type: integer
+          readOnly: true
+          nullable: true
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        note:
+          type: string
+          maxLength: 200
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VacancyStatusEnum'
+          readOnly: true
+        respond_by:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When volunteering closes
+        description:
+          type: string
+          readOnly: true
+        hired_name:
+          type: string
+          nullable: true
+          readOnly: true
+        hired_mandatory:
+          type: boolean
+          nullable: true
+          readOnly: true
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/VacancyOffer'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - date
+      - description
+      - filling_for_name
+      - hired_mandatory
+      - hired_name
+      - id
+      - leave_request
+      - offers
+      - respond_by
+      - station_name
+      - status
+    VacancyOffer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OvertimeOfferStatusEnum'
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - id
+      - responded_at
+      - status
+      - user
+      - user_name
+    VacancyRequest:
+      type: object
+      description: Restricts every related-field choice to the requesting user's department.
+      properties:
+        date:
+          type: string
+          format: date
+        overtime_list:
+          oneOf:
+          - $ref: '#/components/schemas/OvertimeListEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        position:
+          oneOf:
+          - $ref: '#/components/schemas/PositionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        station:
+          type: integer
+          nullable: true
+        filling_for:
+          type: integer
+          nullable: true
+          description: The member whose seat is empty
+        hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        note:
+          type: string
+          maxLength: 200
+      required:
+      - date
+    VacancyStatusEnum:
+      enum:
+      - offered
+      - filled
+      - unfilled
+      - cancelled
+      type: string
+      description: |-
+        * `offered` - Offered to volunteers
+        * `filled` - Filled
+        * `unfilled` - No one available
+        * `cancelled` - Cancelled
     WorkOrder:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

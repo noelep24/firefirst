@@ -1120,6 +1120,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Your own notifications, newest first. */
+        get: operations["api_v1_notifications_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Your own notifications, newest first. */
+        post: operations["api_v1_notifications_read_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Your own notifications, newest first. */
+        post: operations["api_v1_notifications_read_all_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/onboarding/": {
         parameters: {
             query?: never;
@@ -1152,6 +1203,93 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-offers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Overtime offers. Members see and answer their own; officers see everyone's. */
+        get: operations["api_v1_overtime_offers_list"];
+        put?: never;
+        /** @description Overtime offers. Members see and answer their own; officers see everyone's. */
+        post: operations["api_v1_overtime_offers_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-offers/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Overtime offers. Members see and answer their own; officers see everyone's. */
+        get: operations["api_v1_overtime_offers_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-offers/{id}/accept/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Overtime offers. Members see and answer their own; officers see everyone's. */
+        post: operations["api_v1_overtime_offers_accept_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-offers/{id}/decline/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Overtime offers. Members see and answer their own; officers see everyone's. */
+        post: operations["api_v1_overtime_offers_decline_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/overtime-settings/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``/overtime-settings/`` – how the department fills overtime. Everyone can read it; admins change it. */
+        get: operations["api_v1_overtime_settings_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description ``/overtime-settings/`` – how the department fills overtime. Everyone can read it; admins change it. */
+        patch: operations["api_v1_overtime_settings_partial_update"];
         trace?: never;
     };
     "/api/v1/overtime-shifts/": {
@@ -1228,6 +1366,24 @@ export interface paths {
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
         patch: operations["api_v1_platoons_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/push-devices/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description ``POST /push-devices/`` – register this phone for push notifications (the signed-in member's). */
+        post: operations["api_v1_push_devices_create"];
+        /** @description ``POST /push-devices/`` – register this phone for push notifications (the signed-in member's). */
+        delete: operations["api_v1_push_devices_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/reports/": {
@@ -1659,6 +1815,92 @@ export interface paths {
         head?: never;
         /** @description ModelViewSet scoped to ``request.user.department``. */
         patch: operations["api_v1_users_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/vacancies/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Seats to fill with overtime. Posting one offers it to volunteers, then hires off the list. */
+        get: operations["api_v1_vacancies_list"];
+        put?: never;
+        /** @description Seats to fill with overtime. Posting one offers it to volunteers, then hires off the list. */
+        post: operations["api_v1_vacancies_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vacancies/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Seats to fill with overtime. Posting one offers it to volunteers, then hires off the list. */
+        get: operations["api_v1_vacancies_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vacancies/{id}/cancel/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Seats to fill with overtime. Posting one offers it to volunteers, then hires off the list. */
+        post: operations["api_v1_vacancies_cancel_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vacancies/{id}/fill-now/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Stop waiting for answers: hire the top volunteer, or off the list. */
+        post: operations["api_v1_vacancies_fill_now_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vacancies/{id}/hire/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Hire a particular member now (a volunteer, or anyone available), skipping the wait. */
+        post: operations["api_v1_vacancies_hire_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/work-orders/": {
@@ -2186,6 +2428,9 @@ export interface components {
             repeat_until?: string | null;
             repeat_count?: number | null;
         };
+        HireRequest: {
+            user: number;
+        };
         ImportColumn: {
             key: string;
             label: string;
@@ -2617,6 +2862,17 @@ export interface components {
             suppression_appliance: components["schemas"]["NerisValue"][];
             presence: components["schemas"]["NerisValue"][];
         };
+        Notification: {
+            readonly id: number;
+            readonly title: string;
+            readonly body: string;
+            /** @description Where in the app this leads, e.g. /schedule */
+            readonly link: string;
+            /** Format: date-time */
+            readonly read_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
         OnboardingStep: {
             key: string;
             title: string;
@@ -2637,6 +2893,12 @@ export interface components {
             /** @description First available member: who to hire next */
             next_up: number | null;
         };
+        /**
+         * @description * `officers` - Captains & engineers
+         *     * `firefighters` - Firefighters & medics
+         * @enum {string}
+         */
+        OvertimeListEnum: "officers" | "firefighters";
         OvertimeMember: {
             user: number;
             name: string;
@@ -2667,6 +2929,42 @@ export interface components {
          * @enum {string}
          */
         OvertimeMemberStatusEnum: "available" | "on_duty" | "on_leave" | "overtime";
+        /** @description An offer as the member sees it: what the vacancy is and when to answer by. */
+        OvertimeOffer: {
+            readonly id: number;
+            readonly vacancy: number;
+            readonly user: number;
+            readonly user_name: string;
+            readonly status: components["schemas"]["OvertimeOfferStatusEnum"];
+            /** Format: date-time */
+            readonly responded_at: string | null;
+            /** Format: date */
+            readonly date: string;
+            readonly description: string;
+            /** Format: date-time */
+            readonly respond_by: string;
+            /** Format: decimal */
+            readonly hours: string;
+            readonly vacancy_status: string;
+        };
+        /**
+         * @description * `pending` - Waiting for an answer
+         *     * `accepted` - Volunteered
+         *     * `declined` - Turned down
+         *     * `expired` - No answer
+         *     * `withdrawn` - No longer needed
+         * @enum {string}
+         */
+        OvertimeOfferStatusEnum: "pending" | "accepted" | "declined" | "expired" | "withdrawn";
+        OvertimeSettings: {
+            response_hours: number;
+            /** @description Offer overtime to volunteers before forcing anyone off the list */
+            voluntary_first?: boolean;
+            /** @description Turning down an offer counts like working it, sending the member to the bottom */
+            refusal_moves_to_bottom?: boolean;
+            /** @description Open a vacancy automatically when leave is approved for someone on duty */
+            vacancy_from_leave?: boolean;
+        };
         /** @description Restricts every related-field choice to the requesting user's department. */
         OvertimeShift: {
             readonly id: number;
@@ -2884,6 +3182,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["MaintenanceSchedule"][];
         };
+        PaginatedNotificationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Notification"][];
+        };
+        PaginatedOvertimeOfferList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["OvertimeOffer"][];
+        };
         PaginatedOvertimeShiftList: {
             /** @example 123 */
             count: number;
@@ -3048,6 +3376,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["User"][];
+        };
+        PaginatedVacancyList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Vacancy"][];
         };
         PaginatedWorkOrderList: {
             /** @example 123 */
@@ -3291,6 +3634,15 @@ export interface components {
             email?: string;
             phone?: string;
         };
+        PatchedOvertimeSettingsRequest: {
+            response_hours?: number;
+            /** @description Offer overtime to volunteers before forcing anyone off the list */
+            voluntary_first?: boolean;
+            /** @description Turning down an offer counts like working it, sending the member to the bottom */
+            refusal_moves_to_bottom?: boolean;
+            /** @description Open a vacancy automatically when leave is approved for someone on duty */
+            vacancy_from_leave?: boolean;
+        };
         /** @description Restricts every related-field choice to the requesting user's department. */
         PatchedOvertimeShiftRequest: {
             user?: number;
@@ -3465,6 +3817,10 @@ export interface components {
          * @enum {string}
          */
         PriorityEnum: "low" | "normal" | "high" | "critical";
+        PushDeviceRequest: {
+            token: string;
+            platform?: string;
+        };
         /**
          * @description * `restock` - Restock / received
          *     * `used` - Used
@@ -3906,6 +4262,64 @@ export interface components {
             is_active?: boolean;
             password?: string;
         };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        Vacancy: {
+            readonly id: number;
+            /** Format: date */
+            date: string;
+            overtime_list?: components["schemas"]["OvertimeListEnum"] | components["schemas"]["BlankEnum"];
+            position?: components["schemas"]["PositionEnum"] | components["schemas"]["BlankEnum"];
+            station?: number | null;
+            readonly station_name: string;
+            /** @description The member whose seat is empty */
+            filling_for?: number | null;
+            readonly filling_for_name: string;
+            readonly leave_request: number | null;
+            /** Format: decimal */
+            hours?: string;
+            note?: string;
+            readonly status: components["schemas"]["VacancyStatusEnum"];
+            /**
+             * Format: date-time
+             * @description When volunteering closes
+             */
+            readonly respond_by: string | null;
+            readonly description: string;
+            readonly hired_name: string | null;
+            readonly hired_mandatory: boolean | null;
+            readonly offers: components["schemas"]["VacancyOffer"][];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        VacancyOffer: {
+            readonly id: number;
+            readonly user: number;
+            readonly user_name: string;
+            readonly status: components["schemas"]["OvertimeOfferStatusEnum"];
+            /** Format: date-time */
+            readonly responded_at: string | null;
+        };
+        /** @description Restricts every related-field choice to the requesting user's department. */
+        VacancyRequest: {
+            /** Format: date */
+            date: string;
+            overtime_list?: components["schemas"]["OvertimeListEnum"] | components["schemas"]["BlankEnum"];
+            position?: components["schemas"]["PositionEnum"] | components["schemas"]["BlankEnum"];
+            station?: number | null;
+            /** @description The member whose seat is empty */
+            filling_for?: number | null;
+            /** Format: decimal */
+            hours?: string;
+            note?: string;
+        };
+        /**
+         * @description * `offered` - Offered to volunteers
+         *     * `filled` - Filled
+         *     * `unfilled` - No one available
+         *     * `cancelled` - Cancelled
+         * @enum {string}
+         */
+        VacancyStatusEnum: "offered" | "filled" | "unfilled" | "cancelled";
         /** @description Restricts every related-field choice to the requesting user's department. */
         WorkOrder: {
             readonly id: number;
@@ -7159,6 +7573,74 @@ export interface operations {
             };
         };
     };
+    api_v1_notifications_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedNotificationList"];
+                };
+            };
+        };
+    };
+    api_v1_notifications_read_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this notification. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
+    api_v1_notifications_read_all_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     api_v1_onboarding_list: {
         parameters: {
             query?: never;
@@ -7195,6 +7677,174 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OvertimeBoard"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_offers_list: {
+        parameters: {
+            query?: {
+                /** @description Only offers still taking answers */
+                open?: boolean;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `pending` - Waiting for an answer
+                 *     * `accepted` - Volunteered
+                 *     * `declined` - Turned down
+                 *     * `expired` - No answer
+                 *     * `withdrawn` - No longer needed
+                 */
+                status?: "accepted" | "declined" | "expired" | "pending" | "withdrawn";
+                vacancy?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOvertimeOfferList"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_offers_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeOffer"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_offers_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime offer. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeOffer"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_offers_accept_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime offer. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeOffer"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_offers_decline_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this overtime offer. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeOffer"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_settings_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeSettings"];
+                };
+            };
+        };
+    };
+    api_v1_overtime_settings_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedOvertimeSettingsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedOvertimeSettingsRequest"];
+                "multipart/form-data": components["schemas"]["PatchedOvertimeSettingsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OvertimeSettings"];
                 };
             };
         };
@@ -7503,6 +8153,48 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Platoon"];
                 };
+            };
+        };
+    };
+    api_v1_push_devices_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushDeviceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PushDeviceRequest"];
+                "multipart/form-data": components["schemas"]["PushDeviceRequest"];
+            };
+        };
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_v1_push_devices_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -8623,6 +9315,163 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_list: {
+        parameters: {
+            query?: {
+                date?: string;
+                /** @description Only vacancies still open */
+                open?: boolean;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `offered` - Offered to volunteers
+                 *     * `filled` - Filled
+                 *     * `unfilled` - No one available
+                 *     * `cancelled` - Cancelled
+                 */
+                status?: "cancelled" | "filled" | "offered" | "unfilled";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedVacancyList"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VacancyRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VacancyRequest"];
+                "multipart/form-data": components["schemas"]["VacancyRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacancy"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vacancy. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacancy"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_cancel_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vacancy. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacancy"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_fill_now_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vacancy. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacancy"];
+                };
+            };
+        };
+    };
+    api_v1_vacancies_hire_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vacancy. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HireRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["HireRequest"];
+                "multipart/form-data": components["schemas"]["HireRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vacancy"];
                 };
             };
         };
