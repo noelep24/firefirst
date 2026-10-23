@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -119,6 +120,40 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        if not DEBUG
+        else "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
+
+# The built officer web app (web/dist). In production it's served from the same site as the API so the
+# session and CSRF cookies are first-party: files at the root URL, and index.html for every app route.
+WEB_DIST = Path(os.environ.get("FIREFIRST_WEB_DIST", BASE_DIR.parent / "web" / "dist"))
+WHITENOISE_ROOT = WEB_DIST if WEB_DIST.exists() else None
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365 if not DEBUG else 0
+
+# ---------- Production hardening (DJANGO_DEBUG=false) ----------
+if not DEBUG:
+    # Behind a TLS-terminating proxy or load balancer (Render, Fly, ALB, nginx…).
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+    SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDS", 60 * 60 * 24 * 30))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
+    # The health check is fetched over plain HTTP inside the platform's network.
+    SECURE_REDIRECT_EXEMPT = [r"^healthz$"]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO")},
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

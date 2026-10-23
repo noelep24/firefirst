@@ -38,3 +38,22 @@ jobs:
           python manage.py spectacular --fail-on-warn --file /tmp/schema.yml
           diff -u openapi.yml /tmp/schema.yml
       - run: pytest
+
+  docker:
+    # The production image: web app build + Django + gunicorn, started against Postgres.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t firefirst:ci .
+      - name: Image starts and serves the app
+        run: |
+          docker network create ff
+          docker run -d --name db --network ff -e POSTGRES_USER=ff -e POSTGRES_PASSWORD=ff -e POSTGRES_DB=ff postgres:16
+          for i in $(seq 1 30); do docker exec db pg_isready -U ff && break; sleep 1; done
+          docker run -d --name app --network ff -p 8000:8000 \
+            -e DATABASE_URL=postgres://ff:ff@db:5432/ff -e DJANGO_SECRET_KEY=ci-only-0123456789abcdefghijklmnop \
+            -e DJANGO_ALLOWED_HOSTS=localhost -e DJANGO_SECURE_SSL_REDIRECT=false firefirst:ci
+          for i in $(seq 1 30); do curl -fs localhost:8000/healthz && break; sleep 2; done
+          curl -fs localhost:8000/healthz
+          curl -fs localhost:8000/apparatus | grep -q 'id="root"'
+          docker logs app

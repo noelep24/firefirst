@@ -7,4 +7,5 @@ dj-database-url>=3
 django-cors-headers>=4.4
 psycopg[binary]>=3.2
 gunicorn>=23
+whitenoise>=6.7
 openpyxl>=3.1

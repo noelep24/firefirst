@@ -10,15 +10,18 @@ This repository holds:
 - **`web/`**: the officer and admin app for the browser (React). See [web/README.md](web/README.md)
 - **`mobile/`**: the crew app for iOS and Android (Expo / React Native). See [mobile/README.md](mobile/README.md)
 
-## What's in v0.1
+## What's in it
 
 | Module | What it does |
 | --- | --- |
-| **Departments & people** | Multi-station departments, members with roles (admin / officer / member), rank, home station |
+| **Departments & people** | Multi-station departments, members with roles (admin / officer / member), rank, home station, self-serve sign-up with a starter kit and an onboarding checklist |
+| **Certifications** | EMT, Paramedic, Driver/Operator and others, with renewal periods, expirations, required-for-everyone types and a compliance view |
 | **Inventory** | Item catalog (EMS, PPE, SCBA, tools…), storage locations on stations *or* rigs, par levels, expiration tracking, and an immutable log of every stock movement |
 | **Apparatus** | Fleet records, configurable rig-check checklists, inspections that open work orders automatically for deficient items, work orders that take a rig out of service and put it back, and preventive maintenance due by date, mileage or engine hours (pump tests, ladder tests, oil changes…) |
-| **Scheduling** | Platoons, rotation patterns (24/48, 48/96, Kelly, or any custom sequence), standing assignments, a live daily roster, a leave request → approval workflow, and shift trades (requester → covering member → officer) |
-| **Events** | Department calendar (training, drills, meetings, public ed, inspections), invitations, mandatory events, RSVPs, attendance and training-hour totals |
+| **Scheduling** | Platoons, rotation patterns (24/48, 48/96, Kelly, or any custom sequence), standing assignments, a live daily roster, leave and shift-trade approvals, and minimum-staffing rules (by station, position or certification) that flag short shifts, including before leave is approved |
+| **Events** | Department calendar (training, drills, meetings, public ed, inspections), recurring events ("2nd Tuesday of the month"), invitations, mandatory events, RSVPs, attendance and training-hour totals, and a personal calendar feed with each member's real shifts |
+| **Import** | People, apparatus and inventory from ESO exports or spreadsheets (CSV/Excel), with a preview before anything is saved |
+| **Audit log** | Every change to department data: who, when, before and after |
 | **Reports** | Fleet (check rate, out-of-service days, repair and maintenance cost), inventory usage, training hours, leave taken, maintenance status; CSV export |
 | **Dashboard** | One call for the morning view: platoon on duty, rigs out of service, open work orders, maintenance due, low and expiring stock, upcoming events and pending approvals |
 
@@ -32,7 +35,11 @@ backend/
   apps/apparatus/    Apparatus, ChecklistTemplate/Item, Inspection, WorkOrder,
                      MaintenanceSchedule, ServiceRecord
   apps/scheduling/   Platoon, RotationPattern, Assignment, LeaveRequest, ShiftTrade, roster
-  apps/events/       Event, Attendance
+  apps/events/       Event, Attendance, recurrence, iCalendar feed
+  apps/certifications/  CertificationType, Certification
+  apps/imports/      spreadsheet import engine and importers
+  apps/reports/      report tables and CSV export
+  apps/audit/        AuditEntry and the change recorder
 ```
 
 **Multi-tenant from day one.** Every department-owned row carries a
@@ -140,9 +147,10 @@ ruff check . && ruff format --check .
 - [ ] Events: ISO training reports
 
 **Selling to other departments**
-- [ ] Self-serve department sign-up and onboarding
 - [ ] Subscription billing (e.g. Stripe), plans and limits
 - [x] Audit log of who changed what
 - [ ] SSO (Azure AD and Google Workspace are common in municipal IT), MFA
 - [ ] Per-department data export, backups, and a published security and data-retention policy (city IT and procurement will send security questionnaires)
-- [ ] Production deployment (container, managed Postgres, object storage for attachments, error monitoring)
+- [x] Self-serve department sign-up with a starter kit, and an onboarding checklist
+- [x] Production container (API + web app on one site, hardened settings, health check); see [DEPLOY.md](DEPLOY.md)
+- [ ] Object storage for attachments and error monitoring

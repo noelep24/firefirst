@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -11,6 +11,7 @@ from apps.core import views as core
 from apps.core.dashboard import DashboardView
 from apps.core.session_auth import CsrfView, SessionView
 from apps.core.signup import OnboardingView, SignupView
+from apps.core.site import healthz, web_app
 from apps.events import views as events
 from apps.imports import views as imports
 from apps.inventory import views as inventory
@@ -74,4 +75,7 @@ urlpatterns = [
     path("calendar/<str:token>.ics", events.CalendarFeedView.as_view(), name="calendar-feed"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="api-docs"),
+    path("healthz", healthz, name="healthz"),
+    # Everything else is a web app route (files like /assets/*.js are served by WhiteNoise first).
+    re_path(r"^(?!api/|admin/|static/|calendar/)(?P<path>.*)$", web_app, name="web-app"),
 ]
