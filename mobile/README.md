@@ -19,6 +19,31 @@ Keystore (`expo-secure-store`) and refresh automatically. You can change the
 server address on the login screen, which helps when testing against a laptop
 on your Wi-Fi.
 
+## Offline
+
+Apparatus bays and rural calls often have no signal, so the app keeps
+working without it:
+
+- **Data stays on the phone.** Rigs, every active checklist, supplies and the
+  dashboard are cached on the device (for up to 24 hours), so screens open
+  with the last-known data. Sections that were never loaded say "No signal"
+  instead of spinning.
+- **Writes queue in an outbox.** Rig checks, supply changes and problem
+  reports made offline are saved on the phone. A banner on every tab shows
+  how many are waiting, and they send automatically when signal returns,
+  when the app opens, and every 30 seconds while any are waiting.
+- **Retries never duplicate.** Each queued write carries an
+  `Idempotency-Key`. If the server saved it but the reply was lost, the retry
+  gets the original response back instead of saving a second rig check.
+- **Rejected writes wait for a person.** If the server refuses one (for
+  example, a deficient item without a note), it's marked "Not saved" on the
+  Waiting to sync screen, where the member can retry or discard it.
+- Queued writes are tied to the member who made them and are only ever sent
+  with that member's sign-in.
+
+The outbox logic lives in `src/offline/outbox-core.ts` and is unit-tested
+(`npm test`).
+
 ## Running it
 
 Start the backend first (see the root README) and load the demo data with
@@ -87,7 +112,7 @@ loads.
 
 ## Not built yet
 
-- Offline mode: queue rig checks and stock changes made without signal, and sync later
+- Offline leave requests and RSVPs (they need a live answer today)
 - Push notifications for trade requests, approvals and new work orders
 - Photos on rig checks and work orders
 - Date picker (leave dates are typed as YYYY-MM-DD for now)

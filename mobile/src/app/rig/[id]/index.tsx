@@ -5,19 +5,12 @@ import { api, unwrap } from '@/api/client';
 import { Badge, Button, Card, Empty, Label, QueryState, Row, Screen, Section } from '@/components/ui';
 import { formatDateTime, humanize } from '@/lib/format';
 import { apparatusStatus, priorityTone, workOrderStatus } from '@/lib/labels';
+import { checklistsFor, useChecklists, useRig } from '@/lib/queries';
 
 export default function RigScreen() {
   const id = Number(useLocalSearchParams<{ id: string }>().id);
-  const path = { params: { path: { id } } };
-
-  const rig = useQuery({
-    queryKey: ['apparatus', id],
-    queryFn: () => unwrap(api().GET('/api/v1/apparatus/{id}/', path)),
-  });
-  const checklists = useQuery({
-    queryKey: ['apparatus', id, 'checklists'],
-    queryFn: () => unwrap(api().GET('/api/v1/apparatus/{id}/checklists/', path)),
-  });
+  const rig = useRig(id);
+  const checklists = useChecklists();
   const workOrders = useQuery({
     queryKey: ['work-orders', { apparatus: id, open: true }],
     queryFn: () => unwrap(api().GET('/api/v1/work-orders/', { params: { query: { apparatus: id, open: true } } })),
@@ -63,11 +56,11 @@ export default function RigScreen() {
 
       <Section title="Rig check">
         <QueryState query={checklists}>
-          {(checklistsData) =>
-            checklistsData.length === 0 ? (
+          {(all) =>
+            checklistsFor(all, rig.data).length === 0 ? (
               <Empty text="No checklist is set up for this type of rig." />
             ) : (
-              checklistsData.map((template) => (
+              checklistsFor(all, rig.data).map((template) => (
                 <Button
                   key={template.id}
                   title={`Start: ${template.name}`}

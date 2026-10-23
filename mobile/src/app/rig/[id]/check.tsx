@@ -1,12 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { api, type Schemas, unwrap } from '@/api/client';
+import type { Schemas } from '@/api/client';
+import { useMe } from '@/auth/auth-context';
 import { Button, Card, ErrorBox, Field, Label, QueryState, Row, Screen, Section } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useChecklists, useRig } from '@/lib/queries';
+import { submit as submitOrQueue } from '@/offline/outbox';
 
 type Status = 'ok' | 'deficient' | 'na';
 type Answer = { status: Status; note: string };
@@ -23,10 +26,11 @@ export default function RigCheckScreen() {
   const templateId = Number(params.template);
   const queryClient = useQueryClient();
 
-  const template = useQuery({
-    queryKey: ['checklists', templateId],
-    queryFn: () => unwrap(api().GET('/api/v1/checklists/{id}/', { params: { path: { id: templateId } } })),
-  });
+  const { me } = useMe();
+  const rig = useRig(apparatusId);
+  const checklists = useChecklists();
+  // A query-shaped view of the one checklist, for QueryState.
+  const template = { ...checklists, data: checklists.data?.find((t) => t.id === templateId) };
 
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
   const [mileage, setMileage] = useState('');
@@ -35,7 +39,13 @@ export default function RigCheckScreen() {
   const [problem, setProblem] = useState<string | null>(null);
 
   const submit = useMutation({
-    mutationFn: (body: Schemas['InspectionRequest']) => unwrap(api().POST('/api/v1/inspections/', { body })),
+    mutationFn: (body: Schemas['InspectionRequest']) =>
+      submitOrQueue<Schemas['Inspection']>(
+        '/api/v1/inspections/',
+        body,
+        `Rig check · ${rig.data?.unit_number ?? 'apparatus'}`,
+        me.id,
+      ),
     onSuccess: () => {
       for (const key of ['apparatus', 'inspections', 'work-orders', 'dashboard']) {
         queryClient.invalidateQueries({ queryKey: [key] });
@@ -86,8 +96,27 @@ export default function RigCheckScreen() {
     });
   }
 
+  if (submit.isSuccess && submit.data.queued) {
+    const deficient = items.filter((item) => answers[item.id!]?.status === 'deficient').length;
+    return (
+      <Screen>
+        <Card>
+          <Label type="title" color="warning">
+            Saved on this phone
+          </Label>
+          <Label>
+            No signal right now. Your check
+            {deficient ? ` and ${deficient} problem report${deficient === 1 ? '' : 's'}` : ''} will be sent
+            automatically when you&apos;re back online.
+          </Label>
+        </Card>
+        <Button title="Done" onPress={() => router.back()} />
+      </Screen>
+    );
+  }
+
   if (submit.isSuccess) {
-    const deficient = submit.data.deficiency_count ?? 0;
+    const deficient = submit.data.queued ? 0 : (submit.data.data.deficiency_count ?? 0);
     return (
       <Screen>
         <Card>

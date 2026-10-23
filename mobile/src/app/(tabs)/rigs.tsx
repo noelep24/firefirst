@@ -1,16 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 
-import { api, unwrap } from '@/api/client';
 import { Badge, Card, Empty, Label, QueryState, Row, Screen } from '@/components/ui';
 import { humanize } from '@/lib/format';
 import { apparatusStatus } from '@/lib/labels';
+import { rigsQuery, useChecklists } from '@/lib/queries';
 
 export default function RigsScreen() {
-  const rigs = useQuery({
-    queryKey: ['apparatus'],
-    queryFn: () => unwrap(api().GET('/api/v1/apparatus/', { params: { query: { page_size: 200 } } })),
-  });
+  const rigs = useQuery(rigsQuery);
+  // Load every checklist now so a rig check works later even without signal.
+  useChecklists();
 
   return (
     <Screen

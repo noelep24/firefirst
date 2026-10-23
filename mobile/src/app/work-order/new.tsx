@@ -3,9 +3,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Switch } from 'react-native';
 
-import { api, type Schemas, unwrap } from '@/api/client';
+import type { Schemas } from '@/api/client';
+import { useMe } from '@/auth/auth-context';
 import { Button, Card, ErrorBox, Field, Label, Row, Screen, Segmented } from '@/components/ui';
 import { useTheme } from '@/hooks/use-theme';
+import { submit as submitOrQueue } from '@/offline/outbox';
 
 type Priority = NonNullable<Schemas['WorkOrderRequest']['priority']>;
 
@@ -18,12 +20,14 @@ export default function NewWorkOrderScreen() {
   const [priority, setPriority] = useState<Priority>('normal');
   const [outOfService, setOutOfService] = useState(false);
 
+  const { me } = useMe();
   const create = useMutation({
     mutationFn: () =>
-      unwrap(
-        api().POST('/api/v1/work-orders/', {
-          body: { apparatus, title: title.trim(), description, priority, takes_out_of_service: outOfService },
-        }),
+      submitOrQueue(
+        '/api/v1/work-orders/',
+        { apparatus, title: title.trim(), description, priority, takes_out_of_service: outOfService },
+        `Problem report · ${title.trim()}`,
+        me.id,
       ),
     onSuccess: () => {
       for (const key of ['apparatus', 'work-orders', 'dashboard']) queryClient.invalidateQueries({ queryKey: [key] });

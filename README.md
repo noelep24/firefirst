@@ -120,7 +120,8 @@ ruff check . && ruff format --check .
 **Next: clients**
 - [x] Web app for officers and admins (React + TypeScript, types generated from the OpenAPI schema)
 - [x] Mobile app (Expo for iOS and Android): rig checks, work orders, stock usage with barcode scanning, roster, leave and trades, calendar
-- [ ] Mobile: offline rig checks and stock changes that sync when back in coverage, photos, date picker, store builds (EAS)
+- [x] Mobile offline mode: cached data, an outbox that syncs rig checks, stock changes and problem reports, and idempotent retries
+- [ ] Mobile: photos, date picker, store builds (EAS)
 - [ ] Push notifications (trade requests, approvals, work orders, maintenance due)
 
 **Replacing ESO**

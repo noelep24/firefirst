@@ -1,8 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, type ReactNode, use, useEffect, useState } from 'react';
 
 import * as client from '@/api/client';
 import { api, type Schemas, unwrap } from '@/api/client';
+import { clearCache } from '@/offline/query-cache';
 
 type AuthState =
   { status: 'loading' } | { status: 'signedOut' } | { status: 'signedIn'; me: Schemas['Me']; isOfficer: boolean };
@@ -14,17 +15,25 @@ type AuthContextValue = AuthState & {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// The last profile we loaded, so the app can open without signal.
+const ME_KEY = 'ff.me';
+
 function signedIn(me: Schemas['Me']): AuthState {
   return { status: 'signedIn', me, isOfficer: me.role === 'admin' || me.role === 'officer' };
 }
 
+async function loadMe() {
+  const me = await unwrap(api().GET('/api/v1/me/'));
+  await AsyncStorage.setItem(ME_KEY, JSON.stringify(me));
+  return me;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: 'loading' });
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     client.setSessionExpiredHandler(() => {
-      queryClient.clear();
+      clearCache();
       setState({ status: 'signedOut' });
     });
     (async () => {
@@ -33,21 +42,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       try {
-        setState(signedIn(await unwrap(api().GET('/api/v1/me/'))));
+        setState(signedIn(await loadMe()));
       } catch (e) {
-        // A rejected session is cleared. If the server just couldn't be reached, keep the saved
-        // tokens so the next launch can resume, and show login in the meantime.
+        if (e instanceof client.ApiError && e.status === 0) {
+          // No signal: carry on with the saved session and the last-known profile.
+          const cached = await AsyncStorage.getItem(ME_KEY);
+          setState(cached ? signedIn(JSON.parse(cached)) : { status: 'signedOut' });
+          return;
+        }
+        await client.signOut();
         setState({ status: 'signedOut' });
-        if (e instanceof client.ApiError && e.status !== 0) await client.signOut();
       }
     })();
-  }, [queryClient]);
+  }, []);
 
   const value: AuthContextValue = {
     ...state,
     async signIn(server, username, password) {
       await client.signIn(server, username, password);
-      const me = await unwrap(api().GET('/api/v1/me/'));
+      const me = await loadMe();
       if (!me.department) {
         await client.signOut();
         throw new client.ApiError('This account is not part of a department.', 403);
@@ -55,8 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState(signedIn(me));
     },
     async signOut() {
+      // Queued changes stay on the phone, tagged with their author, and are sent next time they sign in.
       await client.signOut();
-      queryClient.clear();
+      await AsyncStorage.removeItem(ME_KEY);
+      await clearCache();
       setState({ status: 'signedOut' });
     },
   };

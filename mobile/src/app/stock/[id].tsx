@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { api, type Schemas, unwrap } from '@/api/client';
+import { useMe } from '@/auth/auth-context';
 import {
   Badge,
   Button,
@@ -21,6 +22,7 @@ import {
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDateTime, formatDay } from '@/lib/format';
+import { submit as submitOrQueue } from '@/offline/outbox';
 
 type Mode = 'used' | 'restock' | 'expired' | 'count';
 
@@ -40,9 +42,16 @@ export default function StockScreen() {
   const [note, setNote] = useState('');
   const [done, setDone] = useState<string | null>(null);
 
+  const { me } = useMe();
   const stock = useQuery({
     queryKey: ['stock', id],
     queryFn: () => unwrap(api().GET('/api/v1/inventory/stock/{id}/', { params: { path: { id } } })),
+    // Start from whatever list the member came from: instant, and works offline.
+    placeholderData: () =>
+      queryClient
+        .getQueriesData<Schemas['StockLevel'][]>({ queryKey: ['stock'] })
+        .flatMap(([, data]) => (Array.isArray(data) ? data : []))
+        .find((s) => s.id === id),
   });
   const history = useQuery({
     queryKey: ['stock', id, 'transactions'],
@@ -52,8 +61,20 @@ export default function StockScreen() {
 
   const adjust = useMutation({
     mutationFn: (body: Schemas['StockAdjustmentRequest']) =>
-      unwrap(api().POST('/api/v1/inventory/stock/{id}/adjust/', { params: { path: { id } }, body })),
-    onSuccess: (result) => {
+      submitOrQueue<Schemas['StockAdjustmentResult']>(
+        `/api/v1/inventory/stock/${id}/adjust/`,
+        body,
+        `${body.change > 0 ? '+' : ''}${body.change} ${stock.data?.item_name ?? 'stock'}`,
+        me.id,
+      ),
+    onSuccess: (submitted) => {
+      if (submitted.queued) {
+        setDone('No signal: saved on this phone. It will sync when you are back online.');
+        setAmount(mode === 'count' ? String(quantity) : '1');
+        setNote('');
+        return;
+      }
+      const result = submitted.data;
       queryClient.setQueryData(['stock', id], result.stock);
       for (const key of ['stock', 'dashboard']) queryClient.invalidateQueries({ queryKey: [key] });
       setDone(

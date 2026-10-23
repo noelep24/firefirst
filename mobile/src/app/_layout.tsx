@@ -1,41 +1,23 @@
-import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { AppState, Platform } from 'react-native';
 
-import { ApiError } from '@/api/client';
 import { AuthProvider, useAuth } from '@/auth/auth-context';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { OutboxSync } from '@/offline/outbox-sync';
+import { persistOptions, queryClient } from '@/offline/query-cache';
 
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 30_000,
-      // Don't retry requests the server rejected (4xx); do retry flaky connections.
-      retry: (count, error) => !(error instanceof ApiError && error.status >= 400 && error.status < 500) && count < 2,
-    },
-  },
-});
-
-// Refetch stale data when the app comes back to the foreground.
-if (Platform.OS !== 'web') {
-  focusManager.setEventListener((handleFocus) => {
-    const subscription = AppState.addEventListener('change', (state) => handleFocus(state === 'active'));
-    return () => subscription.remove();
-  });
-}
-
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <AuthProvider>
         <Navigation />
       </AuthProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
@@ -54,6 +36,7 @@ function Navigation() {
 
   return (
     <ThemeProvider value={theme}>
+      {auth.status === 'signedIn' ? <OutboxSync userId={auth.me.id} /> : null}
       <Stack screenOptions={{ headerBackButtonDisplayMode: 'minimal' }}>
         <Stack.Protected guard={auth.status === 'signedIn'}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -66,6 +49,7 @@ function Navigation() {
           <Stack.Screen name="leave/new" options={{ title: 'Request leave', presentation: 'modal' }} />
           <Stack.Screen name="trade/new" options={{ title: 'Trade a shift', presentation: 'modal' }} />
           <Stack.Screen name="event/[id]" options={{ title: 'Event' }} />
+          <Stack.Screen name="outbox" options={{ title: 'Waiting to sync' }} />
         </Stack.Protected>
         <Stack.Protected guard={auth.status === 'signedOut'}>
           <Stack.Screen name="login" options={{ headerShown: false }} />

@@ -70,3 +70,18 @@ class User(AbstractUser):
     def __str__(self):
         full = self.get_full_name()
         return f"{self.rank} {full}".strip() if full else self.username
+
+
+class IdempotencyKey(models.Model):
+    """Remembers the response to a POST sent with an ``Idempotency-Key`` header, so retries don't repeat it."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    key = models.CharField(max_length=100)
+    path = models.CharField(max_length=300)
+    # Null while the first request is still being processed.
+    status_code = models.PositiveSmallIntegerField(null=True)
+    body = models.JSONField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "key"], name="unique_idempotency_key")]

@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MaxContentWidth, Spacing, type ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { OutboxBanner } from '@/offline/outbox-banner';
 
 type ScreenProps = {
   title?: string;
@@ -42,6 +43,7 @@ export function Screen({ title, subtitle, children, refreshing = false, onRefres
         contentContainerStyle={styles.screenContent}
         keyboardShouldPersistTaps="handled"
         refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> : undefined}>
+        {tab ? <OutboxBanner /> : null}
         {title ? (
           <View style={styles.header}>
             <Label type="title">{title}</Label>
@@ -261,9 +263,12 @@ export function QueryState<T>({
   query,
   children,
 }: {
-  query: { data: T | undefined; isPending: boolean; error: unknown; refetch: () => unknown };
+  query: { data: T | undefined; isPending: boolean; error: unknown; refetch: () => unknown; fetchStatus?: string };
   children: (data: T) => ReactNode;
 }) {
+  // Paused = waiting for a connection, with nothing cached to show.
+  if (query.isPending && query.fetchStatus === 'paused')
+    return <Empty text="No signal. This will load when you're back online." />;
   if (query.isPending) return <Loading />;
   if (query.error) return <ErrorBox error={query.error} onRetry={() => query.refetch()} />;
   return <>{children(query.data as T)}</>;
