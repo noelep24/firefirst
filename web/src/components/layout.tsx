@@ -32,7 +32,7 @@ export function Layout() {
     {
       title: 'Overview',
       items: [
-        { to: '/', label: 'Dashboard' },
+        { to: '/', label: 'Today' },
         { to: '/reports', label: 'Reports' },
       ],
     },
