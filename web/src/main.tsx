@@ -31,6 +31,7 @@ const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const Import = lazy(() => import('@/pages/Import'));
 const Reports = lazy(() => import('@/pages/Reports'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Admin = lazy(() => import('@/pages/Admin'));
 const Incidents = lazy(() => import('@/pages/Incidents'));
 const IncidentDetail = lazy(() => import('@/pages/IncidentDetail'));
 
@@ -73,6 +74,7 @@ function App() {
           {isAdmin ? <Route path="audit" element={<AuditLog />} /> : null}
           {isAdmin ? <Route path="import" element={<Import />} /> : null}
           {isAdmin ? <Route path="settings" element={<Settings />} /> : null}
+          {isAdmin ? <Route path="admin" element={<Admin />} /> : null}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
