@@ -2586,21 +2586,17 @@ paths:
         schema:
           type: string
           enum:
-          - ems
-          - hose
+          - equipment
+          - fire_gear
+          - medical
           - other
-          - ppe
-          - scba
-          - station
-          - tools
+          - uniforms
         description: |-
-          * `ems` - EMS / Medical
-          * `ppe` - PPE / Turnout gear
-          * `scba` - SCBA
-          * `tools` - Tools & equipment
-          * `hose` - Hose & appliances
-          * `station` - Station supplies
-          * `other` - Other
+          * `uniforms` - Station uniforms
+          * `fire_gear` - Structure fire & tech rescue gear
+          * `medical` - Medical supplies
+          * `equipment` - Apparatus equipment
+          * `other` - Station & other supplies
       - in: query
         name: is_active
         schema:
@@ -2979,21 +2975,17 @@ paths:
         schema:
           type: string
           enum:
-          - ems
-          - hose
+          - equipment
+          - fire_gear
+          - medical
           - other
-          - ppe
-          - scba
-          - station
-          - tools
+          - uniforms
         description: |-
-          * `ems` - EMS / Medical
-          * `ppe` - PPE / Turnout gear
-          * `scba` - SCBA
-          * `tools` - Tools & equipment
-          * `hose` - Hose & appliances
-          * `station` - Station supplies
-          * `other` - Other
+          * `uniforms` - Station uniforms
+          * `fire_gear` - Structure fire & tech rescue gear
+          * `medical` - Medical supplies
+          * `equipment` - Apparatus equipment
+          * `other` - Station & other supplies
       - in: query
         name: location
         schema:
@@ -3233,21 +3225,17 @@ paths:
         schema:
           type: string
           enum:
-          - ems
-          - hose
+          - equipment
+          - fire_gear
+          - medical
           - other
-          - ppe
-          - scba
-          - station
-          - tools
+          - uniforms
         description: |-
-          * `ems` - EMS / Medical
-          * `ppe` - PPE / Turnout gear
-          * `scba` - SCBA
-          * `tools` - Tools & equipment
-          * `hose` - Hose & appliances
-          * `station` - Station supplies
-          * `other` - Other
+          * `uniforms` - Station uniforms
+          * `fire_gear` - Structure fire & tech rescue gear
+          * `medical` - Medical supplies
+          * `equipment` - Apparatus equipment
+          * `other` - Station & other supplies
       - in: query
         name: location
         schema:
@@ -8481,22 +8469,18 @@ components:
       - name
     ItemCategoryEnum:
       enum:
-      - ems
-      - ppe
-      - scba
-      - tools
-      - hose
-      - station
+      - uniforms
+      - fire_gear
+      - medical
+      - equipment
       - other
       type: string
       description: |-
-        * `ems` - EMS / Medical
-        * `ppe` - PPE / Turnout gear
-        * `scba` - SCBA
-        * `tools` - Tools & equipment
-        * `hose` - Hose & appliances
-        * `station` - Station supplies
-        * `other` - Other
+        * `uniforms` - Station uniforms
+        * `fire_gear` - Structure fire & tech rescue gear
+        * `medical` - Medical supplies
+        * `equipment` - Apparatus equipment
+        * `other` - Station & other supplies
     ItemRequest:
       type: object
       description: Restricts every related-field choice to the requesting user's department.

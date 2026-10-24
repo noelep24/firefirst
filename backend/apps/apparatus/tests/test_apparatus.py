@@ -205,3 +205,38 @@ def test_work_orders_filter_by_station(client_for, member, department, engine):
     WorkOrder.objects.create(department=department, apparatus=e2, title="Light bar out")
     rows = client_for(member).get(f"/api/v1/work-orders/?station={north.id}").json()["results"]
     assert [w["title"] for w in rows] == ["Light bar out"]
+
+
+def test_rig_checks_email_station_captains_and_new_work_orders_email_admins(
+    client_for, member, admin_user, department, station, make_user, engine, checklist, mailoutbox
+):
+    from apps.scheduling.models import Assignment, Platoon
+
+    platoon = Platoon.objects.create(department=department, code="A")
+    captain = make_user("cap", email="cap@example.com")
+    Assignment.objects.create(department=department, user=captain, platoon=platoon, station=station, position="captain")
+    elsewhere = make_user("other-cap", email="other@example.com")
+    Assignment.objects.create(department=department, user=elsewhere, platoon=platoon, position="captain")
+    admin_user.email = "chief@example.com"
+    admin_user.save()
+
+    # A clean check goes to the station's captain only.
+    client_for(member).post("/api/v1/inspections/", inspection_payload(engine, checklist), format="json")
+    assert [(m.to, m.subject) for m in mailoutbox] == [(["cap@example.com"], "E1 rig check done: all passed")]
+
+    # A check with a problem: the captain hears what was wrong, the admin about the work order it opened.
+    mailoutbox.clear()
+    payload = inspection_payload(engine, checklist, "Driver side light out")
+    client_for(member).post("/api/v1/inspections/", payload, format="json")
+    by_to = {m.to[0]: m for m in mailoutbox}
+    assert by_to["cap@example.com"].subject == "E1 rig check done: 1 problem"
+    assert "Lights and sirens: Driver side light out" in by_to["cap@example.com"].body
+    assert by_to["chief@example.com"].subject == "New work order: E1 – Lights and sirens"
+
+    # A work order reported by hand goes to the admin too.
+    mailoutbox.clear()
+    client_for(member).post(
+        "/api/v1/work-orders/", {"apparatus": engine.id, "title": "Pump won't prime", "priority": "high"}, format="json"
+    )
+    assert [m.subject for m in mailoutbox] == ["New work order: E1 – Pump won't prime"]
+    assert "High priority" in mailoutbox[0].body

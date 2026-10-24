@@ -11,13 +11,12 @@ class Item(TenantModel):
     """A catalog entry: something the department stocks."""
 
     class Category(models.TextChoices):
-        EMS = "ems", "EMS / Medical"
-        PPE = "ppe", "PPE / Turnout gear"
-        SCBA = "scba", "SCBA"
-        TOOLS = "tools", "Tools & equipment"
-        HOSE = "hose", "Hose & appliances"
-        STATION = "station", "Station supplies"
-        OTHER = "other", "Other"
+        # The sections of the Supplies area.
+        UNIFORMS = "uniforms", "Station uniforms"
+        FIRE_GEAR = "fire_gear", "Structure fire & tech rescue gear"
+        MEDICAL = "medical", "Medical supplies"
+        EQUIPMENT = "equipment", "Apparatus equipment"
+        OTHER = "other", "Station & other supplies"
 
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)

@@ -62,13 +62,11 @@ export const apparatusTypes: { value: string; label: string }[] = [
 ];
 
 export const itemCategories: { value: string; label: string }[] = [
-  { value: 'ems', label: 'EMS / Medical' },
-  { value: 'ppe', label: 'PPE / Turnout gear' },
-  { value: 'scba', label: 'SCBA' },
-  { value: 'tools', label: 'Tools & equipment' },
-  { value: 'hose', label: 'Hose & appliances' },
-  { value: 'station', label: 'Station supplies' },
-  { value: 'other', label: 'Other' },
+  { value: 'uniforms', label: 'Station uniforms' },
+  { value: 'fire_gear', label: 'Structure fire & tech rescue gear' },
+  { value: 'medical', label: 'Medical supplies' },
+  { value: 'equipment', label: 'Apparatus equipment' },
+  { value: 'other', label: 'Station & other supplies' },
 ];
 
 export const eventCategories: { value: string; label: string }[] = [

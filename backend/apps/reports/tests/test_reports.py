@@ -70,7 +70,7 @@ def test_inventory_usage(client_for, officer, department, station):
     today = timezone.localdate()
     [row] = report(client_for(officer), "inventory-usage", start=today, end=today)["rows"]
     assert (row["used"], row["restocked"], row["written_off"], row["on_hand"], row["par"]) == (6, 20, 2, 12, 10)
-    assert row["category"] == "Other"
+    assert row["category"] == "Station & other supplies"
 
 
 def test_training(client_for, officer, member, department):
