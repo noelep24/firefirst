@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardCheck, LogOut, Menu, X } from 'lucide-react';
+import { ClipboardCheck, House, LogOut, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 
@@ -10,7 +10,7 @@ import { DepartmentEmblem } from './brand';
 
 import { CalendarFeedButton } from './calendar-feed';
 import { NotificationsBell } from './notifications';
-import { SECTION_GROUPS } from './sections';
+import { AREAS, areaFor, visiblePages } from './sections';
 import { Button } from './ui';
 
 /**
@@ -100,6 +100,7 @@ export function Layout() {
       </nav>
 
       <main className="main">
+        <AreaTabs />
         <Outlet />
       </main>
     </div>
@@ -108,33 +109,53 @@ export function Layout() {
 
 function Navigation({ pending }: { pending: number }) {
   const { isAdmin } = useMe();
+  const current = areaFor(useLocation().pathname);
   return (
     <>
-      {SECTION_GROUPS.map((group) => {
-        const sections = group.sections.filter((s) => !s.adminOnly || isAdmin);
-        if (sections.length === 0) return null;
+      <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+        <House size={18} strokeWidth={1.75} aria-hidden="true" />
+        <span className="nav-label">Home</span>
+      </NavLink>
+      <div className="nav-group">Areas</div>
+      {AREAS.map((area) => {
+        const first = visiblePages(area, isAdmin)[0];
+        if (!first) return null;
+        const Icon = area.icon;
         return (
-          <div key={group.title}>
-            <div className="nav-group">{group.title}</div>
-            {sections.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
-                <span className="nav-label">{label}</span>
-                {to === '/approvals' && pending ? (
-                  <span className="nav-count" aria-label={`${pending} waiting`}>
-                    {pending}
-                  </span>
-                ) : null}
-              </NavLink>
-            ))}
-          </div>
+          <Link
+            key={area.key}
+            to={first.to}
+            className={`nav-link ${current === area ? 'active' : ''}`}
+            aria-current={current === area ? 'page' : undefined}>
+            <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
+            <span className="nav-label">{area.label}</span>
+            {area.key === 'staffing' && pending ? (
+              <span className="nav-count" aria-label={`${pending} waiting`}>
+                {pending}
+              </span>
+            ) : null}
+          </Link>
         );
       })}
     </>
+  );
+}
+
+/** Tabs across the top of an area with more than one page, e.g. Fleet: Apparatus · Work orders · Rig checks. */
+function AreaTabs() {
+  const { isAdmin } = useMe();
+  const area = areaFor(useLocation().pathname);
+  const pages = area ? visiblePages(area, isAdmin) : [];
+  if (!area || pages.length < 2) return null;
+  return (
+    <nav className="area-tabs" aria-label={area.label}>
+      <span className="area-name">{area.label}</span>
+      {pages.map((page) => (
+        <NavLink key={page.to} to={page.to} className={({ isActive }) => `area-tab ${isActive ? 'active' : ''}`}>
+          {page.label}
+        </NavLink>
+      ))}
+    </nav>
   );
 }
 

@@ -31,7 +31,7 @@ const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const Import = lazy(() => import('@/pages/Import'));
 const Reports = lazy(() => import('@/pages/Reports'));
 const Settings = lazy(() => import('@/pages/Settings'));
-const Admin = lazy(() => import('@/pages/Admin'));
+const Training = lazy(() => import('@/pages/Training'));
 const Incidents = lazy(() => import('@/pages/Incidents'));
 const IncidentDetail = lazy(() => import('@/pages/IncidentDetail'));
 
@@ -68,13 +68,13 @@ function App() {
           <Route path="approvals" element={<Approvals />} />
           <Route path="reports" element={<Reports />} />
           <Route path="events" element={<Events />} />
+          <Route path="certifications" element={<Training />} />
           <Route path="checklists" element={<Checklists />} />
           <Route path="people" element={<People />} />
           {isAdmin ? <Route path="stations" element={<Stations />} /> : null}
           {isAdmin ? <Route path="audit" element={<AuditLog />} /> : null}
           {isAdmin ? <Route path="import" element={<Import />} /> : null}
           {isAdmin ? <Route path="settings" element={<Settings />} /> : null}
-          {isAdmin ? <Route path="admin" element={<Admin />} /> : null}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

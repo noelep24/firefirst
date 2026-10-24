@@ -421,6 +421,43 @@ a {
   text-align: center;
 }
 
+.area-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: -8px 0 20px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  width: fit-content;
+  max-width: 100%;
+}
+.area-name {
+  padding: 0 10px 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-2);
+}
+.area-tab {
+  padding: 6px 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.area-tab:hover {
+  color: var(--text);
+}
+.area-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
 .main {
   padding: 32px 40px 72px;
   min-width: 0;
@@ -1183,7 +1220,7 @@ fieldset.incident-form {
 .tile-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 .tile {
   display: flex;
@@ -1204,6 +1241,12 @@ fieldset.incident-form {
 .tile:hover {
   border-color: var(--accent);
   box-shadow: var(--shadow-sm);
+}
+.tile-description {
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: -8px;
 }
 .tile-icon {
   display: grid;
