@@ -109,7 +109,12 @@ class InspectionViewSet(TenantViewSet):
 
 
 @extend_schema_view(
-    list=extend_schema(parameters=[OpenApiParameter("open", OpenApiTypes.BOOL, description="Only open work orders")])
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter("open", OpenApiTypes.BOOL, description="Only open work orders"),
+            OpenApiParameter("station", OpenApiTypes.INT, description="Only rigs based at this station"),
+        ]
+    )
 )
 class WorkOrderViewSet(TenantViewSet):
     """Any member can report a problem; only officers can delete."""
@@ -125,6 +130,9 @@ class WorkOrderViewSet(TenantViewSet):
         qs = super().get_queryset()
         if self.request.query_params.get("open") in ("1", "true"):
             qs = qs.filter(status__in=WorkOrder.OPEN_STATUSES)
+        station = self.request.query_params.get("station")
+        if station and station.isdigit():
+            qs = qs.filter(apparatus__station_id=station)
         return qs
 
     def get_permissions(self):

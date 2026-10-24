@@ -6616,6 +6616,11 @@ paths:
         schema:
           type: string
       - in: query
+        name: station
+        schema:
+          type: integer
+        description: Only rigs based at this station
+      - in: query
         name: status
         schema:
           type: string

@@ -148,12 +148,15 @@ export function Modal({
   onClose,
   children,
   footer,
+  wide,
 }: {
   title: string;
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** For tables and other wide content. */
+  wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -164,7 +167,7 @@ export function Modal({
   }, [open]);
 
   return (
-    <dialog ref={ref} className="modal" onClose={onClose} aria-labelledby="modal-title">
+    <dialog ref={ref} className={`modal ${wide ? 'modal-wide' : ''}`} onClose={onClose} aria-labelledby="modal-title">
       {open ? (
         <>
           <div className="modal-head">

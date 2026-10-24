@@ -1,10 +1,11 @@
 import type { Schemas } from '@/api/http';
 import { CrudPage } from '@/components/crud';
-import { priorities, workOrderFields, workOrderStatuses } from '@/lib/fields';
+import { priorities, useStationFilter, workOrderFields, workOrderStatuses } from '@/lib/fields';
 
 import { workOrderColumns } from './ApparatusDetail';
 
 export default function WorkOrders() {
+  const stationFilter = useStationFilter();
   return (
     <CrudPage<Schemas['WorkOrder']>
       title="Work orders"
@@ -14,6 +15,7 @@ export default function WorkOrders() {
       fields={workOrderFields({ withApparatus: true })}
       defaults={{ priority: 'normal', status: 'open' }}
       filters={[
+        ...stationFilter,
         { name: 'status', label: 'Status', options: workOrderStatuses },
         { name: 'priority', label: 'Priority', options: priorities },
       ]}

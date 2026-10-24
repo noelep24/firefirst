@@ -1,4 +1,7 @@
-import type { Schemas } from '@/api/http';
+import { useQuery } from '@tanstack/react-query';
+
+import { getAll, type Schemas } from '@/api/http';
+import type { Filter } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
 
 import { workOrderStatus } from './labels';
@@ -75,3 +78,15 @@ export const serviceRecordFields: FieldSpec[] = [
   },
   { name: 'notes', label: 'Notes', type: 'textarea' },
 ];
+
+/** A "Station" filter for list pages, once the stations have loaded (none for a one-station department). */
+export function useStationFilter(): Filter[] {
+  const stations = useQuery({
+    queryKey: ['/api/v1/stations/'],
+    queryFn: () => getAll<Schemas['Station']>('/api/v1/stations/'),
+    staleTime: 5 * 60_000,
+  });
+  if (!stations.data || stations.data.length < 2) return [];
+  const options = stations.data.map((s) => ({ value: String(s.id), label: stationLabel(s) }));
+  return [{ name: 'station', label: 'Station', options }];
+}
