@@ -1,14 +1,10 @@
-import { useState } from 'react';
-
 import type { Schemas } from '@/api/http';
 import { useMe } from '@/auth';
 import { CrudPage } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
-import { Badge, PageHeader, Tabs } from '@/components/ui';
+import { Badge, PageHeader } from '@/components/ui';
 import { stationLabel } from '@/lib/fields';
 import { labelFor, roles } from '@/lib/labels';
-
-import { Certifications, CertificationTypes } from './Certifications';
 
 function Members() {
   const { isAdmin } = useMe();
@@ -67,33 +63,19 @@ function Members() {
   );
 }
 
-type Tab = 'members' | 'certifications' | 'types';
-
 export default function People() {
   const { isAdmin } = useMe();
-  const [tab, setTab] = useState<Tab>('members');
   return (
     <div>
       <PageHeader
         title="People"
         subtitle={
           isAdmin
-            ? 'Members, officers and admins, and their certifications.'
+            ? 'Members, officers and admins. Certifications are under Training.'
             : 'Only department admins can edit people.'
         }
       />
-      <Tabs<Tab>
-        value={tab}
-        onChange={setTab}
-        options={[
-          { value: 'members', label: 'Members' },
-          { value: 'certifications', label: 'Certifications' },
-          { value: 'types', label: 'Certification types' },
-        ]}
-      />
-      {tab === 'members' ? <Members /> : null}
-      {tab === 'certifications' ? <Certifications /> : null}
-      {tab === 'types' ? <CertificationTypes /> : null}
+      <Members />
     </div>
   );
 }

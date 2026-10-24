@@ -1,19 +1,28 @@
 import { Link } from 'react-router';
 
-import type { Section } from './sections';
+import { useMe } from '@/auth';
 
-/** A grid of quiet icon tiles, one per section. */
-export function TileGrid({ sections }: { sections: Pick<Section, 'to' | 'label' | 'icon'>[] }) {
+import { type Area, visiblePages } from './sections';
+
+/** One quiet tile per area of the app. */
+export function TileGrid({ areas }: { areas: Area[] }) {
+  const { isAdmin } = useMe();
   return (
     <div className="tile-grid">
-      {sections.map(({ to, label, icon: Icon }) => (
-        <Link key={to} to={to} className="tile">
-          <span className="tile-icon">
-            <Icon size={22} strokeWidth={1.75} aria-hidden="true" />
-          </span>
-          <span className="tile-label">{label}</span>
-        </Link>
-      ))}
+      {areas.map((area) => {
+        const first = visiblePages(area, isAdmin)[0];
+        if (!first) return null;
+        const Icon = area.icon;
+        return (
+          <Link key={area.key} to={first.to} className="tile">
+            <span className="tile-icon">
+              <Icon size={22} strokeWidth={1.75} aria-hidden="true" />
+            </span>
+            <span className="tile-label">{area.label}</span>
+            <span className="tile-description">{area.description}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

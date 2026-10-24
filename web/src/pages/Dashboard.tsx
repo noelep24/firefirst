@@ -50,7 +50,7 @@ export default function Dashboard() {
                 danger
               />
               <StatLink
-                to="/people"
+                to="/certifications"
                 label="Certifications expiring or expired"
                 value={d.certifications_needing_attention}
               />
