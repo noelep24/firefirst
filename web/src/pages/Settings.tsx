@@ -27,6 +27,7 @@ const SECTIONS = [
   { key: 'scheduling', label: 'Scheduling', hint: 'Platoons, rotation, minimum staffing' },
   { key: 'overtime', label: 'Overtime rules', hint: 'Answer time, volunteers, refusals' },
   { key: 'notifications', label: 'Notifications', hint: 'Phone and email, by event' },
+  { key: 'reports', label: 'Reports', hint: 'Emailed briefings and summaries' },
 ] as const;
 type Section = (typeof SECTIONS)[number]['key'];
 
@@ -71,9 +72,147 @@ export default function Settings() {
           ) : null}
           {section === 'overtime' ? <OvertimeRules /> : null}
           {section === 'notifications' ? <NotificationRules /> : null}
+          {section === 'reports' ? <ReportSchedules /> : null}
         </div>
       </div>
     </div>
+  );
+}
+
+type Schedule = Schemas['ReportSchedule'];
+
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/** Reports emailed on a schedule, with a preview and a test send. */
+function ReportSchedules() {
+  const schedules = useQuery({
+    queryKey: ['/api/v1/report-schedules/'],
+    queryFn: () => http.get<Schedule[]>('/api/v1/report-schedules/'),
+  });
+  return (
+    <div className="stack">
+      <p className="muted">
+        Reports go out by email at the time you set, in the department's time zone. Preview one to see today's version.
+      </p>
+      <QueryState query={schedules}>
+        {(rows) => (
+          <>
+            {rows.map((row) => (
+              <ReportScheduleCard key={row.report} schedule={row} />
+            ))}
+          </>
+        )}
+      </QueryState>
+    </div>
+  );
+}
+
+function ReportScheduleCard({ schedule }: { schedule: Schedule }) {
+  const queryClient = useQueryClient();
+  const [values, setValues] = useState(schedule);
+  const [saved, setSaved] = useState(false);
+  const [preview, setPreview] = useState<Schemas['ReportPreview'] | null>(null);
+  const [sent, setSent] = useState(false);
+  const set = (change: Partial<Schedule>) => {
+    setSaved(false);
+    setValues({ ...values, ...change });
+  };
+  const save = useMutation({
+    mutationFn: () => http.patch<Schedule[]>('/api/v1/report-schedules/', [values]),
+    onSuccess: (data) => {
+      setSaved(true);
+      queryClient.setQueryData(['/api/v1/report-schedules/'], data);
+    },
+  });
+  const show = useMutation({
+    mutationFn: () => http.get<Schemas['ReportPreview']>(`/api/v1/report-schedules/${schedule.report}/preview/`),
+    onSuccess: setPreview,
+  });
+  const test = useMutation({
+    mutationFn: () => http.post(`/api/v1/report-schedules/${schedule.report}/send-test/`, {}),
+    onSuccess: () => setSent(true),
+  });
+
+  return (
+    <Card className="stack-sm">
+      <div className="row spread">
+        <div>
+          <h3>{values.label}</h3>
+          <p className="muted small">{values.description}</p>
+        </div>
+        <label className="checkbox">
+          <input type="checkbox" checked={values.enabled} onChange={(e) => set({ enabled: e.target.checked })} />
+          Send it
+        </label>
+      </div>
+      <div className="form-grid">
+        {values.weekly ? (
+          <div className="field">
+            <label htmlFor={`${values.report}-day`}>Day</label>
+            <select
+              id={`${values.report}-day`}
+              value={values.weekday}
+              onChange={(e) => set({ weekday: Number(e.target.value) })}>
+              {WEEKDAYS.map((day, i) => (
+                <option key={day} value={i}>
+                  {day}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+        <div className="field">
+          <label htmlFor={`${values.report}-time`}>Time</label>
+          <input
+            id={`${values.report}-time`}
+            type="time"
+            value={values.send_at.slice(0, 5)}
+            onChange={(e) => set({ send_at: e.target.value })}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor={`${values.report}-to`}>Send to</label>
+          <select
+            id={`${values.report}-to`}
+            value={values.audience}
+            onChange={(e) => set({ audience: e.target.value as Schedule['audience'] })}>
+            <option value="officers">Officers and admins</option>
+            <option value="admins">Admins only</option>
+            <option value="nobody">Only the addresses below</option>
+          </select>
+        </div>
+        <div className="field span-all">
+          <label htmlFor={`${values.report}-extra`}>Also send to (one email per line)</label>
+          <textarea
+            id={`${values.report}-extra`}
+            value={values.extra_emails ?? ''}
+            placeholder="e.g. the city manager"
+            onChange={(e) => set({ extra_emails: e.target.value })}
+          />
+        </div>
+      </div>
+      {values.last_sent_on ? <p className="muted small">Last sent {values.last_sent_on}.</p> : null}
+      <ErrorBox error={save.error ?? show.error ?? test.error} />
+      {saved ? <div className="notice">Saved.</div> : null}
+      {sent ? <div className="notice">Sent to your email address.</div> : null}
+      <div className="row">
+        <Button variant="primary" loading={save.isPending} onClick={() => save.mutate()}>
+          Save
+        </Button>
+        <Button loading={show.isPending} onClick={() => show.mutate()}>
+          Preview today's
+        </Button>
+        <Button variant="ghost" loading={test.isPending} onClick={() => test.mutate()}>
+          Email me a test
+        </Button>
+      </div>
+      {preview ? (
+        <div className="report-preview">
+          <strong>{preview.subject}</strong>
+          <pre>{preview.body}</pre>
+        </div>
+      ) : null}
+    </Card>
   );
 }
 
