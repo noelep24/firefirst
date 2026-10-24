@@ -815,6 +815,9 @@ dialog.modal {
   color: var(--text);
   box-shadow: 0 24px 64px rgb(0 0 0 / 0.3);
 }
+dialog.modal-wide {
+  width: min(980px, calc(100vw - 32px));
+}
 dialog.modal::backdrop {
   background: rgb(0 0 0 / 0.45);
 }
@@ -910,6 +913,23 @@ dialog.modal::backdrop {
   gap: 4px;
   font-size: 0.85rem;
   min-width: 0;
+}
+.calendar-day.addable {
+  cursor: pointer;
+  position: relative;
+}
+.calendar-day.addable:hover {
+  outline: 1.5px solid var(--accent);
+  outline-offset: -1.5px;
+}
+.calendar-day.addable:hover::after {
+  content: '+ Add';
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
 }
 .calendar-day.outside {
   background: transparent;
@@ -1187,6 +1207,8 @@ fieldset.incident-form {
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   overflow: hidden;
+}
+.home-side {
   position: sticky;
   top: 80px;
 }
@@ -1241,6 +1263,32 @@ fieldset.incident-form {
   color: var(--text-2);
 }
 
+.area-links:empty {
+  display: none;
+}
+.area-links-clear {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--success);
+  font-weight: 600;
+}
+.link-button {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  padding: 4px 2px;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.link-button:hover {
+  color: var(--text);
+}
+
 /* Switch between stations: a two-way (or more) toggle. */
 .station-toggle {
   display: inline-flex;
@@ -1274,7 +1322,7 @@ fieldset.incident-form {
   .home-layout {
     grid-template-columns: 1fr;
   }
-  .area-links {
+  .home-side {
     position: static;
   }
 }

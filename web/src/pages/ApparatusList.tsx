@@ -4,7 +4,7 @@ import type { Schemas } from '@/api/http';
 import { CrudPage } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
 import { Badge } from '@/components/ui';
-import { stationLabel } from '@/lib/fields';
+import { stationLabel, useStationFilter } from '@/lib/fields';
 import { apparatusStatus, apparatusTypes, labelFor } from '@/lib/labels';
 
 export const apparatusFields: FieldSpec[] = [
@@ -36,6 +36,7 @@ export const apparatusFields: FieldSpec[] = [
 
 export default function ApparatusList() {
   const navigate = useNavigate();
+  const stationFilter = useStationFilter();
   return (
     <CrudPage<Schemas['Apparatus']>
       title="Apparatus"
@@ -46,6 +47,7 @@ export default function ApparatusList() {
       defaults={{ status: 'in_service', apparatus_type: 'engine', mileage: '0', engine_hours: '0' }}
       onRowClick={(a) => navigate(`/apparatus/${a.id}`)}
       filters={[
+        ...stationFilter,
         {
           name: 'status',
           label: 'Status',

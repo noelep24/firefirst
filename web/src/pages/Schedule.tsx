@@ -5,10 +5,12 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { getAll, http, type Schemas } from '@/api/http';
 import { CrudPage, RecordModal } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
-import { Badge, Button, Card, DataTable, Empty, ErrorBox, PageHeader, QueryState, Tabs } from '@/components/ui';
+import { Badge, Button, Card, DataTable, Empty, ErrorBox, Modal, PageHeader, QueryState, Tabs } from '@/components/ui';
 import { personLabel, stationLabel } from '@/lib/fields';
 import { addDays, formatDateTime, formatDay, isoDate, parseDate } from '@/lib/format';
 import { labelFor, positions } from '@/lib/labels';
+
+import { EventFormModal } from './Events';
 
 type Tab = 'calendar' | 'roster' | 'overtime' | 'assignments';
 
@@ -57,6 +59,9 @@ function monthGrid(month: Date) {
 
 function MonthCalendar() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  // Clicking a day adds an event on it.
+  const [adding, setAdding] = useState<string | null>(null);
   const [month, setMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -126,7 +131,11 @@ function MonthCalendar() {
             <div
               key={day}
               role="gridcell"
-              className={`calendar-day ${date.getMonth() !== month.getMonth() ? 'outside' : ''} ${day === today ? 'today' : ''}`}>
+              tabIndex={0}
+              aria-label={`${formatDay(day, { weekday: 'long' })}: add an event`}
+              onClick={() => setAdding(day)}
+              onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && setAdding(day)}
+              className={`calendar-day addable ${date.getMonth() !== month.getMonth() ? 'outside' : ''} ${day === today ? 'today' : ''}`}>
               <div className="row spread">
                 <span className="day-number">{date.getDate()}</span>
                 {code ? (
@@ -153,7 +162,10 @@ function MonthCalendar() {
                 <button
                   key={e.id}
                   className="calendar-event"
-                  onClick={() => navigate(`/events?open=${e.id}`)}
+                  onClick={(click) => {
+                    click.stopPropagation();
+                    navigate(`/events?open=${e.id}`);
+                  }}
                   title={e.title}>
                   {e.is_mandatory ? '● ' : ''}
                   {e.title}
@@ -172,7 +184,19 @@ function MonthCalendar() {
             </span>
           ))}
           <span>● mandatory event</span>
+          <span>Click a day to add an event.</span>
         </div>
+      ) : null}
+      {adding ? (
+        <EventFormModal
+          event={null}
+          day={adding}
+          onClose={() => setAdding(null)}
+          onSaved={() => {
+            queryClient.invalidateQueries();
+            setAdding(null);
+          }}
+        />
       ) : null}
     </div>
   );
@@ -656,27 +680,6 @@ function Overtime() {
         )}
       </QueryState>
 
-      <CrudPage<Schemas['OvertimeShift']>
-        header={false}
-        title="Overtime worked"
-        noun="overtime shift"
-        endpoint="/api/v1/overtime-shifts/"
-        search={false}
-        fields={overtimeFields}
-        defaults={{ date, hours: 24, mandatory: true }}
-        columns={[
-          { header: 'Date', cell: (o) => formatDay(o.date) },
-          { header: 'Member', cell: (o) => <strong>{o.user_name}</strong> },
-          { header: 'Hours', cell: (o) => Number(o.hours) },
-          { header: 'Filling for', cell: (o) => o.filling_for_name ?? o.station_name ?? '—' },
-          {
-            header: '',
-            cell: (o) => (o.mandatory ? <Badge tone="warning">Mandatory</Badge> : <Badge>Voluntary</Badge>),
-          },
-          { header: '', cell: () => <span className="muted small">Edit ›</span> },
-        ]}
-      />
-
       {hiring ? (
         <RecordModal<Schemas['OvertimeShift']>
           title="Record overtime"
@@ -747,6 +750,7 @@ const OFFER_STATUS: Record<string, { label: string; tone: 'success' | 'neutral' 
 /** Seats being filled automatically: open ones on any day, plus everything on the day shown. */
 function Vacancies({ date }: { date: string }) {
   const [posting, setPosting] = useState(false);
+  const [history, setHistory] = useState(false);
   const queryClient = useQueryClient();
   const open = useQuery({
     queryKey: ['/api/v1/vacancies/', { open: true }],
@@ -768,10 +772,16 @@ function Vacancies({ date }: { date: string }) {
           <h3>Vacancies</h3>
           <p className="muted small">Offered to volunteers, then filled from the list automatically.</p>
         </div>
-        <Button small variant="primary" onClick={() => setPosting(true)}>
-          Post a vacancy
-        </Button>
+        <div className="row">
+          <Button small onClick={() => setHistory(true)}>
+            Overtime worked
+          </Button>
+          <Button small variant="primary" onClick={() => setPosting(true)}>
+            Post a vacancy
+          </Button>
+        </div>
       </div>
+      {history ? <OvertimeHistory date={date} onClose={() => setHistory(false)} /> : null}
       {open.error ? <ErrorBox error={open.error} /> : null}
       {rows.length === 0 && open.data ? <p className="muted">No open vacancies.</p> : null}
       {rows.map((v) => (
@@ -876,5 +886,33 @@ function VacancyRow({ vacancy: v }: { vacancy: Vacancy }) {
         </div>
       ) : null}
     </div>
+  );
+}
+
+/** Every overtime shift recorded: add one by hand, or open one to change or remove it. */
+function OvertimeHistory({ date, onClose }: { date: string; onClose: () => void }) {
+  return (
+    <Modal title="Overtime worked" open onClose={onClose} wide>
+      <CrudPage<Schemas['OvertimeShift']>
+        header={false}
+        title="Overtime worked"
+        noun="overtime shift"
+        endpoint="/api/v1/overtime-shifts/"
+        search={false}
+        fields={overtimeFields}
+        defaults={{ date, hours: 24, mandatory: true }}
+        columns={[
+          { header: 'Date', cell: (o) => formatDay(o.date) },
+          { header: 'Member', cell: (o) => <strong>{o.user_name}</strong> },
+          { header: 'Hours', cell: (o) => Number(o.hours) },
+          { header: 'Filling for', cell: (o) => o.filling_for_name ?? o.station_name ?? '—' },
+          {
+            header: '',
+            cell: (o) => (o.mandatory ? <Badge tone="warning">Mandatory</Badge> : <Badge>Voluntary</Badge>),
+          },
+          { header: '', cell: () => <span className="muted small">Edit ›</span> },
+        ]}
+      />
+    </Modal>
   );
 }

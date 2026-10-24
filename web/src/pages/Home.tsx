@@ -23,6 +23,14 @@ export default function Home() {
   const [now] = useState(() => new Date());
   const today = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
   const onDuty = dashboard.data?.platoon_on_duty;
+  const [showAll, setShowAll] = useState(false);
+  // Today is the section on the left, so its link isn't repeated on the right. Admins see only areas with
+  // something due; the menu still reaches the rest.
+  const others = AREAS.filter((a) => a.key !== 'today');
+  const due = dashboard.data
+    ? others.filter((a) => (a.alerts?.(dashboard.data) ?? []).some((x) => x && x.tone !== 'neutral'))
+    : [];
+  const areas = isAdmin && !showAll ? due : others;
 
   return (
     <div className="home">
@@ -61,8 +69,17 @@ export default function Home() {
           </div>
           <StationBoard />
         </section>
-        {/* Today is the section on the left, so its link isn't repeated here. */}
-        <AreaLinks areas={AREAS.filter((a) => a.key !== 'today')} dashboard={dashboard.data} />
+        <div className="home-side stack-sm">
+          <AreaLinks areas={areas} dashboard={dashboard.data} />
+          {isAdmin && dashboard.data && due.length === 0 && !showAll ? (
+            <div className="area-links-clear">All clear: nothing is due.</div>
+          ) : null}
+          {isAdmin ? (
+            <button type="button" className="link-button" onClick={() => setShowAll(!showAll)}>
+              {showAll ? 'Show only what needs attention' : 'Show all areas'}
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
   );

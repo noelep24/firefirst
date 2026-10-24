@@ -193,3 +193,15 @@ def test_checklists_for_apparatus_filters_by_type(client_for, member, department
     ChecklistTemplate.objects.create(department=department, name="Any rig weekly")
     names = {t["name"] for t in client_for(member).get(f"/api/v1/apparatus/{engine.id}/checklists/").json()}
     assert names == {"Engine daily", "Any rig weekly"}
+
+
+def test_work_orders_filter_by_station(client_for, member, department, engine):
+    from apps.apparatus.models import WorkOrder
+    from apps.core.models import Station
+
+    north = Station.objects.create(department=department, number="2", name="Northside")
+    e2 = Apparatus.objects.create(department=department, unit_number="E2", apparatus_type="engine", station=north)
+    WorkOrder.objects.create(department=department, apparatus=engine, title="Pump packing leak")
+    WorkOrder.objects.create(department=department, apparatus=e2, title="Light bar out")
+    rows = client_for(member).get(f"/api/v1/work-orders/?station={north.id}").json()["results"]
+    assert [w["title"] for w in rows] == ["Light bar out"]

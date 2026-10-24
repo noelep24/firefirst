@@ -7,7 +7,7 @@ import { RecordModal } from '@/components/crud';
 import type { FieldSpec } from '@/components/form';
 import { Badge, Button, DataTable, ErrorBox, Modal, PageHeader, QueryState, Tabs } from '@/components/ui';
 import { personLabel, stationLabel } from '@/lib/fields';
-import { addDays, formatDateTime, formatTime, isoDate } from '@/lib/format';
+import { addDays, formatDateTime, formatDay, formatTime, isoDate } from '@/lib/format';
 import { eventCategories, labelFor } from '@/lib/labels';
 
 // Only offered when creating: each occurrence is then a separate event.
@@ -112,18 +112,8 @@ export default function Events() {
         />
       ) : null}
       {editing ? (
-        <RecordModal<Schemas['Event']>
-          title={editing === 'new' ? 'New event' : 'Edit event'}
-          endpoint="/api/v1/events/"
-          fields={editing === 'new' ? [...eventFields, ...repeatFields] : eventFields}
-          record={editing === 'new' ? null : editing}
-          defaults={{ category: 'training', repeat: 'none', repeat_interval: '1' }}
-          prepare={(body) => {
-            if (body.repeat === undefined || body.repeat === 'none') {
-              for (const key of ['repeat', 'repeat_interval', 'repeat_until', 'repeat_count']) delete body[key];
-            }
-            return body;
-          }}
+        <EventFormModal
+          event={editing === 'new' ? null : editing}
           onClose={() => setEditing(null)}
           onSaved={() => {
             queryClient.invalidateQueries();
@@ -132,6 +122,42 @@ export default function Events() {
         />
       ) : null}
     </div>
+  );
+}
+
+/** Add or edit an event. `day` (YYYY-MM-DD) starts a new one on that day, 9–10 AM. */
+export function EventFormModal({
+  event,
+  day,
+  onClose,
+  onSaved,
+}: {
+  event: Schemas['Event'] | null;
+  day?: string;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  return (
+    <RecordModal<Schemas['Event']>
+      title={event ? 'Edit event' : day ? `New event · ${formatDay(day, { weekday: 'long' })}` : 'New event'}
+      endpoint="/api/v1/events/"
+      fields={event ? eventFields : [...eventFields, ...repeatFields]}
+      record={event}
+      defaults={{
+        category: 'training',
+        repeat: 'none',
+        repeat_interval: '1',
+        ...(day ? { starts_at: `${day}T09:00`, ends_at: `${day}T10:00` } : {}),
+      }}
+      prepare={(body) => {
+        if (body.repeat === undefined || body.repeat === 'none') {
+          for (const key of ['repeat', 'repeat_interval', 'repeat_until', 'repeat_count']) delete body[key];
+        }
+        return body;
+      }}
+      onClose={onClose}
+      onSaved={onSaved}
+    />
   );
 }
 

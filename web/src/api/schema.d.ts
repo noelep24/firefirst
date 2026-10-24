@@ -9833,6 +9833,8 @@ export interface operations {
                 priority?: "critical" | "high" | "low" | "normal";
                 /** @description A search term. */
                 search?: string;
+                /** @description Only rigs based at this station */
+                station?: number;
                 /**
                  * @description * `open` - Open
                  *     * `in_progress` - In progress
