@@ -157,13 +157,20 @@ function SettingsForm({ department }: { department: Schemas['Department'] }) {
   const [name, setName] = useState(department.name);
   const [timezone, setTimezone] = useState(department.timezone ?? 'America/Chicago');
   const [nerisId, setNerisId] = useState(department.neris_id ?? '');
-  const [logo, setLogo] = useState(department.logo ?? '');
+  // The image to show: the saved one's URL, a newly picked image, or '' once removed. Only a change is sent.
+  const [logo, setLogo] = useState(department.logo_url ?? '');
+  const logoChanged = logo !== (department.logo_url ?? '');
   const [logoError, setLogoError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   const save = useMutation({
     mutationFn: () =>
-      http.patch<Schemas['Department']>('/api/v1/department/', { name, timezone, neris_id: nerisId, logo }),
+      http.patch<Schemas['Department']>('/api/v1/department/', {
+        name,
+        timezone,
+        neris_id: nerisId,
+        ...(logoChanged ? { logo } : {}),
+      }),
     onSuccess: async () => {
       setSaved(true);
       queryClient.invalidateQueries();

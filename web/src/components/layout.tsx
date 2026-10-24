@@ -67,7 +67,7 @@ export function Layout() {
           Menu
         </Button>
         <Link to="/" className="topbar-home">
-          <DepartmentEmblem logo={department?.logo} name={department?.name} size={30} />
+          <DepartmentEmblem logo={department?.logo_url} name={department?.name} size={30} />
           <span>{department?.name}</span>
         </Link>
         <div className="topbar-end">

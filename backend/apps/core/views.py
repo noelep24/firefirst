@@ -1,6 +1,12 @@
-from rest_framework import generics
+import base64
 
-from .models import Station, User
+from django.http import Http404, HttpResponse
+from drf_spectacular.utils import extend_schema
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+
+from .models import Department, Station, User
 from .permissions import IsDepartmentAdminOrReadOnly, IsDepartmentMember
 from .serializers import DepartmentSerializer, MeSerializer, StationSerializer, UserSerializer
 from .tenancy import TenantViewSet
@@ -22,6 +28,26 @@ class DepartmentView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.department
+
+
+@extend_schema(exclude=True)
+class DepartmentLogoView(APIView):
+    """``GET /departments/<slug>/logo/`` – the department's patch as an image, for ``<img>`` tags.
+
+    Public, like a patch on a door: it carries no member data, and image requests don't send API tokens.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, slug):
+        department = Department.objects.filter(slug=slug, is_active=True).exclude(logo="").first()
+        if department is None:
+            raise Http404
+        header, _, data = department.logo.partition(",")
+        response = HttpResponse(base64.b64decode(data), content_type=header.removeprefix("data:").split(";")[0])
+        response["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
 
 
 class StationViewSet(TenantViewSet):

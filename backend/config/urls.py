@@ -65,6 +65,7 @@ api_v1 = [
     path("me/", core.MeView.as_view(), name="me"),
     path("me/calendar-feed/", events.MyCalendarFeedView.as_view(), name="my-calendar-feed"),
     path("department/", core.DepartmentView.as_view(), name="department"),
+    path("departments/<slug:slug>/logo/", core.DepartmentLogoView.as_view(), name="department-logo"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("roster/", scheduling.RosterView.as_view(), name="roster"),
     path("station-board/", scheduling.StationBoardView.as_view(), name="station-board"),

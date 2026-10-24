@@ -26,18 +26,33 @@ def test_api_paths_are_not_swallowed_by_the_web_app(client, db):
     assert client.get("/api/v1/me/").status_code in (401, 403)
 
 
-def test_department_logo(client_for, admin_user, member):
+def test_department_logo(client, client_for, admin_user, member):
     import base64
 
     url = "/api/v1/department/"
-    client = client_for(admin_user)
-    png = "data:image/png;base64," + base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 64).decode()
-    assert client.patch(url, {"logo": png}, format="json").json()["logo"] == png
-    assert client_for(member).get("/api/v1/me/").json()["department"]["logo"] == png
+    admin = client_for(admin_user)
+    image = b"\x89PNG\r\n\x1a\n" + b"0" * 64
+    png = "data:image/png;base64," + base64.b64encode(image).decode()
+    saved = admin.patch(url, {"logo": png}, format="json").json()
+    assert "logo" not in saved
+    # Profiles carry a link to the image, not the image itself.
+    me = client_for(member).get("/api/v1/me/").json()["department"]
+    assert me["logo_url"] == saved["logo_url"]
+    assert "logo" not in me
+    # The link serves the image to anyone (an <img> tag sends no token), cached until the image changes.
+    response = client.get(me["logo_url"])
+    assert (response.status_code, response["Content-Type"], response.content) == (200, "image/png", image)
+    assert "immutable" in response["Cache-Control"]
+    assert client.get("/api/v1/departments/nope/logo/").status_code == 404
+
     # Not an image type we accept (SVG can carry script), not base64, or too big.
     svg = "data:image/svg+xml;base64," + base64.b64encode(b"<svg/>").decode()
-    assert client.patch(url, {"logo": svg}, format="json").status_code == 400
-    assert client.patch(url, {"logo": "data:image/png;base64,***"}, format="json").status_code == 400
+    assert admin.patch(url, {"logo": svg}, format="json").status_code == 400
+    assert admin.patch(url, {"logo": "data:image/png;base64,***"}, format="json").status_code == 400
     big = "data:image/png;base64," + base64.b64encode(b"0" * (513 * 1024)).decode()
-    assert client.patch(url, {"logo": big}, format="json").status_code == 400
-    assert client.patch(url, {"logo": ""}, format="json").json()["logo"] == ""
+    assert admin.patch(url, {"logo": big}, format="json").status_code == 400
+    assert admin.patch(url, {"logo": ""}, format="json").json()["logo_url"] is None
+    assert client.get(me["logo_url"]).status_code == 404
+    # Saving other settings leaves the logo alone.
+    admin.patch(url, {"logo": png}, format="json")
+    assert admin.patch(url, {"name": "Renamed"}, format="json").json()["logo_url"] == me["logo_url"]

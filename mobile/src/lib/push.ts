@@ -19,10 +19,10 @@ Notifications.setNotificationHandler({
 
 /**
  * Ask to send notifications (once; the phone remembers the answer) and tell the server where to send them.
- * Never throws: without push, members still see offers on the Today screen.
+ * Never throws: without push, members still see offers on the Today screen. (Web uses push.web.ts.)
  */
 export async function registerForPush() {
-  if (Platform.OS === 'web' || !Device.isDevice) return;
+  if (!Device.isDevice) return;
   try {
     let { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
