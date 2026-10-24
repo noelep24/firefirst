@@ -7,29 +7,65 @@ import type { FieldSpec } from '@/components/form';
 import { Badge, Button, DataTable, ErrorBox, fieldErrors, Modal, PageHeader, QueryState, Tabs } from '@/components/ui';
 import { stationLabel } from '@/lib/fields';
 import { formatDateTime, formatDay, humanize, isoDate } from '@/lib/format';
-import { itemCategories, labelFor } from '@/lib/labels';
+import { itemCategories } from '@/lib/labels';
 
-type Tab = 'stock' | 'items' | 'locations' | 'activity';
+/** The Supplies sections, one per kind of stock. Each is a tab across the top of the Supplies area. */
+export const SUPPLY_SECTIONS = [
+  { path: 'uniforms', category: 'uniforms', title: 'Station uniforms', subtitle: 'Shirts, pants and outerwear.' },
+  {
+    path: 'fire-gear',
+    category: 'fire_gear',
+    title: 'Structure fire & tech rescue gear',
+    subtitle: 'Turnouts, SCBA and technical rescue equipment.',
+  },
+  {
+    path: 'medical',
+    category: 'medical',
+    title: 'Medical supplies',
+    subtitle: 'EMS stock, with expiration dates where they matter.',
+  },
+  { path: 'equipment', category: 'equipment', title: 'Apparatus equipment', subtitle: 'Tools, hose and appliances.' },
+  { path: 'other', category: 'other', title: 'Station & other supplies', subtitle: 'Cleaning, kitchen and office.' },
+];
 
-export default function Inventory() {
+type Tab = 'stock' | 'items';
+
+/** One section of Supplies: its stock levels, and its items. */
+export function SupplySection({ path }: { path: string }) {
+  const section = SUPPLY_SECTIONS.find((s) => s.path === path) ?? SUPPLY_SECTIONS[0];
   const [tab, setTab] = useState<Tab>('stock');
   return (
     <div>
-      <PageHeader title="Inventory" subtitle="Supplies, EMS stock and equipment across stations and rigs." />
+      <PageHeader title={section.title} subtitle={section.subtitle} />
       <Tabs<Tab>
         value={tab}
         onChange={setTab}
         options={[
           { value: 'stock', label: 'Stock levels' },
-          { value: 'items', label: 'Item catalog' },
-          { value: 'locations', label: 'Storage locations' },
-          { value: 'activity', label: 'Activity' },
+          { value: 'items', label: 'Items' },
         ]}
       />
-      {tab === 'stock' ? <StockTab /> : null}
-      {tab === 'items' ? <ItemsTab /> : null}
-      {tab === 'locations' ? <LocationsTab /> : null}
-      {tab === 'activity' ? <ActivityTab /> : null}
+      {/* Keyed so switching sections starts the filters fresh. */}
+      {tab === 'stock' ? <StockTab key={section.category} category={section.category} /> : null}
+      {tab === 'items' ? <ItemsTab key={section.category} category={section.category} /> : null}
+    </div>
+  );
+}
+
+export function StorageLocations() {
+  return (
+    <div>
+      <PageHeader title="Storage locations" subtitle="Supply rooms, cabinets and apparatus compartments." />
+      <LocationsTab />
+    </div>
+  );
+}
+
+export function SupplyActivity() {
+  return (
+    <div>
+      <PageHeader title="Activity" subtitle="Every change to stock, newest first." />
+      <ActivityTab />
     </div>
   );
 }
@@ -39,12 +75,11 @@ const locationLabel = ((l: Schemas['StorageLocation']) => l.label) as (row: neve
 
 type StockFilter = 'all' | 'below_par' | 'expiring';
 
-function StockTab() {
+function StockTab({ category }: { category: string }) {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StockFilter>('all');
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
-  const [category, setCategory] = useState('');
   const [selected, setSelected] = useState<Schemas['StockLevel'] | null>(null);
   const [adding, setAdding] = useState(false);
 
@@ -80,14 +115,6 @@ function StockTab() {
           {(locations.data ?? []).map((l) => (
             <option key={l.id} value={l.id}>
               {l.label}
-            </option>
-          ))}
-        </select>
-        <select aria-label="Category" value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All categories</option>
-          {itemCategories.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
             </option>
           ))}
         </select>
@@ -154,6 +181,7 @@ function StockTab() {
               label: 'Item',
               type: 'relation',
               endpoint: '/api/v1/inventory/items/',
+              query: { category, is_active: true },
               optionLabel: itemLabel,
               required: true,
             },
@@ -390,7 +418,7 @@ function StockModal({
   );
 }
 
-function ItemsTab() {
+function ItemsTab({ category }: { category: string }) {
   const fields: FieldSpec[] = [
     { name: 'name', label: 'Name', type: 'text', required: true, wide: true },
     { name: 'category', label: 'Category', type: 'select', options: itemCategories, required: true },
@@ -408,11 +436,10 @@ function ItemsTab() {
       noun="item"
       endpoint="/api/v1/inventory/items/"
       fields={fields}
-      defaults={{ category: 'ems', unit: 'each', is_active: true }}
-      filters={[{ name: 'category', label: 'Category', options: itemCategories }]}
+      query={{ category }}
+      defaults={{ category, unit: 'each', is_active: true, tracks_expiration: category === 'medical' }}
       columns={[
         { header: 'Name', cell: (i) => <strong>{i.name}</strong> },
-        { header: 'Category', cell: (i) => labelFor(itemCategories, i.category) },
         { header: 'Unit', cell: (i) => i.unit },
         { header: 'SKU', cell: (i) => i.sku },
         { header: 'Barcode', cell: (i) => i.barcode },

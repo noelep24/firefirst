@@ -377,12 +377,49 @@ class ApparatusImporter(Importer):
 # ---------------------------------------------------------------- Inventory
 
 CATEGORY_KEYWORDS = [
-    (("ems", "medical", "med", "medication", "drug", "airway", "bls", "als", "trauma", "iv"), Item.Category.EMS),
-    (("ppe", "turnout", "turnouts", "gear", "bunker", "helmet", "glove", "gloves", "boots", "hood"), Item.Category.PPE),
-    (("scba", "air", "mask", "bottle", "cylinder"), Item.Category.SCBA),
-    (("hose", "nozzle", "appliance", "fitting", "coupling"), Item.Category.HOSE),
-    (("tool", "tools", "equipment", "hand tool", "power tool", "extrication"), Item.Category.TOOLS),
-    (("station", "office", "janitorial", "cleaning", "kitchen", "household", "supplies"), Item.Category.STATION),
+    (
+        ("uniform", "uniforms", "station wear", "shirt", "t-shirt", "pants", "class a", "class b", "jacket", "badge"),
+        Item.Category.UNIFORMS,
+    ),
+    (("ems", "medical", "med", "medication", "drug", "airway", "bls", "als", "trauma", "iv"), Item.Category.MEDICAL),
+    (
+        (
+            "ppe",
+            "turnout",
+            "turnouts",
+            "gear",
+            "bunker",
+            "helmet",
+            "glove",
+            "gloves",
+            "boots",
+            "hood",
+            "scba",
+            "mask",
+            "cylinder",
+            "tech",
+            "technical rescue",
+            "rope",
+            "harness",
+        ),
+        Item.Category.FIRE_GEAR,
+    ),
+    (
+        (
+            "equipment",
+            "apparatus",
+            "hose",
+            "nozzle",
+            "appliance",
+            "fitting",
+            "coupling",
+            "tool",
+            "tools",
+            "extrication",
+        ),
+        Item.Category.EQUIPMENT,
+    ),
+    (("station", "office", "janitorial", "cleaning", "kitchen", "household", "supplies"), Item.Category.OTHER),
 ]
 
 

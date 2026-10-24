@@ -170,7 +170,7 @@ def test_inventory_import_creates_items_locations_and_logged_stock(admin, depart
     assert saline.location.station.number == "1"
     txn = StockTransaction.objects.get(stock=saline)
     assert (txn.change, txn.reason, txn.performed_by) == (18, "count", admin_user)
-    assert Item.objects.get(name="Halligan bar").category == "tools"
+    assert Item.objects.get(name="Halligan bar").category == "equipment"
     assert not StockLevel.objects.filter(item__name="Halligan bar").exists()
 
 

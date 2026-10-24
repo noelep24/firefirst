@@ -30,13 +30,17 @@ ENGINE_CHECK = {
 }
 
 ITEMS = [
-    ("4x4 gauze", "ems", "pack", 40, 30),
-    ("Nitrile gloves L", "ems", "box", 12, 10),
-    ("Normal saline 1000 mL", "ems", "bag", 18, 20),
-    ("Epinephrine 1 mg/mL", "ems", "vial", 6, 6),
-    ("Class A foam", "tools", "pail", 4, 3),
-    ("Structure gloves", "ppe", "pair", 5, 8),
-    ("Paper towels", "station", "case", 2, 2),
+    ("4x4 gauze", "medical", "pack", 40, 30),
+    ("Nitrile gloves L", "medical", "box", 12, 10),
+    ("Normal saline 1000 mL", "medical", "bag", 18, 20),
+    ("Epinephrine 1 mg/mL", "medical", "vial", 6, 6),
+    ("Class A foam", "equipment", "pail", 4, 3),
+    ("2.5 in. hose, 50 ft", "equipment", "length", 6, 6),
+    ("Structure gloves", "fire_gear", "pair", 5, 8),
+    ("Turnout hood", "fire_gear", "each", 10, 8),
+    ("Station T-shirt, L", "uniforms", "each", 12, 10),
+    ("Uniform pants, 34", "uniforms", "pair", 3, 4),
+    ("Paper towels", "other", "case", 2, 2),
 ]
 
 
@@ -247,13 +251,13 @@ class Command(BaseCommand):
         m1_cabinet = StorageLocation.objects.create(department=dept, name="Main cabinet", apparatus=m1)
         for name, category, unit, qty, par in ITEMS:
             item = Item.objects.create(
-                department=dept, name=name, category=category, unit=unit, tracks_expiration=category == "ems"
+                department=dept, name=name, category=category, unit=unit, tracks_expiration=category == "medical"
             )
             expires = today + datetime.timedelta(days=21) if name.startswith("Epinephrine") else None
             StockLevel.objects.create(
                 department=dept, item=item, location=supply, quantity=qty, par_level=par, expires_on=expires
             )
-            if category == "ems":
+            if category == "medical":
                 StockLevel.objects.create(
                     department=dept,
                     item=item,

@@ -30,6 +30,7 @@ export function CrudPage<T extends Row>({
   onRowClick,
   actions,
   header = true,
+  query: fixed = {},
 }: {
   title: string;
   subtitle?: ReactNode;
@@ -49,6 +50,8 @@ export function CrudPage<T extends Row>({
   onRowClick?: (row: T) => void;
   actions?: ReactNode;
   header?: boolean;
+  /** Filters always applied, e.g. a section's category. */
+  query?: Record<string, string>;
 }) {
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -57,8 +60,8 @@ export function CrudPage<T extends Row>({
   const [creating, setCreating] = useState(false);
 
   const list = useQuery({
-    queryKey: [endpoint, { query, ...filterValues }],
-    queryFn: () => getAll<T>(endpoint, { search: query || undefined, ...filterValues }),
+    queryKey: [endpoint, { query, ...fixed, ...filterValues }],
+    queryFn: () => getAll<T>(endpoint, { search: query || undefined, ...fixed, ...filterValues }),
   });
 
   const open = creating || editing !== null;

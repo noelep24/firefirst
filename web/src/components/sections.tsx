@@ -82,9 +82,17 @@ export const AREAS: Area[] = [
   {
     key: 'supplies',
     label: 'Supplies',
-    description: 'Station stock, par levels and expirations',
+    description: 'Uniforms, gear, medical and equipment stock',
     icon: Package,
-    pages: [{ to: '/inventory', label: 'Inventory' }],
+    pages: [
+      { to: '/supplies/uniforms', label: 'Uniforms' },
+      { to: '/supplies/fire-gear', label: 'Fire & tech gear' },
+      { to: '/supplies/medical', label: 'Medical' },
+      { to: '/supplies/equipment', label: 'Apparatus equipment' },
+      { to: '/supplies/other', label: 'Station & other' },
+      { to: '/supplies/locations', label: 'Storage locations' },
+      { to: '/supplies/activity', label: 'Activity' },
+    ],
     alerts: (d) => [count(d.stock_below_par, 'below par'), count(d.stock_expiring_30_days, 'expiring', 'danger')],
   },
   {

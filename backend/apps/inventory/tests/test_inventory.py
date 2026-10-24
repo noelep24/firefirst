@@ -8,7 +8,7 @@ from apps.inventory.models import Item, StockLevel, StockTransaction, StorageLoc
 
 @pytest.fixture
 def gauze(department):
-    return Item.objects.create(department=department, name="4x4 gauze", category="ems", unit="pack")
+    return Item.objects.create(department=department, name="4x4 gauze", category="medical", unit="pack")
 
 
 @pytest.fixture

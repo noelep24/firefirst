@@ -20,7 +20,9 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ApparatusList = lazy(() => import('@/pages/ApparatusList'));
 const ApparatusDetail = lazy(() => import('@/pages/ApparatusDetail'));
 const WorkOrders = lazy(() => import('@/pages/WorkOrders'));
-const Inventory = lazy(() => import('@/pages/Inventory'));
+const SupplySectionPage = lazy(() => import('@/pages/Supplies').then((m) => ({ default: m.SupplySectionPage })));
+const StorageLocations = lazy(() => import('@/pages/Inventory').then((m) => ({ default: m.StorageLocations })));
+const SupplyActivity = lazy(() => import('@/pages/Inventory').then((m) => ({ default: m.SupplyActivity })));
 const Schedule = lazy(() => import('@/pages/Schedule'));
 const Approvals = lazy(() => import('@/pages/Approvals'));
 const Events = lazy(() => import('@/pages/Events'));
@@ -64,7 +66,11 @@ function App() {
           <Route path="apparatus" element={<ApparatusList />} />
           <Route path="apparatus/:id" element={<ApparatusDetail />} />
           <Route path="work-orders" element={<WorkOrders />} />
-          <Route path="inventory" element={<Inventory />} />
+          <Route path="inventory" element={<Navigate to="/supplies/medical" replace />} />
+          <Route path="supplies" element={<Navigate to="/supplies/uniforms" replace />} />
+          <Route path="supplies/locations" element={<StorageLocations />} />
+          <Route path="supplies/activity" element={<SupplyActivity />} />
+          <Route path="supplies/:section" element={<SupplySectionPage />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="approvals" element={<Approvals />} />
           <Route path="reports" element={<Reports />} />

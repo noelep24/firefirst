@@ -2792,16 +2792,14 @@ export interface components {
             is_active?: boolean;
         };
         /**
-         * @description * `ems` - EMS / Medical
-         *     * `ppe` - PPE / Turnout gear
-         *     * `scba` - SCBA
-         *     * `tools` - Tools & equipment
-         *     * `hose` - Hose & appliances
-         *     * `station` - Station supplies
-         *     * `other` - Other
+         * @description * `uniforms` - Station uniforms
+         *     * `fire_gear` - Structure fire & tech rescue gear
+         *     * `medical` - Medical supplies
+         *     * `equipment` - Apparatus equipment
+         *     * `other` - Station & other supplies
          * @enum {string}
          */
-        ItemCategoryEnum: "ems" | "ppe" | "scba" | "tools" | "hose" | "station" | "other";
+        ItemCategoryEnum: "uniforms" | "fire_gear" | "medical" | "equipment" | "other";
         /** @description Restricts every related-field choice to the requesting user's department. */
         ItemRequest: {
             name: string;
@@ -6543,15 +6541,13 @@ export interface operations {
             query?: {
                 barcode?: string;
                 /**
-                 * @description * `ems` - EMS / Medical
-                 *     * `ppe` - PPE / Turnout gear
-                 *     * `scba` - SCBA
-                 *     * `tools` - Tools & equipment
-                 *     * `hose` - Hose & appliances
-                 *     * `station` - Station supplies
-                 *     * `other` - Other
+                 * @description * `uniforms` - Station uniforms
+                 *     * `fire_gear` - Structure fire & tech rescue gear
+                 *     * `medical` - Medical supplies
+                 *     * `equipment` - Apparatus equipment
+                 *     * `other` - Station & other supplies
                  */
-                category?: "ems" | "hose" | "other" | "ppe" | "scba" | "station" | "tools";
+                category?: "equipment" | "fire_gear" | "medical" | "other" | "uniforms";
                 is_active?: boolean;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -6863,15 +6859,13 @@ export interface operations {
                 below_par?: boolean;
                 item?: number;
                 /**
-                 * @description * `ems` - EMS / Medical
-                 *     * `ppe` - PPE / Turnout gear
-                 *     * `scba` - SCBA
-                 *     * `tools` - Tools & equipment
-                 *     * `hose` - Hose & appliances
-                 *     * `station` - Station supplies
-                 *     * `other` - Other
+                 * @description * `uniforms` - Station uniforms
+                 *     * `fire_gear` - Structure fire & tech rescue gear
+                 *     * `medical` - Medical supplies
+                 *     * `equipment` - Apparatus equipment
+                 *     * `other` - Station & other supplies
                  */
-                item__category?: "ems" | "hose" | "other" | "ppe" | "scba" | "station" | "tools";
+                item__category?: "equipment" | "fire_gear" | "medical" | "other" | "uniforms";
                 location?: number;
                 location__apparatus?: number;
                 location__station?: number;
@@ -7059,15 +7053,13 @@ export interface operations {
                 days?: number;
                 item?: number;
                 /**
-                 * @description * `ems` - EMS / Medical
-                 *     * `ppe` - PPE / Turnout gear
-                 *     * `scba` - SCBA
-                 *     * `tools` - Tools & equipment
-                 *     * `hose` - Hose & appliances
-                 *     * `station` - Station supplies
-                 *     * `other` - Other
+                 * @description * `uniforms` - Station uniforms
+                 *     * `fire_gear` - Structure fire & tech rescue gear
+                 *     * `medical` - Medical supplies
+                 *     * `equipment` - Apparatus equipment
+                 *     * `other` - Station & other supplies
                  */
-                item__category?: "ems" | "hose" | "other" | "ppe" | "scba" | "station" | "tools";
+                item__category?: "equipment" | "fire_gear" | "medical" | "other" | "uniforms";
                 location?: number;
                 location__apparatus?: number;
                 location__station?: number;
