@@ -16,7 +16,8 @@ export default defineConfig({
     // Same-origin API in development, so session and CSRF cookies are first-party.
     proxy: {
       '/api': backend,
-      '/admin': backend,
+      // Django's admin lives at /admin/; /admin without the slash is the web app's own Admin page.
+      '^/admin/': backend,
       '/static': backend,
     },
   },
