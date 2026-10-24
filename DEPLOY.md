@@ -38,6 +38,10 @@ The image has a `HEALTHCHECK`; point your load balancer at `GET /healthz`
 | `WEB_CONCURRENCY` | `3` | gunicorn workers (about 2 × CPU cores) |
 | `PORT` | `8000` | Set by most platforms |
 | `PUSH_NOTIFICATIONS_ENABLED` | `true` | Sends phone notifications (overtime offers and the like) through Expo's push service |
+| `APP_URL` | `https://app.firefirst.example` | Where links in notification emails point |
+| `EMAIL_HOST` | `smtp.postmarkapp.com` | Any SMTP service (Postmark, SendGrid, Amazon SES). Without it, emails are printed to the log instead of sent |
+| `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | `587`, … | From the email service |
+| `DEFAULT_FROM_EMAIL` | `FireFirst <alerts@firefirst.example>` | A sender address the email service has verified |
 
 With debug off you get HTTPS redirects, HSTS, `nosniff`, `X-Frame-Options:
 DENY`, a same-origin referrer policy, secure httpOnly session cookies,
@@ -58,6 +62,7 @@ Run daily (cron, a platform scheduler, or a one-off container):
 
 ```bash
 python manage.py prune_idempotency_keys   # clears stored mobile-retry responses older than 14 days
+python manage.py send_reminders           # certification reminders 60, 30 and 7 days before expiry
 ```
 
 ## First run

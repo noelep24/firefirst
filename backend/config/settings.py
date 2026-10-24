@@ -22,6 +22,21 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me-do-not-
 DEBUG = env_bool("DJANGO_DEBUG", True)
 # Push notifications go to phones through Expo's push service. Tests turn this off.
 PUSH_NOTIFICATIONS_ENABLED = env_bool("PUSH_NOTIFICATIONS_ENABLED", True)
+# Where links in emails point.
+APP_URL = os.environ.get("APP_URL", "http://localhost:8000")
+
+# Email goes out through any SMTP service (Postmark, SendGrid, Amazon SES, ...). Without EMAIL_HOST, emails are
+# printed to the server's terminal instead, which is what the trial does.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+if EMAIL_HOST:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "FireFirst <notifications@firefirst.local>")
 ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
 
 if not DEBUG and SECRET_KEY.startswith("dev-insecure"):

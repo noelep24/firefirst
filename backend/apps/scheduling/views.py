@@ -14,6 +14,7 @@ from apps.core.models import Station, User
 from apps.core.params import parse_date
 from apps.core.permissions import IsDepartmentAdmin, IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
+from apps.notifications.send import notify
 
 from . import offers
 from .models import (
@@ -375,7 +376,22 @@ class LeaveRequestViewSet(TenantViewSet):
 
     def perform_create(self, serializer):
         user = serializer.validated_data.get("user", self.request.user)
-        serializer.save(department=self.request.user.department, user=user)
+        leave = serializer.save(department=self.request.user.department, user=user)
+        if leave.status == LeaveRequest.Status.PENDING:
+            # Any other officer can approve it.
+            officers = User.objects.filter(
+                department=leave.department, is_active=True, role__in=[User.Role.ADMIN, User.Role.OFFICER]
+            ).exclude(pk=leave.user_id)
+            days = f"{leave.start_date:%b} {leave.start_date.day}"
+            if leave.end_date != leave.start_date:
+                days += f" – {leave.end_date:%b} {leave.end_date.day}"
+            notify(
+                "leave_waiting",
+                officers,
+                f"Leave request from {leave.user}",
+                f"{leave.get_leave_type_display()}, {days}",
+                "/approvals",
+            )
 
     def perform_update(self, serializer):
         if serializer.instance.status != LeaveRequest.Status.PENDING:

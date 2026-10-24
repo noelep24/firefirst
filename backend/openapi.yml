@@ -4084,6 +4084,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalendarLink'
           description: ''
+  /api/v1/me/notifications/:
+    get:
+      operationId: api_v1_me_notifications_list
+      description: '``/me/notifications/`` – which notifications the signed-in member
+        gets on their phone and by email.'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MyChannel'
+          description: ''
+    patch:
+      operationId: api_v1_me_notifications_partial_update
+      description: '``/me/notifications/`` – which notifications the signed-in member
+        gets on their phone and by email.'
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyChannelRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyChannelRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyChannelRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MyChannel'
+          description: ''
   /api/v1/neris/value-sets/:
     get:
       operationId: api_v1_neris_value_sets_retrieve
@@ -4100,6 +4155,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NerisValueSets'
+          description: ''
+  /api/v1/notification-rules/:
+    get:
+      operationId: api_v1_notification_rules_list
+      description: '``/notification-rules/`` – how the department sends each kind
+        of notification (admins).'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChannelRule'
+          description: ''
+    patch:
+      operationId: api_v1_notification_rules_partial_update
+      description: '``/notification-rules/`` – how the department sends each kind
+        of notification (admins).'
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChannelRuleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChannelRuleRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChannelRuleRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChannelRule'
           description: ''
   /api/v1/notifications/:
     get:
@@ -7199,6 +7309,48 @@ components:
           type: string
       required:
       - name
+    ChannelRule:
+      type: object
+      description: One kind of notification and how it goes out.
+      properties:
+        kind:
+          type: string
+        label:
+          type: string
+          readOnly: true
+        audience:
+          type: string
+          readOnly: true
+        required:
+          type: boolean
+          readOnly: true
+          description: Members can't turn it off
+        push:
+          type: boolean
+        email:
+          type: boolean
+      required:
+      - audience
+      - email
+      - kind
+      - label
+      - push
+      - required
+    ChannelRuleRequest:
+      type: object
+      description: One kind of notification and how it goes out.
+      properties:
+        kind:
+          type: string
+          minLength: 1
+        push:
+          type: boolean
+        email:
+          type: boolean
+      required:
+      - email
+      - kind
+      - push
     ChecklistItem:
       type: object
       properties:
@@ -8589,6 +8741,59 @@ components:
       required:
       - station
       - temporary
+    MyChannel:
+      type: object
+      description: |-
+        One kind of notification for the signed-in member: whether the department sends it by push and email, and
+        whether they want it.
+      properties:
+        kind:
+          type: string
+        label:
+          type: string
+          readOnly: true
+        required:
+          type: boolean
+          readOnly: true
+        department_push:
+          type: boolean
+          readOnly: true
+        department_email:
+          type: boolean
+          readOnly: true
+        push:
+          type: boolean
+          description: The member wants it on their phone
+        email:
+          type: boolean
+          description: The member wants it by email
+      required:
+      - department_email
+      - department_push
+      - email
+      - kind
+      - label
+      - push
+      - required
+    MyChannelRequest:
+      type: object
+      description: |-
+        One kind of notification for the signed-in member: whether the department sends it by push and email, and
+        whether they want it.
+      properties:
+        kind:
+          type: string
+          minLength: 1
+        push:
+          type: boolean
+          description: The member wants it on their phone
+        email:
+          type: boolean
+          description: The member wants it by email
+      required:
+      - email
+      - kind
+      - push
     NerisValue:
       type: object
       properties:

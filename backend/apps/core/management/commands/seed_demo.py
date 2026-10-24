@@ -103,6 +103,8 @@ class Command(BaseCommand):
                 first_name=first,
                 last_name=last,
                 rank=rank,
+                # example.com never delivers, so trial emails (printed in the terminal) can't reach anyone.
+                email=f"{username}@example.com",
                 **kw,
             )
 

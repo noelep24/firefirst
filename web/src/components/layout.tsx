@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardCheck, House, LogOut, Menu, X } from 'lucide-react';
+import { BellRing, ClipboardCheck, House, LogOut, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 
@@ -190,6 +190,10 @@ function UserMenu() {
             <div className="user-name">{name}</div>
             <div className="muted small">{me.role === 'admin' ? 'Department admin' : 'Officer'}</div>
           </div>
+          <Link to="/my-notifications" className="btn btn-ghost btn-sm" onClick={() => setOpen(false)}>
+            <BellRing size={16} aria-hidden="true" />
+            My notifications
+          </Link>
           <CalendarFeedButton />
           <Button small variant="ghost" onClick={logout}>
             <LogOut size={16} aria-hidden="true" />

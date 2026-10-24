@@ -32,6 +32,7 @@ const Import = lazy(() => import('@/pages/Import'));
 const Reports = lazy(() => import('@/pages/Reports'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Training = lazy(() => import('@/pages/Training'));
+const MyNotifications = lazy(() => import('@/pages/MyNotifications'));
 const Incidents = lazy(() => import('@/pages/Incidents'));
 const IncidentDetail = lazy(() => import('@/pages/IncidentDetail'));
 
@@ -69,6 +70,7 @@ function App() {
           <Route path="reports" element={<Reports />} />
           <Route path="events" element={<Events />} />
           <Route path="certifications" element={<Training />} />
+          <Route path="my-notifications" element={<MyNotifications />} />
           <Route path="checklists" element={<Checklists />} />
           <Route path="people" element={<People />} />
           {isAdmin ? <Route path="stations" element={<Stations />} /> : null}

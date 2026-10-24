@@ -43,6 +43,7 @@ def open_vacancy(vacancy, now=None):
             )
             users = User.objects.filter(id__in=[m["user"] for m in candidates])
             notify(
+                "overtime_offer",
                 users,
                 f"Overtime available {_day(vacancy.date)}",
                 f"{describe(vacancy)}. Answer by {_time(vacancy, vacancy.respond_by)}.",
@@ -101,9 +102,21 @@ def hire(vacancy, user, mandatory, by=None):
         status__in=[OvertimeOffer.Status.PENDING, OvertimeOffer.Status.ACCEPTED]
     ).update(status=OvertimeOffer.Status.WITHDRAWN, updated_at=timezone.now())
     kind = "mandatory overtime" if mandatory else "overtime"
-    notify([user], f"You're working {kind} {_day(vacancy.date)}", describe(vacancy), LINK)
+    notify(
+        "overtime_mandatory" if mandatory else "overtime_voluntary",
+        [user],
+        f"You're working {kind} {_day(vacancy.date)}",
+        describe(vacancy),
+        LINK,
+    )
     if vacancy.created_by and vacancy.created_by != by:
-        notify([vacancy.created_by], f"Vacancy filled {_day(vacancy.date)}", f"{user} · {describe(vacancy)}", LINK)
+        notify(
+            "vacancy_filled",
+            [vacancy.created_by],
+            f"Vacancy filled {_day(vacancy.date)}",
+            f"{user} · {describe(vacancy)}",
+            LINK,
+        )
     return shift
 
 
@@ -117,7 +130,7 @@ def cancel(vacancy):
         overtime_offers__vacancy=vacancy,
         overtime_offers__status__in=[OvertimeOffer.Status.PENDING, OvertimeOffer.Status.ACCEPTED],
     )
-    notify(waiting, f"Overtime no longer needed {_day(vacancy.date)}", describe(vacancy), LINK)
+    notify("overtime_withdrawn", waiting, f"Overtime no longer needed {_day(vacancy.date)}", describe(vacancy), LINK)
     vacancy.offers.filter(status__in=[OvertimeOffer.Status.PENDING, OvertimeOffer.Status.ACCEPTED]).update(
         status=OvertimeOffer.Status.WITHDRAWN, updated_at=timezone.now()
     )
@@ -197,7 +210,13 @@ def _hire_from_list(vacancy):
     officers = User.objects.filter(
         department=vacancy.department, is_active=True, role__in=[User.Role.ADMIN, User.Role.OFFICER]
     )
-    notify(officers, f"Vacancy still open {_day(vacancy.date)}", f"No one is available. {describe(vacancy)}", LINK)
+    notify(
+        "vacancy_unfilled",
+        officers,
+        f"Vacancy still open {_day(vacancy.date)}",
+        f"No one is available. {describe(vacancy)}",
+        LINK,
+    )
 
 
 def _day(date):

@@ -1103,6 +1103,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``/me/notifications/`` – which notifications the signed-in member gets on their phone and by email. */
+        get: operations["api_v1_me_notifications_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description ``/me/notifications/`` – which notifications the signed-in member gets on their phone and by email. */
+        patch: operations["api_v1_me_notifications_partial_update"];
+        trace?: never;
+    };
     "/api/v1/neris/value-sets/": {
         parameters: {
             query?: never;
@@ -1118,6 +1136,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notification-rules/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``/notification-rules/`` – how the department sends each kind of notification (admins). */
+        get: operations["api_v1_notification_rules_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description ``/notification-rules/`` – how the department sends each kind of notification (admins). */
+        patch: operations["api_v1_notification_rules_partial_update"];
         trace?: never;
     };
     "/api/v1/notifications/": {
@@ -2221,6 +2257,22 @@ export interface components {
             required_for_all?: boolean;
             notes?: string;
         };
+        /** @description One kind of notification and how it goes out. */
+        ChannelRule: {
+            kind: string;
+            readonly label: string;
+            readonly audience: string;
+            /** @description Members can't turn it off */
+            readonly required: boolean;
+            push: boolean;
+            email: boolean;
+        };
+        /** @description One kind of notification and how it goes out. */
+        ChannelRuleRequest: {
+            kind: string;
+            push: boolean;
+            email: boolean;
+        };
         ChecklistItem: {
             id?: number;
             /** @description e.g. Cab, Pump panel, Compartment 1 */
@@ -2835,6 +2887,32 @@ export interface components {
             /** @description Temporary only: a rig whose crew rides this one meanwhile */
             covering_for?: number | null;
             reason?: string;
+        };
+        /**
+         * @description One kind of notification for the signed-in member: whether the department sends it by push and email, and
+         *     whether they want it.
+         */
+        MyChannel: {
+            kind: string;
+            readonly label: string;
+            readonly required: boolean;
+            readonly department_push: boolean;
+            readonly department_email: boolean;
+            /** @description The member wants it on their phone */
+            push: boolean;
+            /** @description The member wants it by email */
+            email: boolean;
+        };
+        /**
+         * @description One kind of notification for the signed-in member: whether the department sends it by push and email, and
+         *     whether they want it.
+         */
+        MyChannelRequest: {
+            kind: string;
+            /** @description The member wants it on their phone */
+            push: boolean;
+            /** @description The member wants it by email */
+            email: boolean;
         };
         NerisValue: {
             value: string;
@@ -7551,6 +7629,50 @@ export interface operations {
             };
         };
     };
+    api_v1_me_notifications_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyChannel"][];
+                };
+            };
+        };
+    };
+    api_v1_me_notifications_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MyChannelRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["MyChannelRequest"][];
+                "multipart/form-data": components["schemas"]["MyChannelRequest"][];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyChannel"][];
+                };
+            };
+        };
+    };
     api_v1_neris_value_sets_retrieve: {
         parameters: {
             query?: never;
@@ -7566,6 +7688,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NerisValueSets"];
+                };
+            };
+        };
+    };
+    api_v1_notification_rules_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelRule"][];
+                };
+            };
+        };
+    };
+    api_v1_notification_rules_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChannelRuleRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["ChannelRuleRequest"][];
+                "multipart/form-data": components["schemas"]["ChannelRuleRequest"][];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelRule"][];
                 };
             };
         };
