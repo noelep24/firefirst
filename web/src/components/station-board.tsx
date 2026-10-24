@@ -72,14 +72,14 @@ function BoardView({ board, onPickStation }: { board: Board; onPickStation: (id:
       </Card>
 
       {board.stations.length > 1 ? (
-        <div className="tabs" role="tablist" aria-label="Station">
+        <div className="station-toggle" role="tablist" aria-label="Station">
           {board.stations.map((s) => (
             <button
               key={s.id}
               type="button"
               role="tab"
               aria-selected={s.id === station?.id}
-              className={`tab ${s.id === station?.id ? 'active' : ''}`}
+              className={s.id === station?.id ? 'active' : ''}
               onClick={() => onPickStation(s.id)}>
               Station {s.number}
             </button>
