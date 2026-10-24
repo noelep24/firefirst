@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from apps.core.permissions import IsDepartmentMember, IsOfficer, IsOfficerOrReadOnly
 from apps.core.tenancy import TenantViewSet
 
+from . import alerts
 from .models import (
     Apparatus,
     ApparatusMove,
@@ -105,7 +106,8 @@ class InspectionViewSet(TenantViewSet):
     filterset_fields = ["apparatus", "template", "performed_by"]
 
     def perform_create(self, serializer):
-        serializer.save(department=self.request.user.department, performed_by=self.request.user)
+        inspection = serializer.save(department=self.request.user.department, performed_by=self.request.user)
+        alerts.rig_check_completed(inspection)
 
 
 @extend_schema_view(
@@ -141,7 +143,8 @@ class WorkOrderViewSet(TenantViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        serializer.save(department=self.request.user.department, reported_by=self.request.user)
+        work_order = serializer.save(department=self.request.user.department, reported_by=self.request.user)
+        alerts.work_orders_opened([work_order])
 
     def perform_destroy(self, instance):
         apparatus = instance.apparatus

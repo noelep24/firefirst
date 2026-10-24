@@ -29,6 +29,15 @@ KINDS = [
     Kind("vacancy_unfilled", "Vacancy nobody could fill", "Officers", email=True, required=True, officers_only=True),
     Kind("leave_waiting", "Leave request waiting", "Officers", officers_only=True),
     Kind("certification_expiring", "Certification expiring", "The member and officers", email=True),
+    Kind(
+        "rig_check_completed",
+        "Rig check completed",
+        "Captains on duty at the rig's station",
+        push=False,
+        email=True,
+        officers_only=True,
+    ),
+    Kind("work_order_new", "New work order", "Admins", email=True, officers_only=True),
 ]
 
 BY_KEY = {kind.key: kind for kind in KINDS}
