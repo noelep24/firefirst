@@ -13,7 +13,7 @@
   --text-2: #645d54;
   --accent: #b3161d;
   --accent-hover: #8f1117;
-  --accent-soft: #f7e4e2;
+  --accent-soft: #f4ebe8;
   --accent-text: #ffffff;
   --brass: #c9a227;
   --brass-deep: #9a7a1c;
@@ -688,7 +688,7 @@ tr.clickable {
   cursor: pointer;
 }
 tr.clickable:hover td {
-  background: var(--accent-soft);
+  background: var(--surface-2);
 }
 
 .field {
@@ -1116,7 +1116,7 @@ fieldset.incident-form {
   padding: 28px;
 }
 
-/* ---------- Home: the department's emblem behind what needs attention and a tile per area ---------- */
+/* ---------- Home: today's station board, the areas down the right, over the department's patch ---------- */
 
 .home {
   position: relative;
@@ -1130,10 +1130,10 @@ fieldset.incident-form {
   z-index: -1;
   top: calc(50% + 30px);
   left: 50%;
-  width: min(70vh, 640px);
+  width: min(72vh, 680px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
-  opacity: 0.05;
+  opacity: 0.16;
   pointer-events: none;
 }
 .home-backdrop img,
@@ -1141,6 +1141,8 @@ fieldset.incident-form {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* Clearly visible, with the reds muted so the patch doesn't wash the page pink. */
+  filter: saturate(0.45) contrast(1.1);
 }
 .home-head {
   display: flex;
@@ -1149,51 +1151,6 @@ fieldset.incident-form {
 }
 .home-head h1 {
   font-size: 1.75rem;
-}
-.attention {
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.attention-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  text-decoration: none;
-  color: var(--text);
-}
-.attention-row + .attention-row {
-  border-top: 1px solid var(--surface-2);
-}
-.attention-row:hover {
-  background: var(--surface-2);
-}
-.attention-label {
-  font-weight: 600;
-  min-width: 140px;
-}
-.attention-arrow {
-  margin-left: auto;
-  color: var(--text-2);
-}
-.attention-clear {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  color: var(--success);
-  font-weight: 600;
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: 50%;
-  background: currentColor;
 }
 .home-hint {
   display: flex;
@@ -1209,57 +1166,121 @@ fieldset.incident-form {
 .home-hint:hover {
   color: var(--text);
 }
-.group-title {
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-2);
-}
-.tile-grid {
+.home-layout {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  align-items: start;
 }
-.tile {
+.home-today {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  border-radius: var(--radius);
+  gap: 14px;
+  min-width: 0;
+}
+
+/* The areas, stacked down the right of the home page. */
+.area-links {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  overflow: hidden;
+  position: sticky;
+  top: 80px;
+}
+.area-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
   color: var(--text);
   text-decoration: none;
-  font-weight: 600;
-  transition:
-    border-color 0.12s,
-    box-shadow 0.12s;
 }
-.tile:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-sm);
+.area-link + .area-link {
+  border-top: 1px solid var(--surface-2);
 }
-.tile-description {
-  color: var(--text-2);
-  font-size: 0.85rem;
-  font-weight: 400;
-  margin-top: -8px;
+.area-link:hover {
+  background: var(--surface-2);
 }
-.tile-icon {
+.area-link-icon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  flex: none;
   border-radius: 10px;
-  background: var(--accent-soft);
+  background: var(--surface-2);
   color: var(--accent);
 }
-@media (prefers-reduced-motion: reduce) {
-  .tile {
-    transition: none;
+.area-link-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.area-link-label {
+  font-weight: 600;
+}
+.area-link-description,
+.area-link-alert {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.area-link-description {
+  color: var(--text-2);
+}
+.area-link-alert {
+  font-weight: 600;
+}
+.area-link-arrow {
+  flex: none;
+  color: var(--text-2);
+}
+
+/* Switch between stations: a two-way (or more) toggle. */
+.station-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+.station-toggle button {
+  border: none;
+  border-radius: 9px;
+  padding: 7px 18px;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.station-toggle button:hover {
+  color: var(--text);
+}
+.station-toggle button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 1100px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+  .area-links {
+    position: static;
+  }
+}
+@media (max-width: 860px) {
+  .home-head h1 {
+    font-size: 1.4rem;
   }
 }
 
