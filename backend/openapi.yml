@@ -4929,6 +4929,103 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/report-schedules/:
+    get:
+      operationId: api_v1_report_schedules_list
+      description: '``/report-schedules/`` – which reports are emailed, when, and
+        to whom (admins).'
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportSchedule'
+          description: ''
+    patch:
+      operationId: api_v1_report_schedules_partial_update
+      description: '``/report-schedules/`` – which reports are emailed, when, and
+        to whom (admins).'
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReportScheduleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReportScheduleRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReportScheduleRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportSchedule'
+          description: ''
+  /api/v1/report-schedules/{report}/preview/:
+    get:
+      operationId: api_v1_report_schedules_preview_retrieve
+      description: '``GET /report-schedules/<report>/preview/`` – today''s report,
+        as it would be emailed.'
+      parameters:
+      - in: path
+        name: report
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportPreview'
+          description: ''
+  /api/v1/report-schedules/{report}/send-test/:
+    post:
+      operationId: api_v1_report_schedules_send_test_create
+      description: '``POST /report-schedules/<report>/send-test/`` – email today''s
+        report to yourself.'
+      parameters:
+      - in: path
+        name: report
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/reports/:
     get:
       operationId: api_v1_reports_list
@@ -6999,6 +7096,16 @@ components:
         * `declined` - Declined
         * `attended` - Attended
         * `absent` - Absent
+    AudienceEnum:
+      enum:
+      - officers
+      - admins
+      - nobody
+      type: string
+      description: |-
+        * `officers` - Officers and admins
+        * `admins` - Admins only
+        * `nobody` - Only the extra addresses
     AuditEntry:
       type: object
       properties:
@@ -10749,6 +10856,85 @@ components:
       - slug
       - title
       - uses_dates
+    ReportPreview:
+      type: object
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+      required:
+      - body
+      - subject
+    ReportSchedule:
+      type: object
+      properties:
+        report:
+          type: string
+        label:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        weekly:
+          type: boolean
+          readOnly: true
+        enabled:
+          type: boolean
+        send_at:
+          type: string
+          format: time
+        weekday:
+          type: integer
+          maximum: 6
+          minimum: 0
+        audience:
+          $ref: '#/components/schemas/AudienceEnum'
+        extra_emails:
+          type: string
+          default: ''
+        last_sent_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+      required:
+      - audience
+      - description
+      - enabled
+      - label
+      - last_sent_on
+      - report
+      - send_at
+      - weekday
+      - weekly
+    ReportScheduleRequest:
+      type: object
+      properties:
+        report:
+          type: string
+          minLength: 1
+        enabled:
+          type: boolean
+        send_at:
+          type: string
+          format: time
+        weekday:
+          type: integer
+          maximum: 6
+          minimum: 0
+        audience:
+          $ref: '#/components/schemas/AudienceEnum'
+        extra_emails:
+          type: string
+          default: ''
+      required:
+      - audience
+      - enabled
+      - report
+      - send_at
+      - weekday
     ReviewRequest:
       type: object
       properties:

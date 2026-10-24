@@ -1422,6 +1422,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/report-schedules/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``/report-schedules/`` – which reports are emailed, when, and to whom (admins). */
+        get: operations["api_v1_report_schedules_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description ``/report-schedules/`` – which reports are emailed, when, and to whom (admins). */
+        patch: operations["api_v1_report_schedules_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/report-schedules/{report}/preview/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description ``GET /report-schedules/<report>/preview/`` – today's report, as it would be emailed. */
+        get: operations["api_v1_report_schedules_preview_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/report-schedules/{report}/send-test/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description ``POST /report-schedules/<report>/send-test/`` – email today's report to yourself. */
+        post: operations["api_v1_report_schedules_send_test_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reports/": {
         parameters: {
             query?: never;
@@ -2124,6 +2176,13 @@ export interface components {
          * @enum {string}
          */
         AttendanceStatusEnum: "invited" | "going" | "declined" | "attended" | "absent";
+        /**
+         * @description * `officers` - Officers and admins
+         *     * `admins` - Admins only
+         *     * `nobody` - Only the extra addresses
+         * @enum {string}
+         */
+        AudienceEnum: "officers" | "admins" | "nobody";
         AuditEntry: {
             readonly id: number;
             /** Format: date-time */
@@ -3936,6 +3995,35 @@ export interface components {
             title: string;
             description: string;
             uses_dates: boolean;
+        };
+        ReportPreview: {
+            subject: string;
+            body: string;
+        };
+        ReportSchedule: {
+            report: string;
+            readonly label: string;
+            readonly description: string;
+            readonly weekly: boolean;
+            enabled: boolean;
+            /** Format: time */
+            send_at: string;
+            weekday: number;
+            audience: components["schemas"]["AudienceEnum"];
+            /** @default  */
+            extra_emails: string;
+            /** Format: date */
+            readonly last_sent_on: string | null;
+        };
+        ReportScheduleRequest: {
+            report: string;
+            enabled: boolean;
+            /** Format: time */
+            send_at: string;
+            weekday: number;
+            audience: components["schemas"]["AudienceEnum"];
+            /** @default  */
+            extra_emails: string;
         };
         ReviewRequest: {
             note?: string;
@@ -8348,6 +8436,91 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_v1_report_schedules_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSchedule"][];
+                };
+            };
+        };
+    };
+    api_v1_report_schedules_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportScheduleRequest"][];
+                "application/x-www-form-urlencoded": components["schemas"]["ReportScheduleRequest"][];
+                "multipart/form-data": components["schemas"]["ReportScheduleRequest"][];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSchedule"][];
+                };
+            };
+        };
+    };
+    api_v1_report_schedules_preview_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportPreview"];
+                };
+            };
+        };
+    };
+    api_v1_report_schedules_send_test_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report: string;
+            };
             cookie?: never;
         };
         requestBody?: never;

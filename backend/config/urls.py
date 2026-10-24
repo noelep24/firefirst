@@ -17,6 +17,7 @@ from apps.imports import views as imports
 from apps.incidents import views as incidents
 from apps.inventory import views as inventory
 from apps.notifications import views as notifications
+from apps.reports import schedule_views as report_schedules
 from apps.reports import views as reports
 from apps.scheduling import views as scheduling
 
@@ -74,6 +75,17 @@ api_v1 = [
     path("push-devices/", notifications.PushDeviceView.as_view(), name="push-devices"),
     path("notification-rules/", notifications.NotificationRulesView.as_view(), name="notification-rules"),
     path("me/notifications/", notifications.MyNotificationsView.as_view(), name="my-notifications"),
+    path("report-schedules/", report_schedules.ReportSchedulesView.as_view(), name="report-schedules"),
+    path(
+        "report-schedules/<slug:report>/preview/",
+        report_schedules.ReportPreviewView.as_view(),
+        name="report-preview",
+    ),
+    path(
+        "report-schedules/<slug:report>/send-test/",
+        report_schedules.ReportTestSendView.as_view(),
+        name="report-send-test",
+    ),
     path("neris/value-sets/", incidents.NerisValueSetsView.as_view(), name="neris-value-sets"),
     path("shift-calendar/", scheduling.ShiftCalendarView.as_view(), name="shift-calendar"),
     path("staffing/", scheduling.StaffingOutlookView.as_view(), name="staffing"),

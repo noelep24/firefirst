@@ -49,10 +49,11 @@ year-long caching for fingerprinted web assets, and logs on stdout.
 
 ## Scheduled jobs
 
-Run every 5 minutes:
+Run every 5 minutes (every 15 is fine for `send_reports`):
 
 ```bash
 python manage.py process_overtime   # closes volunteering on vacancies whose answer time is up, and hires
+python manage.py send_reports       # emails scheduled reports (morning briefing, weekly overtime) when due
 ```
 
 Deadlines are also acted on whenever someone opens the overtime list or their offers, so a missed run only

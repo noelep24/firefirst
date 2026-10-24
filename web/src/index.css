@@ -1330,6 +1330,20 @@ td.center input[type='checkbox'] {
   }
 }
 
+.report-preview {
+  margin-top: 6px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.report-preview pre {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
 /* ---------- Department settings ---------- */
 
 .logo-picker {
