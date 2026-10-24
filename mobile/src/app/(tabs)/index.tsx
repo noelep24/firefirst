@@ -149,6 +149,7 @@ export default function TodayScreen() {
           );
         }}
       </QueryState>
+      <Button title="My notifications" variant="secondary" onPress={() => router.push('/notifications')} />
       <Button title="Sign out" variant="ghost" onPress={signOut} />
     </Screen>
   );

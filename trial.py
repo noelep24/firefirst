@@ -176,6 +176,8 @@ def main():
     )
     if not has_demo:
         run([venv_python(), "manage.py", "seed_demo"], cwd=BACKEND, env=env)
+    # The day's reminders (certifications expiring). Their emails print below, since the trial doesn't send email.
+    run([venv_python(), "manage.py", "send_reminders"], cwd=BACKEND, env=env)
 
     # 3. Server, reached by the phone through the Expo dev server.
     say(f"Starting the server at {backend}")

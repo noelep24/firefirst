@@ -6,8 +6,10 @@ import { useSearchParams } from 'react-router';
 import { http, type Schemas } from '@/api/http';
 import { useAuth } from '@/auth';
 import { DepartmentEmblem } from '@/components/brand';
-import { Button, Card, ErrorBox, PageHeader, QueryState, Tabs } from '@/components/ui';
+import { Button, Card, ErrorBox, PageHeader, QueryState } from '@/components/ui';
 import { shrinkImage } from '@/lib/image';
+
+import { Rotation, StaffingRules } from './Schedule';
 
 const timezones = [
   'America/New_York',
@@ -20,29 +22,148 @@ const timezones = [
   'America/Puerto_Rico',
 ];
 
+const SECTIONS = [
+  { key: 'department', label: 'Department', hint: 'Name, patch, time zone, NERIS ID' },
+  { key: 'scheduling', label: 'Scheduling', hint: 'Platoons, rotation, minimum staffing' },
+  { key: 'overtime', label: 'Overtime rules', hint: 'Answer time, volunteers, refusals' },
+  { key: 'notifications', label: 'Notifications', hint: 'Phone and email, by event' },
+] as const;
+type Section = (typeof SECTIONS)[number]['key'];
+
 export default function Settings() {
   const department = useQuery({
     queryKey: ['/api/v1/department/'],
     queryFn: () => http.get<Schemas['Department']>('/api/v1/department/'),
   });
   const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') === 'overtime' ? 'overtime' : 'general';
+  // ?tab= is what older links (and the overtime notifications) use.
+  const asked = params.get('section') ?? params.get('tab');
+  const section: Section = SECTIONS.some((s) => s.key === asked) ? (asked as Section) : 'department';
+  const current = SECTIONS.find((s) => s.key === section)!;
   return (
     <div>
-      <PageHeader title="Department settings" />
-      <Tabs<'general' | 'overtime'>
-        value={tab}
-        onChange={(value) => setParams(value === 'general' ? {} : { tab: value }, { replace: true })}
-        options={[
-          { value: 'general', label: 'General' },
-          { value: 'overtime', label: 'Overtime rules' },
-        ]}
-      />
-      {tab === 'general' ? (
-        <QueryState query={department}>{(d) => <SettingsForm department={d} />}</QueryState>
-      ) : (
-        <OvertimeRules />
-      )}
+      <PageHeader title="Settings" subtitle="How FireFirst works for your department." />
+      <div className="settings-layout">
+        <nav className="settings-nav" aria-label="Settings sections">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              className={`settings-link ${s.key === section ? 'active' : ''}`}
+              aria-current={s.key === section ? 'page' : undefined}
+              onClick={() => setParams(s.key === 'department' ? {} : { section: s.key }, { replace: true })}>
+              <span className="settings-link-label">{s.label}</span>
+              <span className="settings-link-hint">{s.hint}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="settings-body stack">
+          <h2>{current.label}</h2>
+          {section === 'department' ? (
+            <QueryState query={department}>{(d) => <SettingsForm department={d} />}</QueryState>
+          ) : null}
+          {section === 'scheduling' ? (
+            <>
+              <Rotation />
+              <h2>Minimum staffing</h2>
+              <StaffingRules />
+            </>
+          ) : null}
+          {section === 'overtime' ? <OvertimeRules /> : null}
+          {section === 'notifications' ? <NotificationRules /> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type Rule = Schemas['ChannelRule'];
+
+/** For each kind of notification, whether it goes to phones, email, or both. Everything also shows in the app. */
+function NotificationRules() {
+  const rules = useQuery({
+    queryKey: ['/api/v1/notification-rules/'],
+    queryFn: () => http.get<Rule[]>('/api/v1/notification-rules/'),
+  });
+  return <QueryState query={rules}>{(r) => <NotificationRulesForm rules={r} />}</QueryState>;
+}
+
+function NotificationRulesForm({ rules }: { rules: Rule[] }) {
+  const queryClient = useQueryClient();
+  const [values, setValues] = useState(rules);
+  const [saved, setSaved] = useState(false);
+  const set = (kind: string, change: Partial<Rule>) => {
+    setSaved(false);
+    setValues(values.map((r) => (r.kind === kind ? { ...r, ...change } : r)));
+  };
+  const save = useMutation({
+    mutationFn: () =>
+      http.patch<Rule[]>(
+        '/api/v1/notification-rules/',
+        values.map(({ kind, push, email }) => ({ kind, push, email })),
+      ),
+    onSuccess: (data) => {
+      setSaved(true);
+      queryClient.setQueryData(['/api/v1/notification-rules/'], data);
+    },
+  });
+
+  return (
+    <div className="stack">
+      <p className="muted">
+        Everything shows in the bell in FireFirst. Choose which also go to members' phones and email. Members can turn
+        off the ones they don't need under their name › Notifications, except those marked required.
+      </p>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Notification</th>
+              <th>Who gets it</th>
+              <th className="center">Phone</th>
+              <th className="center">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {values.map((r) => (
+              <tr key={r.kind}>
+                <td>
+                  <strong>{r.label}</strong>
+                  {r.required ? <span className="muted small"> · required</span> : null}
+                </td>
+                <td className="muted">{r.audience}</td>
+                <td className="center">
+                  <input
+                    type="checkbox"
+                    aria-label={`${r.label} by phone`}
+                    checked={r.push}
+                    onChange={(e) => set(r.kind, { push: e.target.checked })}
+                  />
+                </td>
+                <td className="center">
+                  <input
+                    type="checkbox"
+                    aria-label={`${r.label} by email`}
+                    checked={r.email}
+                    onChange={(e) => set(r.kind, { email: e.target.checked })}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="field-help">
+        Email needs an email service connected when FireFirst is hosted. In the trial, emails are printed in the
+        terminal running trial.py.
+      </p>
+      <ErrorBox error={save.error} />
+      {saved ? <div className="notice">Saved.</div> : null}
+      <div>
+        <Button variant="primary" loading={save.isPending} onClick={() => save.mutate()}>
+          Save
+        </Button>
+      </div>
     </div>
   );
 }

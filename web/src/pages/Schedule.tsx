@@ -10,7 +10,7 @@ import { personLabel, stationLabel } from '@/lib/fields';
 import { addDays, formatDateTime, formatDay, isoDate, parseDate } from '@/lib/format';
 import { labelFor, positions } from '@/lib/labels';
 
-type Tab = 'calendar' | 'roster' | 'overtime' | 'assignments' | 'staffing' | 'rotation';
+type Tab = 'calendar' | 'roster' | 'overtime' | 'assignments';
 
 export default function Schedule() {
   const [params] = useSearchParams();
@@ -27,16 +27,12 @@ export default function Schedule() {
           { value: 'roster', label: 'Daily roster' },
           { value: 'overtime', label: 'Overtime list' },
           { value: 'assignments', label: 'Assignments' },
-          { value: 'staffing', label: 'Staffing rules' },
-          { value: 'rotation', label: 'Platoons & rotation' },
         ]}
       />
       {tab === 'calendar' ? <MonthCalendar /> : null}
       {tab === 'roster' ? <Roster /> : null}
       {tab === 'overtime' ? <Overtime /> : null}
       {tab === 'assignments' ? <Assignments /> : null}
-      {tab === 'staffing' ? <StaffingRules /> : null}
-      {tab === 'rotation' ? <Rotation /> : null}
     </div>
   );
 }
@@ -346,7 +342,8 @@ function Assignments() {
   );
 }
 
-function Rotation() {
+/** Platoons and the rotation they work. Shown in Settings › Scheduling. */
+export function Rotation() {
   return (
     <div className="stack">
       <section className="stack-sm">
@@ -463,7 +460,8 @@ function PlatoonCounts() {
   );
 }
 
-function StaffingRules() {
+/** Minimum staffing per station and position. Shown in Settings › Scheduling. */
+export function StaffingRules() {
   return (
     <div className="stack-sm">
       <p className="muted small">

@@ -1263,6 +1263,73 @@ fieldset.incident-form {
   }
 }
 
+/* ---------- Settings ---------- */
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: sticky;
+  top: 80px;
+}
+.settings-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.settings-link:hover {
+  background: var(--surface-2);
+}
+.settings-link.active {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  outline: 1px solid var(--border);
+}
+.settings-link-label {
+  font-weight: 600;
+}
+.settings-link.active .settings-link-label {
+  color: var(--accent);
+}
+.settings-link-hint {
+  font-size: 0.8rem;
+  color: var(--text-2);
+}
+.settings-body > h2 {
+  margin-bottom: -4px;
+}
+th.center,
+td.center {
+  text-align: center;
+}
+td.center input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+@media (max-width: 860px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-nav {
+    position: static;
+  }
+}
+
 /* ---------- Department settings ---------- */
 
 .logo-picker {
